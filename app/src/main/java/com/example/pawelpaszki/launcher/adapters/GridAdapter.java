@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.example.pawelpaszki.launcher.AppDetail;
 import com.example.pawelpaszki.launcher.AppsListActivity;
 import com.example.pawelpaszki.launcher.R;
+import com.example.pawelpaszki.launcher.utils.BitMapFilter;
 
 import java.util.List;
 
@@ -84,7 +85,9 @@ public class GridAdapter extends BaseAdapter{
             text = text.substring(0,11) + "...";
         }
         textView.setText(text);
-        imageView.setImageDrawable(apps.get(position).getIcon());
+        Bitmap immutableBmp= ((BitmapDrawable)apps.get(position).getIcon()).getBitmap();
+        Bitmap mutableBitmap=immutableBmp.copy(Bitmap.Config.ARGB_8888, true);
+        imageView.setImageDrawable(RoundedBitmapDrawableFactory.create(v.getResources(), BitMapFilter.applyFilter(v, mutableBitmap)));
         Bitmap bitmap = BitmapFactory.decodeResource(v.getResources(), R.mipmap.imageviewbg);
         RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(v.getResources(), bitmap);
         roundedBitmapDrawable.setCornerRadius(30f);

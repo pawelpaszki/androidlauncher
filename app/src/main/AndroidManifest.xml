@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.pawelpaszki.launcher">
-
+    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
     <application
+
         android:allowBackup="true"
         android:fitsSystemWindows="true"
         android:orientation="vertical"
