@@ -32,6 +32,7 @@ import com.example.pawelpaszki.launcher.AppsListActivity;
 import com.example.pawelpaszki.launcher.R;
 import com.example.pawelpaszki.launcher.utils.BitMapFilter;
 import com.example.pawelpaszki.launcher.utils.IconLoader;
+import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
 import java.util.List;
 
@@ -41,10 +42,10 @@ public class GridAdapter extends BaseAdapter{
     Context context;
     PackageManager manager;
     private static LayoutInflater inflater=null;
-    public GridAdapter(AppsListActivity mainActivity, List<AppDetail> apps, PackageManager manager) {
+    public GridAdapter(AppsListActivity appsListActivity, List<AppDetail> apps, PackageManager manager) {
         // TODO Auto-generated constructor stub
         this.apps=apps;
-        context=mainActivity;
+        context=appsListActivity;
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.imageviewbg);
         bgIcon = icon.copy(Bitmap.Config.ARGB_8888, true);
         Canvas canvas = new Canvas(bgIcon);
@@ -130,6 +131,7 @@ public class GridAdapter extends BaseAdapter{
             @Override
             public void onClick(View v) {
                 Intent i = manager.getLaunchIntentForPackage(apps.get(position).getName().toString());
+                SharedPrefs.increaseNumberOfActivityStarts(apps.get(position).getLabel().toString(), context);
                 context.startActivity(i);
             }
         });

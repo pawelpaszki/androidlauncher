@@ -10,6 +10,7 @@ public class AppDetail {
     private CharSequence label;
     private CharSequence name;
     private Drawable icon;
+    private int numberOfStarts;
 
     public CharSequence getLabel() {
         return this.label;
@@ -33,5 +34,13 @@ public class AppDetail {
 
     public void setIcon(Drawable icon) {
         this.icon = icon;
+    }
+
+    public int getNumberOfStarts() {
+        return numberOfStarts;
+    }
+
+    public void setNumberOfStarts(int numberOfStarts) {
+        this.numberOfStarts = numberOfStarts;
     }
 }

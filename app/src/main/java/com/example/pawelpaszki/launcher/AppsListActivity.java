@@ -2,22 +2,24 @@ package com.example.pawelpaszki.launcher;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.RelativeLayout;
 
 import com.example.pawelpaszki.launcher.adapters.GridAdapter;
+import com.example.pawelpaszki.launcher.utils.NoOfStartsSorter;
+import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-
 import static com.example.pawelpaszki.launcher.animations.SlideAnimation.*;
 
 public class AppsListActivity extends Activity {
@@ -25,32 +27,23 @@ public class AppsListActivity extends Activity {
     private PackageManager manager;
     private List<AppDetail> apps;
     private boolean menuVisible = false;
+    private boolean reverseList = false;
     private Button settings;
     private Button sort_az;
     private Button sort_most_used;
     private RelativeLayout menu_options;
     GridView gv;
+    private Handler handler;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        handler = new Handler();
         setContentView(R.layout.activity_apps_list);
         loadApps();
         gv=(GridView) findViewById(R.id.gridView);
 
         gv.setAdapter(new GridAdapter(this, apps, manager));
         gv.setFastScrollEnabled(true);
-    }
-
-    public String getSortingMethod() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        return prefs.getString("sortingMethod", "name");
-    }
-
-    public void setSortingMethod(String sortValue) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("sortingMethod", sortValue);
-        editor.commit();
     }
 
     private void loadApps(){
@@ -66,7 +59,40 @@ public class AppsListActivity extends Activity {
             app.setLabel(ri.loadLabel(manager));
             app.setName(ri.activityInfo.packageName);
             app.setIcon(ri.activityInfo.loadIcon(manager));
+            app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
             apps.add(app);
+            Log.i("app starts", String.valueOf(ri.loadLabel(manager)) + " " + SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
+        }
+        Log.i("sorting method", SharedPrefs.getSortingMethod(this));
+        sortApps(SharedPrefs.getSortingMethod(this));
+    }
+
+    private void sortApps(String parameter) {
+        Log.i("sorting method", parameter);
+        if(parameter.equals("name")) {
+            Collections.sort(apps, new Comparator<AppDetail>() {
+                @Override
+                public int compare(AppDetail app1, AppDetail app2) {
+                    return app1.getLabel().toString().compareTo(app2.getLabel().toString());
+                }
+            });
+            if(SharedPrefs.getReverseListOrderFlag(this) == 1) {
+                Collections.reverse(apps);
+            }
+        } else {
+            Collections.sort(apps, new NoOfStartsSorter() {
+                @Override
+                public int compare(AppDetail app1, AppDetail app2) {
+                    if (app1.getNumberOfStarts() > app2.getNumberOfStarts())
+                        return 1;
+                    if (app1.getNumberOfStarts() < app2.getNumberOfStarts())
+                        return -1;
+                    return app1.getLabel().toString().compareTo(app2.getLabel().toString()) * -1;
+                }
+            });
+            if(!(SharedPrefs.getReverseListOrderFlag(this) == 1)) {
+                Collections.reverse(apps);
+            }
         }
     }
 
@@ -84,7 +110,6 @@ public class AppsListActivity extends Activity {
             slideOutToRight(this, sort_az);
 
             slideOutToRight(this, sort_most_used);
-            final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -114,5 +139,41 @@ public class AppsListActivity extends Activity {
         startActivity(intent);
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
         finish();
+    }
+
+    public void sortByName(View view) {
+        if(SharedPrefs.getSortingMethod(this).equals("name")) {
+            if((SharedPrefs.getReverseListOrderFlag(this) == 1)) {
+                SharedPrefs.setReverseListOrderFlag(0,this);
+            } else {
+                SharedPrefs.setReverseListOrderFlag(1,this);
+            }
+        }
+        SharedPrefs.setSortingMethod(this,"name");
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                AppsListActivity.this.recreate();
+            }
+        }, 100);
+    }
+
+
+    public void sortByMostUsed(View view) {
+        if(!SharedPrefs.getSortingMethod(this).equals("name")) {
+            if((SharedPrefs.getReverseListOrderFlag(this) == 1)) {
+                SharedPrefs.setReverseListOrderFlag(0,this);
+            } else {
+                SharedPrefs.setReverseListOrderFlag(1,this);
+            }
+        }
+
+        SharedPrefs.setSortingMethod(this,"mostUsed");
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                AppsListActivity.this.recreate();
+            }
+        }, 100);
     }
 }

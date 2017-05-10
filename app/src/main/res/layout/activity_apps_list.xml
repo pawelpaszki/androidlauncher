@@ -32,6 +32,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"
             android:layout_toLeftOf="@+id/sort_az"
+            android:onClick="sortByMostUsed"
             android:visibility="gone"/>
         <Button
             android:id="@+id/sort_az"
@@ -42,6 +43,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"
             android:layout_toLeftOf="@+id/arrow"
+            android:onClick="sortByName"
             android:visibility="gone"/>
         <Button
             android:id="@+id/arrow"
