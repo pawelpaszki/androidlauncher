@@ -112,6 +112,7 @@ public class HomeActivity extends Activity {
         //startIntentService();
         Intent i = new Intent(this, AppsListActivity.class);
         startActivity(i);
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 
     @Override
