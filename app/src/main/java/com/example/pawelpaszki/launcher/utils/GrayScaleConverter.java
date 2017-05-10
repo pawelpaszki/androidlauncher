@@ -1,7 +1,12 @@
 package com.example.pawelpaszki.launcher.utils;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.util.Log;
 
 import static android.graphics.Bitmap.Config.ARGB_8888;
@@ -43,12 +48,24 @@ public class GrayScaleConverter {
                     int green = (int) (G * 0.72);
                     int blue = (int) (B * 0.07);
                     int sum = red + green + blue;
-                    int RGB = android.graphics.Color.argb(A, sum, sum, blue * 10);
+                    int RGB = android.graphics.Color.argb(A, sum, sum, sum);
                     newImage.setPixel(x, y, RGB);
                 }
             }
         }
-        return image;
+        return darkenBitMap(image);
+    }
+
+    private static Bitmap darkenBitMap(Bitmap bm) {
+
+        Canvas canvas = new Canvas(bm);
+        Paint p = new Paint(Color.RED);
+        //ColorFilter filter = new LightingColorFilter(0xFFFFFFFF , 0x00222222); // lighten
+        ColorFilter filter = new LightingColorFilter(0xFF262626, 0x00000000);    // darken
+        p.setColorFilter(filter);
+        canvas.drawBitmap(bm, new Matrix(), p);
+
+        return bm;
     }
 
     public static boolean isTransparent(Bitmap image, int x, int y) {

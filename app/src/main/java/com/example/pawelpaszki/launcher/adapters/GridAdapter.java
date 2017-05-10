@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -30,10 +31,12 @@ import com.example.pawelpaszki.launcher.AppDetail;
 import com.example.pawelpaszki.launcher.AppsListActivity;
 import com.example.pawelpaszki.launcher.R;
 import com.example.pawelpaszki.launcher.utils.BitMapFilter;
+import com.example.pawelpaszki.launcher.utils.IconLoader;
 
 import java.util.List;
 
 public class GridAdapter extends BaseAdapter{
+    private final Bitmap bgIcon;
     List<AppDetail> apps;
     Context context;
     PackageManager manager;
@@ -42,11 +45,17 @@ public class GridAdapter extends BaseAdapter{
         // TODO Auto-generated constructor stub
         this.apps=apps;
         context=mainActivity;
+        Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.imageviewbg);
+        bgIcon = icon.copy(Bitmap.Config.ARGB_8888, true);
+        Canvas canvas = new Canvas(bgIcon);
+        canvas.drawARGB(5,255,255,255);
         this.manager = manager;
         inflater = ( LayoutInflater )context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
+
+
 
     @Override
     public int getCount() {
@@ -85,13 +94,37 @@ public class GridAdapter extends BaseAdapter{
             text = text.substring(0,11) + "...";
         }
         textView.setText(text);
-        Bitmap immutableBmp= ((BitmapDrawable)apps.get(position).getIcon()).getBitmap();
-        Bitmap mutableBitmap=immutableBmp.copy(Bitmap.Config.ARGB_8888, true);
-        imageView.setImageDrawable(RoundedBitmapDrawableFactory.create(v.getResources(), BitMapFilter.applyFilter(v, mutableBitmap)));
-        Bitmap bitmap = BitmapFactory.decodeResource(v.getResources(), R.mipmap.imageviewbg);
-        RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(v.getResources(), bitmap);
+        //String path = context.getFilesDir().getAbsolutePath();
+//        Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
+//        // set foreground
+//        if(icon != null) {
+//            imageView.setImageDrawable(RoundedBitmapDrawableFactory.create(v.getResources(), icon));//Bitmap.createScaledBitmap(icon, icon.getWidth(), (icon.getHeight() / 6), false)
+//        } else {
+//            Bitmap immutableBmp= ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
+//            Bitmap mutableBitmap=immutableBmp.copy(Bitmap.Config.ARGB_8888, true);
+//            Bitmap iconToSet = BitMapFilter.applyEdgeColors(context.getResources(), mutableBitmap);
+//            //app.setIcon(RoundedBitmapDrawableFactory.create(this.getResources(),iconToSet));
+//            IconLoader.saveIcon(context, iconToSet, (String) apps.get(position).getLabel());
+//            imageView.setImageDrawable(RoundedBitmapDrawableFactory.create(v.getResources(), iconToSet));
+//        }
+//        Bitmap bitmap = BitmapFactory.decodeResource(v.getResources(), R.mipmap.imageviewbg);
+        imageView.setImageDrawable(apps.get(position).getIcon());
+
+//        Bitmap bgIcon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
+//        if(bgIcon != null) {
+//            //imageView.setImageDrawable(RoundedBitmapDrawableFactory.create(v.getResources(), icon));//Bitmap.createScaledBitmap(icon, icon.getWidth(), (icon.getHeight() / 6), false)
+//        } else {
+//            Bitmap immutableBmp= ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
+//            Bitmap mutableBitmap=immutableBmp.copy(Bitmap.Config.ARGB_8888, true);
+//            Bitmap iconToSet = BitMapFilter.getShadow(context.getResources(), mutableBitmap);
+//            //app.setIcon(RoundedBitmapDrawableFactory.create(this.getResources(),iconToSet));
+//            IconLoader.saveIcon(context, iconToSet, (String) apps.get(position).getLabel());
+//            //imageView.setImageDrawable(RoundedBitmapDrawableFactory.create(v.getResources(), iconToSet));
+//        }
+        RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(v.getResources(), bgIcon);
         roundedBitmapDrawable.setCornerRadius(30f);
         imageView.setBackground(roundedBitmapDrawable);
+        // end set
         v.setOnClickListener(new OnClickListener() {
 
             @Override

@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
@@ -18,6 +20,7 @@ import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.adapters.GridAdapter;
 
@@ -35,6 +38,7 @@ public class AppsListActivity extends Activity {
         setContentView(R.layout.activity_apps_list);
         loadApps();
         gv=(GridView) findViewById(R.id.gridView);
+
         gv.setAdapter(new GridAdapter(this, apps, manager));
         gv.setFastScrollEnabled(true);
     }

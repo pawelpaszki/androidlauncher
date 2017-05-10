@@ -18,5 +18,22 @@
         android:onClick="showApps"
         android:drawableStart="@mipmap/apps"
         android:background="@android:color/transparent"/>
-
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@android:style/Widget.Holo.ProgressBar.Large"
+        android:id="@+id/progress"
+        android:visibility="gone"
+        android:layout_above="@+id/progress_text"
+        android:layout_centerHorizontal="true" />
+    <TextView
+        android:background="#00000000"
+        android:id="@+id/progress_text"
+        android:text="@string/progress_bar_text"
+        android:textSize="16dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_width="wrap_content"/>
 </RelativeLayout>

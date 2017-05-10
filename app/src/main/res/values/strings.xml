@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Launcher</string>
+    <string name="progress_bar_text">Please wait while your icons are being prepared</string>
 </resources>
