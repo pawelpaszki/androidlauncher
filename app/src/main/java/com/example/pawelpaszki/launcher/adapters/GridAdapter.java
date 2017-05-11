@@ -11,6 +11,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -49,7 +51,7 @@ public class GridAdapter extends BaseAdapter{
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.imageviewbg);
         bgIcon = icon.copy(Bitmap.Config.ARGB_8888, true);
         Canvas canvas = new Canvas(bgIcon);
-        canvas.drawARGB(5,255,255,255);
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         this.manager = manager;
         inflater = ( LayoutInflater )context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -91,9 +93,9 @@ public class GridAdapter extends BaseAdapter{
         ImageView imageView=(ImageView) v.findViewById(R.id.item_app_icon);
 
         String text = (String) apps.get(position).getLabel();
-        if(text.length() > 14) {
-            text = text.substring(0,11) + "...";
-        }
+//        if(text.length() > 14) {
+//            text = text.substring(0,11) + "...";
+//        }
         textView.setText(text);
         //String path = context.getFilesDir().getAbsolutePath();
 //        Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());

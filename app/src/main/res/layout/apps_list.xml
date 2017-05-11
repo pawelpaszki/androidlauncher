@@ -8,11 +8,9 @@
         android:id="@+id/item_app_icon"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:background="@mipmap/imageviewbg"
-        android:padding="10dp"
         />
 
     <TextView
@@ -24,6 +22,8 @@
         android:textStyle="bold"
         android:textColor="#ffffff"
         android:layout_marginBottom="12dp"
+        android:maxLines="1"
+        android:ellipsize="end"
 
         />
 
