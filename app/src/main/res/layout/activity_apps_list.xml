@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
-    android:background="@drawable/background"
 
     tools:context=".AppsListActivity" >
     <RelativeLayout
@@ -22,6 +21,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"
             android:layout_toLeftOf="@+id/sort_most_used"
+            android:onClick="showSettings"
             android:visibility="gone"/>
         <Button
             android:id="@+id/sort_most_used"

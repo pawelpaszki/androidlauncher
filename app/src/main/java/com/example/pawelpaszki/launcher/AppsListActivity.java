@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.RelativeLayout;
@@ -20,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import static com.example.pawelpaszki.launcher.animations.SlideAnimation.*;
+
+import static com.example.pawelpaszki.launcher.animations.SlideAnimation.slideInFromRight;
+import static com.example.pawelpaszki.launcher.animations.SlideAnimation.slideOutToRight;
 
 public class AppsListActivity extends Activity {
 
@@ -39,11 +44,22 @@ public class AppsListActivity extends Activity {
         super.onCreate(savedInstanceState);
         handler = new Handler();
         setContentView(R.layout.activity_apps_list);
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setNavigationBarColor(Color.TRANSPARENT);
         loadApps();
         gv=(GridView) findViewById(R.id.gridView);
 
         gv.setAdapter(new GridAdapter(this, apps, manager));
         gv.setFastScrollEnabled(true);
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
     }
 
     private void loadApps(){
@@ -148,6 +164,8 @@ public class AppsListActivity extends Activity {
             } else {
                 SharedPrefs.setReverseListOrderFlag(1,this);
             }
+        } else {
+            SharedPrefs.setReverseListOrderFlag(0,this);
         }
         SharedPrefs.setSortingMethod(this,"name");
         handler.postDelayed(new Runnable() {
@@ -166,6 +184,8 @@ public class AppsListActivity extends Activity {
             } else {
                 SharedPrefs.setReverseListOrderFlag(1,this);
             }
+        } else {
+            SharedPrefs.setReverseListOrderFlag(0,this);
         }
 
         SharedPrefs.setSortingMethod(this,"mostUsed");
@@ -175,5 +195,11 @@ public class AppsListActivity extends Activity {
                 AppsListActivity.this.recreate();
             }
         }, 100);
+    }
+
+    public void showSettings(View view) {
+        Intent i = new Intent(this, SettingsActivity.class);
+        startActivity(i);
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 }

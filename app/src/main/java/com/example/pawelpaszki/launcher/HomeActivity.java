@@ -1,33 +1,21 @@
 package com.example.pawelpaszki.launcher;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ProgressDialog;
 import android.app.WallpaperManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
-import android.support.annotation.MainThread;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.services.MyIntentService;
-import com.example.pawelpaszki.launcher.utils.BitMapFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,6 +32,10 @@ public class HomeActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setNavigationBarColor(Color.TRANSPARENT);
 
         WallpaperManager myWallpaperManager
                 = WallpaperManager.getInstance(getApplicationContext());
@@ -56,6 +48,11 @@ public class HomeActivity extends Activity {
         //startIntentService();
 
         //
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     public void startIntentService() {
