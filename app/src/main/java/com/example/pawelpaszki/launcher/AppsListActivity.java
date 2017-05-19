@@ -184,43 +184,44 @@ public class AppsListActivity extends Activity {
         }
     }
 
-    public void toggleMenu(View view) {
-        Toast.makeText(this,String.valueOf(SharedPrefs.getNumberOfColumns(this)) ,
-                Toast.LENGTH_LONG).show();
-        this.menuVisible = !menuVisible;
-        menu_options = (RelativeLayout) findViewById(R.id.options);
-        Button toggle_menu = (Button) findViewById(R.id.arrow);
-        sort_az = (Button) findViewById(R.id.sort_az);
-        sort_most_used = (Button) findViewById(R.id.sort_most_used);
-        settings = (Button) findViewById(R.id.settings);
-        if(!this.menuVisible) {
+//    public void toggleMenu(View view) {
+//        Toast.makeText(this,String.valueOf(SharedPrefs.getNumberOfColumns(this)) ,
+//                Toast.LENGTH_LONG).show();
+//        this.menuVisible = !menuVisible;
+//        menu_options = (RelativeLayout) findViewById(R.id.options);
+//        Button toggle_menu = (Button) findViewById(R.id.arrow);
+//        sort_az = (Button) findViewById(R.id.sort_az);
+//        sort_most_used = (Button) findViewById(R.id.sort_most_used);
+//        settings = (Button) findViewById(R.id.settings);
+//        if(!this.menuVisible) {
+//
+//            slideOutToRight(this, settings);
+//
+//            slideOutToRight(this, sort_az);
+//
+//            slideOutToRight(this, sort_most_used);
+//            handler.postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    menu_options.setBackgroundColor(android.graphics.Color.argb(0, 255, 255, 255));
+//                    settings.setVisibility(View.GONE);
+//                    sort_az.setVisibility(View.GONE);
+//                    sort_most_used.setVisibility(View.GONE);
+//                }
+//            }, 300);
+//            toggle_menu.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.left_arrow, 0, 0, 0);
+//        } else {
+//            menu_options.setBackgroundColor(android.graphics.Color.argb(102, 255, 255, 255));
+//            settings.setVisibility(View.VISIBLE);
+//            slideInFromRight(this, settings);
+//            sort_az.setVisibility(View.VISIBLE);
+//            slideInFromRight(this, sort_az);
+//            sort_most_used.setVisibility(View.VISIBLE);
+//            slideInFromRight(this, sort_most_used);
+//            toggle_menu.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.right_arrow, 0, 0, 0);
+//        }
+//    }
 
-            slideOutToRight(this, settings);
-
-            slideOutToRight(this, sort_az);
-
-            slideOutToRight(this, sort_most_used);
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    menu_options.setBackgroundColor(android.graphics.Color.argb(0, 255, 255, 255));
-                    settings.setVisibility(View.GONE);
-                    sort_az.setVisibility(View.GONE);
-                    sort_most_used.setVisibility(View.GONE);
-                }
-            }, 300);
-            toggle_menu.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.left_arrow, 0, 0, 0);
-        } else {
-            menu_options.setBackgroundColor(android.graphics.Color.argb(102, 255, 255, 255));
-            settings.setVisibility(View.VISIBLE);
-            slideInFromRight(this, settings);
-            sort_az.setVisibility(View.VISIBLE);
-            slideInFromRight(this, sort_az);
-            sort_most_used.setVisibility(View.VISIBLE);
-            slideInFromRight(this, sort_most_used);
-            toggle_menu.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.right_arrow, 0, 0, 0);
-        }
-    }
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(this, HomeActivity.class);
@@ -231,43 +232,4 @@ public class AppsListActivity extends Activity {
         finish();
     }
 
-    public void sortByName(View view) {
-        if(SharedPrefs.getSortingMethod(this).equals("name")) {
-            if((SharedPrefs.getReverseListOrderFlag(this) == 1)) {
-                SharedPrefs.setReverseListOrderFlag(0,this);
-            } else {
-                SharedPrefs.setReverseListOrderFlag(1,this);
-            }
-        } else {
-            SharedPrefs.setReverseListOrderFlag(0,this);
-        }
-        SharedPrefs.setSortingMethod(this,"name");
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                AppsListActivity.this.recreate();
-            }
-        }, 100);
-    }
-
-
-    public void sortByMostUsed(View view) {
-        if(!SharedPrefs.getSortingMethod(this).equals("name")) {
-            if((SharedPrefs.getReverseListOrderFlag(this) == 1)) {
-                SharedPrefs.setReverseListOrderFlag(0,this);
-            } else {
-                SharedPrefs.setReverseListOrderFlag(1,this);
-            }
-        } else {
-            SharedPrefs.setReverseListOrderFlag(0,this);
-        }
-
-        SharedPrefs.setSortingMethod(this,"mostUsed");
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                AppsListActivity.this.recreate();
-            }
-        }, 100);
-    }
 }

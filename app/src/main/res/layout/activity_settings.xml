@@ -118,4 +118,18 @@
     <View style="@style/Divider"
         android:id="@+id/div4"
         android:layout_below="@+id/no_of_columns"/>
+    <TextView
+        android:id="@+id/set_wallpaper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/div4"
+        android:padding="12dp"
+        android:textSize="16sp"
+        android:textColor="#1A237E"
+        android:text="@string/change_wallpaper"
+        android:onClick="changeWallpaper"/>
+    <View style="@style/Divider"
+        android:id="@+id/div5"
+        android:layout_below="@+id/set_wallpaper"/>
 </RelativeLayout>

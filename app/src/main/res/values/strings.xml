@@ -22,6 +22,8 @@
     <string name="select_visible_apps">Select which apps are shown</string>
     <string name="show_app_names">Show names of applications</string>
     <string name="no_of_columns">Pick number of items per row</string>
+    <string name="change_wallpaper">Change wallpaper</string>
+    <string name="change_lockscreen">Change lockscreen</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>
         <item>When possible</item>

@@ -84,6 +84,7 @@ public class GridAdapter extends BaseAdapter{
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         View v;
+        int noofCols = SharedPrefs.getNumberOfColumns(context);
         if (convertView == null) {
             LayoutInflater li = inflater;
             v = li.inflate(R.layout.apps_list, null);
@@ -93,17 +94,17 @@ public class GridAdapter extends BaseAdapter{
         ImageView imageView=(ImageView) v.findViewById(R.id.item_app_icon);
         TextView textView=(TextView) v.findViewById(R.id.item_app_label);
         LinearLayout.LayoutParams margins = new LinearLayout.LayoutParams(imageView.getLayoutParams());
-        margins.topMargin = 0;
-        margins.bottomMargin = 0;
-        margins.leftMargin = 2;
-        margins.rightMargin = 2;
-        imageView.setLayoutParams(margins);
-        if(SharedPrefs.getNumberOfColumns(context) < 5) {
+        margins.topMargin = 80 / noofCols;
+        margins.bottomMargin = 80 / noofCols;
+        margins.leftMargin = noofCols;
+        margins.rightMargin = noofCols;
 
+        if(noofCols >= 5 || !SharedPrefs.getShowAppNames(context)) {
+            textView.setVisibility(View.GONE);
+            imageView.setLayoutParams(margins);
+        } else {
             String text = (String) apps.get(position).getLabel();
             textView.setText(text);
-        } else {
-            textView.setVisibility(View.GONE);
         }
 
 

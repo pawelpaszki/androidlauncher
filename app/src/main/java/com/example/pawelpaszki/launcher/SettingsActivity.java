@@ -1,5 +1,6 @@
 package com.example.pawelpaszki.launcher;
 
+import android.app.admin.DevicePolicyManager;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -25,7 +26,7 @@ import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 public class SettingsActivity extends AppCompatActivity {
 
     private Spinner sortSpinner;
-    private CheckBox showAppsCheckBox;
+    private CheckBox showAppNamesCheckBox;
     private Spinner noOfColsSpinner;
 
     @Override
@@ -53,6 +54,11 @@ public class SettingsActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(SettingsActivity.this, parent.getItemAtPosition(position).toString(),
                         Toast.LENGTH_LONG).show();
+                if(parent.getItemAtPosition(position).toString().equals("by name")) {
+                    sortByName();
+                } else {
+                    sortByMostUsed();
+                }
             }
 
             @Override
@@ -61,7 +67,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
         String sortType = SharedPrefs.getSortingMethod(this);
-        if(sortType.equals("mostUsed")) {
+        if(sortType.equals("most used")) {
             sortSpinner.setSelection(1);
         }
 
@@ -74,8 +80,13 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 SharedPrefs.setNumberOfColumns(Integer.parseInt(parent.getItemAtPosition(position).toString()), SettingsActivity.this);
-                Toast.makeText(SettingsActivity.this, parent.getItemAtPosition(position).toString(),
-                        Toast.LENGTH_LONG).show();
+                if(Integer.parseInt(parent.getItemAtPosition(position).toString()) >=5) {
+                    showAppNamesCheckBox.setChecked(false);
+                    SharedPrefs.setShowAppNames(false, SettingsActivity.this);
+                    showAppNamesCheckBox.setEnabled(false);
+                } else {
+                    showAppNamesCheckBox.setEnabled(true);
+                }
             }
 
             @Override
@@ -87,14 +98,43 @@ public class SettingsActivity extends AppCompatActivity {
 
         noOfColsSpinner.setSelection(spinnerPosition - 1);
 
-        showAppsCheckBox = (CheckBox) findViewById(R.id.show_names_checkbox);
-        showAppsCheckBox.setOnClickListener(new View.OnClickListener() {
+        showAppNamesCheckBox = (CheckBox) findViewById(R.id.show_names_checkbox);
+        showAppNamesCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(SettingsActivity.this, ((CheckBox) v).isChecked()? "selected": "not selected",
+                SharedPrefs.setShowAppNames(((CheckBox) v).isChecked(), SettingsActivity.this);
+                Toast.makeText(SettingsActivity.this, String.valueOf(SharedPrefs.getShowAppNames(SettingsActivity.this)),
                         Toast.LENGTH_LONG).show();
             }
         });
+        showAppNamesCheckBox.setChecked(SharedPrefs.getShowAppNames(this));
+    }
+
+    public void sortByName() {
+        if(SharedPrefs.getSortingMethod(this).equals("name")) {
+            if((SharedPrefs.getReverseListOrderFlag(this) == 1)) {
+                SharedPrefs.setReverseListOrderFlag(0,this);
+            } else {
+                SharedPrefs.setReverseListOrderFlag(1,this);
+            }
+        } else {
+            SharedPrefs.setReverseListOrderFlag(0,this);
+        }
+        SharedPrefs.setSortingMethod(this,"name");
+    }
+
+    public void sortByMostUsed() {
+        if(!SharedPrefs.getSortingMethod(this).equals("name")) {
+            if((SharedPrefs.getReverseListOrderFlag(this) == 1)) {
+                SharedPrefs.setReverseListOrderFlag(0,this);
+            } else {
+                SharedPrefs.setReverseListOrderFlag(1,this);
+            }
+        } else {
+            SharedPrefs.setReverseListOrderFlag(0,this);
+        }
+
+        SharedPrefs.setSortingMethod(this,"most used");
     }
 
     @Override
@@ -121,5 +161,11 @@ public class SettingsActivity extends AppCompatActivity {
     public void selectVisibleApps(View view) {
         Toast.makeText(this, "Show visible apps",
                 Toast.LENGTH_LONG).show();
+    }
+
+    public void changeWallpaper(View view) {
+        Intent intent = new Intent(Intent.ACTION_SET_WALLPAPER);
+        startActivity(Intent.createChooser(intent, "Select Wallpaper"));
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 }

@@ -63,4 +63,18 @@ public class SharedPrefs {
         String key = "noOfColumns";
         return prefs.getInt(key, 0);
     }
+
+    public static void setShowAppNames(boolean value, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "showAppNames";
+        editor.putBoolean(key, value);
+        editor.commit();
+    }
+
+    public static boolean getShowAppNames(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "showAppNames";
+        return prefs.getBoolean(key, true);
+    }
 }
