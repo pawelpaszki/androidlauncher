@@ -7,13 +7,17 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.adapters.GridAdapter;
 import com.example.pawelpaszki.launcher.utils.NoOfStartsSorter;
@@ -37,7 +41,8 @@ public class AppsListActivity extends Activity {
     private Button sort_az;
     private Button sort_most_used;
     private RelativeLayout menu_options;
-    GridView gv;
+    private GridView gv;
+    private int noOfCols;
     private Handler handler;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +55,77 @@ public class AppsListActivity extends Activity {
         window.setNavigationBarColor(Color.TRANSPARENT);
         loadApps();
         gv=(GridView) findViewById(R.id.gridView);
-
         gv.setAdapter(new GridAdapter(this, apps, manager));
         gv.setFastScrollEnabled(true);
+        noOfCols = SharedPrefs.getNumberOfColumns(this);
+        if(noOfCols != 0) {
+            gv.setNumColumns(SharedPrefs.getNumberOfColumns(this));
+        }
+
+        detector = new GestureDetectorCompat(this, new MyGestureListener());
+        gv.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                detector.onTouchEvent(event);
+                return false;
+            }
+        });
 
     }
+
+    private GestureDetectorCompat detector;
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        detector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        private static final int SWIPE_THRESHOLD = 100;
+        private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            if(event1 != null && event2 != null) {
+                float diffY = event2.getY() - event1.getY();
+                float diffX = event2.getX() - event1.getX();
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                        if (diffX > 0) {
+
+                        } else {
+                            onSwipeLeft();
+                        }
+                    }
+                } else {
+                    if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+                        if (diffY > 0) {
+
+                        } else {
+
+                        }
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private void onSwipeLeft() {
+        Intent i = new Intent(this, SettingsActivity.class);
+        startActivity(i);
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+    }
+
 
     @Override
     protected void onPause() {
@@ -84,6 +155,7 @@ public class AppsListActivity extends Activity {
     }
 
     private void sortApps(String parameter) {
+
         Log.i("sorting method", parameter);
         if(parameter.equals("name")) {
             Collections.sort(apps, new Comparator<AppDetail>() {
@@ -113,6 +185,8 @@ public class AppsListActivity extends Activity {
     }
 
     public void toggleMenu(View view) {
+        Toast.makeText(this,String.valueOf(SharedPrefs.getNumberOfColumns(this)) ,
+                Toast.LENGTH_LONG).show();
         this.menuVisible = !menuVisible;
         menu_options = (RelativeLayout) findViewById(R.id.options);
         Button toggle_menu = (Button) findViewById(R.id.arrow);
@@ -195,11 +269,5 @@ public class AppsListActivity extends Activity {
                 AppsListActivity.this.recreate();
             }
         }, 100);
-    }
-
-    public void showSettings(View view) {
-        Intent i = new Intent(this, SettingsActivity.class);
-        startActivity(i);
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 }

@@ -26,6 +26,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -89,14 +90,28 @@ public class GridAdapter extends BaseAdapter{
         } else {
             v = convertView;
         }
-        TextView textView=(TextView) v.findViewById(R.id.item_app_label);
         ImageView imageView=(ImageView) v.findViewById(R.id.item_app_icon);
+        TextView textView=(TextView) v.findViewById(R.id.item_app_label);
+        LinearLayout.LayoutParams margins = new LinearLayout.LayoutParams(imageView.getLayoutParams());
+        margins.topMargin = 0;
+        margins.bottomMargin = 0;
+        margins.leftMargin = 2;
+        margins.rightMargin = 2;
+        imageView.setLayoutParams(margins);
+        if(SharedPrefs.getNumberOfColumns(context) < 5) {
 
-        String text = (String) apps.get(position).getLabel();
+            String text = (String) apps.get(position).getLabel();
+            textView.setText(text);
+        } else {
+            textView.setVisibility(View.GONE);
+        }
+
+
+
 //        if(text.length() > 14) {
 //            text = text.substring(0,11) + "...";
 //        }
-        textView.setText(text);
+
         //String path = context.getFilesDir().getAbsolutePath();
 //        Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
 //        // set foreground

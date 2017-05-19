@@ -49,4 +49,18 @@ public class SharedPrefs {
         String key = "reverseList";
         return prefs.getInt(key, 0);
     }
+
+    public static void setNumberOfColumns(int value, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "noOfColumns";
+        editor.putInt(key, value);
+        editor.commit();
+    }
+
+    public static int getNumberOfColumns(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "noOfColumns";
+        return prefs.getInt(key, 0);
+    }
 }
