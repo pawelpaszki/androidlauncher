@@ -77,4 +77,18 @@ public class SharedPrefs {
         String key = "showAppNames";
         return prefs.getBoolean(key, true);
     }
+
+    public static void setAppVisible(boolean visible, String name, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "visible" + name;
+        editor.putBoolean(key, visible);
+        editor.commit();
+    }
+
+    public static boolean getAppVisible(Context context, String name) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "visible" + name;
+        return prefs.getBoolean(key, true);
+    }
 }

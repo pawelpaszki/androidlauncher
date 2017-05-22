@@ -84,7 +84,10 @@ public class GridAdapter extends BaseAdapter{
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         View v;
-        int noofCols = SharedPrefs.getNumberOfColumns(context);
+        int noOfCols = SharedPrefs.getNumberOfColumns(context);
+        if(noOfCols == 0) {
+            noOfCols = 4;
+        }
         if (convertView == null) {
             LayoutInflater li = inflater;
             v = li.inflate(R.layout.apps_list, null);
@@ -94,12 +97,12 @@ public class GridAdapter extends BaseAdapter{
         ImageView imageView=(ImageView) v.findViewById(R.id.item_app_icon);
         TextView textView=(TextView) v.findViewById(R.id.item_app_label);
         LinearLayout.LayoutParams margins = new LinearLayout.LayoutParams(imageView.getLayoutParams());
-        margins.topMargin = 80 / noofCols;
-        margins.bottomMargin = 80 / noofCols;
-        margins.leftMargin = noofCols;
-        margins.rightMargin = noofCols;
+        margins.topMargin = 80 / noOfCols;
+        margins.bottomMargin = 80 / noOfCols;
+        margins.leftMargin = noOfCols;
+        margins.rightMargin = noOfCols;
 
-        if(noofCols >= 5 || !SharedPrefs.getShowAppNames(context)) {
+        if(noOfCols >= 5 || !SharedPrefs.getShowAppNames(context)) {
             textView.setVisibility(View.GONE);
             imageView.setLayoutParams(margins);
         } else {
@@ -113,8 +116,8 @@ public class GridAdapter extends BaseAdapter{
 //            text = text.substring(0,11) + "...";
 //        }
 
-        //String path = context.getFilesDir().getAbsolutePath();
-//        Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
+        String path = context.getFilesDir().getAbsolutePath();
+        Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
 //        // set foreground
 //        if(icon != null) {
 //            imageView.setImageDrawable(RoundedBitmapDrawableFactory.create(v.getResources(), icon));//Bitmap.createScaledBitmap(icon, icon.getWidth(), (icon.getHeight() / 6), false)
@@ -127,7 +130,9 @@ public class GridAdapter extends BaseAdapter{
 //            imageView.setImageDrawable(RoundedBitmapDrawableFactory.create(v.getResources(), iconToSet));
 //        }
 //        Bitmap bitmap = BitmapFactory.decodeResource(v.getResources(), R.mipmap.imageviewbg);
-        imageView.setImageDrawable(apps.get(position).getIcon());
+        //imageView.setImageDrawable(apps.get(position).getIcon());
+        imageView.setImageDrawable(new BitmapDrawable(v.getResources(), icon));
+
 
 //        Bitmap bgIcon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
 //        if(bgIcon != null) {

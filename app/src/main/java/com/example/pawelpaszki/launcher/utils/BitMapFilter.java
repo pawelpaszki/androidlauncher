@@ -20,15 +20,15 @@ import java.util.Random;
 public class BitMapFilter {
 
     public static Bitmap applyFilter(View v, Bitmap image) {
-        image = addTexture(v, GrayScaleConverter.convertToGrayScale(image));
+        image = addTexture(v.getResources(), GrayScaleConverter.convertToGrayScale(image));
         return image;
     }
 
-    public static Bitmap addTexture(View v, Bitmap image) {
+    public static Bitmap addTexture(Resources resources, Bitmap image) {
         int imageHeight = image.getHeight();
         int imageWidth = image.getWidth();
-        Bitmap texture = BitmapFactory.decodeResource(v.getResources(), R.mipmap.texture);
-        texture = Bitmap.createScaledBitmap(texture, image.getWidth(), image.getHeight(), false);
+        Bitmap texture = BitmapFactory.decodeResource(resources, R.mipmap.texture);
+        texture = Bitmap.createBitmap(texture, 0,0, image.getWidth(), image.getHeight());
         for (int x = 0; x < imageWidth; x++) {
             for (int y = 0; y < imageHeight; y++) {
                 int p = texture.getPixel(x, y);
@@ -44,10 +44,11 @@ public class BitMapFilter {
                     double d = Math.random();
                     //image.setPixel(x, y, manipulateColor(pp, 0.7f));
                     image.setPixel(x, y, 0x3949AB);
+                    //image.setPixel(x, y, 0x00000000);
                 }
             }
         }
-        return image;
+        return GrayScaleConverter.convertToGrayScale(image);
     }
 
     public static int manipulateColor(int color, float factor) {

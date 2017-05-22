@@ -95,6 +95,9 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
         int spinnerPosition = SharedPrefs.getNumberOfColumns(this);
+        if(spinnerPosition == 0) {
+            spinnerPosition = 4;
+        }
 
         noOfColsSpinner.setSelection(spinnerPosition - 1);
 
@@ -159,8 +162,9 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public void selectVisibleApps(View view) {
-        Toast.makeText(this, "Show visible apps",
-                Toast.LENGTH_LONG).show();
+        Intent i = new Intent(this, SelectAppsActivity.class);
+        startActivity(i);
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 
     public void changeWallpaper(View view) {
@@ -168,4 +172,5 @@ public class SettingsActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(intent, "Select Wallpaper"));
         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
+
 }

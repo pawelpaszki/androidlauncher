@@ -53,7 +53,7 @@ public class GrayScaleConverter {
                 }
             }
         }
-        return darkenBitMap(image);
+        return image;
     }
 
     private static Bitmap darkenBitMap(Bitmap bm) {

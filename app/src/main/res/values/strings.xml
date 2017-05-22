@@ -24,6 +24,7 @@
     <string name="no_of_columns">Pick number of items per row</string>
     <string name="change_wallpaper">Change wallpaper</string>
     <string name="change_lockscreen">Change lockscreen</string>
+    <string name="toolbar_select_apps">Select visible apps</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>
         <item>When possible</item>

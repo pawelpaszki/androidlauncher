@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
+    android:background="#40000000"
     tools:context=".AppsListActivity" >
     <!--<RelativeLayout-->
         <!--android:id="@+id/options"-->

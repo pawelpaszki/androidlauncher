@@ -100,7 +100,7 @@ public class AppsListActivity extends Activity {
                 if (Math.abs(diffX) > Math.abs(diffY)) {
                     if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                         if (diffX > 0) {
-
+                            onSwipeRight();
                         } else {
                             onSwipeLeft();
                         }
@@ -126,6 +126,14 @@ public class AppsListActivity extends Activity {
         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 
+    private void onSwipeRight() {
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+        finish();
+    }
+
 
     @Override
     protected void onPause() {
@@ -147,7 +155,9 @@ public class AppsListActivity extends Activity {
             app.setName(ri.activityInfo.packageName);
             app.setIcon(ri.activityInfo.loadIcon(manager));
             app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
-            apps.add(app);
+            if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(manager))) {
+                apps.add(app);
+            }
             Log.i("app starts", String.valueOf(ri.loadLabel(manager)) + " " + SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
         }
         Log.i("sorting method", SharedPrefs.getSortingMethod(this));
