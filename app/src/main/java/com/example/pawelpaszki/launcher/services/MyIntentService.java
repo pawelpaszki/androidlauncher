@@ -74,7 +74,7 @@ public class MyIntentService extends IntentService {
             } else {
                 Bitmap immutableBmp= ((BitmapDrawable) ri.activityInfo.loadIcon(manager)).getBitmap();
                 Bitmap mutableBitmap=immutableBmp.copy(Bitmap.Config.ARGB_8888, true);
-                Bitmap iconToSet = BitMapFilter.addTexture(this.getResources(), mutableBitmap);
+                Bitmap iconToSet = mutableBitmap;//BitMapFilter.addTexture(this.getResources(), mutableBitmap);
                 //Bitmap iconToSet = BitMapFilter.getShadow(this.getResources(), mutableBitmap);// BitMapFilter.applyEdgeColors(this.getResources(), mutableBitmap));
                 //app.setIcon(RoundedBitmapDrawableFactory.create(this.getResources(),iconToSet));
                 IconLoader.saveIcon(this, iconToSet, (String) ri.loadLabel(manager));

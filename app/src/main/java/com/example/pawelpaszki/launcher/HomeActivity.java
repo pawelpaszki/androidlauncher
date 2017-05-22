@@ -2,25 +2,38 @@ package com.example.pawelpaszki.launcher;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
-import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.GridView;
+import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.pawelpaszki.launcher.services.MyIntentService;
+import com.example.pawelpaszki.launcher.utils.IconLoader;
+import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,11 +42,15 @@ import java.util.List;
 public class HomeActivity extends Activity {
 
     private Handler handler = new Handler();
-    private List<AppDetail> apps;
+    private List<AppDetail> dockerApps;
     private ProgressBar pb;
     private TextView textView;
     private MyResultReceiver myResultReceiver;
     private GestureDetectorCompat detector;
+    private PackageManager manager;
+    private Context context;
+    private int j;
+    private HorizontalScrollView container;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +79,67 @@ public class HomeActivity extends Activity {
                 return false;
             }
         });
+        context = this;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    private void loadCarousel() {
+        LinearLayout dock = (LinearLayout) findViewById(R.id.dock_list);
+        manager = getPackageManager();
+        dockerApps = new ArrayList<AppDetail>();
+
+        Intent i = new Intent(Intent.ACTION_MAIN, null);
+        i.addCategory(Intent.CATEGORY_LAUNCHER);
+
+        List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
+        for(ResolveInfo ri:availableActivities){
+            AppDetail app = new AppDetail();
+            app.setLabel(ri.loadLabel(manager));
+            app.setName(ri.activityInfo.packageName);
+            app.setIcon(ri.activityInfo.loadIcon(manager));
+            app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
+            if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(manager))) {
+                dockerApps.add(app);
+            }
+        }
+        for(j = 0; j < dockerApps.size(); j++) {
+            View view = LayoutInflater.from(this).inflate(R.layout.dock_item,null);
+            view.setTag((String) dockerApps.get(j).getName());
+            ImageView iv = (ImageView) view.findViewById(R.id.dock_app_icon);
+            final TextView tv = (TextView) view.findViewById(R.id.dock_app_name);
+            String path = this.getFilesDir().getAbsolutePath();
+            Bitmap icon = IconLoader.loadImageFromStorage(path, (String) dockerApps.get(j).getLabel());
+            iv.setImageDrawable(new BitmapDrawable(this.getResources(), icon));
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = manager.getLaunchIntentForPackage(v.getTag().toString());
+                    Log.i("name", v.getTag().toString());
+                    SharedPrefs.increaseNumberOfActivityStarts(((TextView)v.findViewById(R.id.dock_app_name)).getText().toString(), context);
+                    if(intent != null) {
+                        context.startActivity(intent);
+                    } else {
+                        context.startActivity(new Intent(v.getTag().toString()));
+                    }
+
+                }
+            });
+            dock.addView(view);
+
+        }
+
+        container = (HorizontalScrollView) findViewById(R.id.carousel_container);
+        container.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                Log.i("scroll: ", String.valueOf(container.getScrollX()));
+                Log.i("ScrollWidth",Integer.toString(container.getChildAt(0).getMeasuredWidth()));
+            }
+        });
+
     }
 
     @Override
@@ -171,8 +249,7 @@ public class HomeActivity extends Activity {
                     public void run() {
                         pb.setVisibility(View.GONE);
                         textView.setVisibility(View.GONE);
-                        //showApps(HomeActivity.this.findViewById(android.R.id.content).getRootView());
-
+                        loadCarousel();
                     }
                 });
             }

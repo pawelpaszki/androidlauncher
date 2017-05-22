@@ -48,7 +48,7 @@ public class BitMapFilter {
                 }
             }
         }
-        return GrayScaleConverter.convertToGrayScale(image);
+        return image;
     }
 
     public static int manipulateColor(int color, float factor) {

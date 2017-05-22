@@ -5,15 +5,19 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.GestureDetector;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -28,6 +32,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Spinner sortSpinner;
     private CheckBox showAppNamesCheckBox;
     private Spinner noOfColsSpinner;
+    private GestureDetectorCompat detector;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -111,6 +116,66 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
         showAppNamesCheckBox.setChecked(SharedPrefs.getShowAppNames(this));
+        detector = new GestureDetectorCompat(this, new MyGestureListener());
+        RelativeLayout container = (RelativeLayout) findViewById(R.id.settings_container);
+        container.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                detector.onTouchEvent(event);
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        detector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        private static final int SWIPE_THRESHOLD = 100;
+        private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            if(event1 != null && event2 != null) {
+                float diffY = event2.getY() - event1.getY();
+                float diffX = event2.getX() - event1.getX();
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                        if (diffX > 0) {
+                            onSwipeRight();
+                        } else {
+
+                        }
+                    }
+                } else {
+                    if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+                        if (diffY > 0) {
+
+                        } else {
+
+                        }
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private void onSwipeRight() {
+        Intent i = new Intent(SettingsActivity.this, AppsListActivity.class);
+        startActivity(i);
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
     }
 
     public void sortByName() {
@@ -125,6 +190,8 @@ public class SettingsActivity extends AppCompatActivity {
         }
         SharedPrefs.setSortingMethod(this,"name");
     }
+
+
 
     public void sortByMostUsed() {
         if(!SharedPrefs.getSortingMethod(this).equals("name")) {
