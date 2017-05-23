@@ -20,11 +20,8 @@ import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.GridView;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -203,7 +200,7 @@ public class HomeActivity extends Activity {
     private void onSwipeLeft() {
         Intent i = new Intent(HomeActivity.this, AppsListActivity.class);
         startActivity(i);
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
     }
 
 
@@ -279,13 +276,6 @@ public class HomeActivity extends Activity {
                 });
             }
         }
-    }
-
-    public void showApps(View v){
-        //startIntentService();
-        Intent i = new Intent(this, AppsListActivity.class);
-        startActivity(i);
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 
     @Override

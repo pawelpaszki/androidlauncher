@@ -20,7 +20,6 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.utils.IconLoader;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
@@ -116,21 +115,10 @@ public class SelectAppsActivity extends AppCompatActivity {
         if (menuItem.getItemId() == android.R.id.home) {
             Intent intent = new Intent(this, SettingsActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            Log.i("back pressed", "back pressed");
             startActivity(intent);
-            //overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
             finish();
         }
         return super.onOptionsItemSelected(menuItem);
-    }
-
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(this, SettingsActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        Log.i("back pressed", "back pressed");
-        startActivity(intent);
-        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
-        finish();
     }
 }

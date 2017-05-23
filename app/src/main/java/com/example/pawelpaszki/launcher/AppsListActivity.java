@@ -17,20 +17,13 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.adapters.GridAdapter;
 import com.example.pawelpaszki.launcher.utils.AppsSorter;
-import com.example.pawelpaszki.launcher.utils.NoOfStartsSorter;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-
-import static com.example.pawelpaszki.launcher.animations.SlideAnimation.slideInFromRight;
-import static com.example.pawelpaszki.launcher.animations.SlideAnimation.slideOutToRight;
 
 public class AppsListActivity extends Activity {
 
@@ -124,14 +117,14 @@ public class AppsListActivity extends Activity {
     private void onSwipeLeft() {
         Intent i = new Intent(this, SettingsActivity.class);
         startActivity(i);
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
     }
 
     private void onSwipeRight() {
         Intent intent = new Intent(this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
         finish();
     }
 
@@ -239,7 +232,7 @@ public class AppsListActivity extends Activity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
         startActivity(intent);
-        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
         finish();
     }
 

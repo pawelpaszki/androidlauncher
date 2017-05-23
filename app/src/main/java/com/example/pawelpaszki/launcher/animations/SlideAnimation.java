@@ -19,7 +19,7 @@ public class SlideAnimation {
      * @param view
      */
     public static void slideInFromLeft(Context context, View view) {
-        runSimpleAnimation(context, view, R.anim.slide_from_left);
+        runSimpleAnimation(context, view, R.anim.slide_in_left);
     }
 
     /**
@@ -29,7 +29,7 @@ public class SlideAnimation {
      * @param view
      */
     public static void slideOutToLeft(Context context, View view) {
-        runSimpleAnimation(context, view, R.anim.slide_to_left);
+        runSimpleAnimation(context, view, R.anim.slide_out_left);
     }
 
     /**
@@ -39,7 +39,7 @@ public class SlideAnimation {
      * @param view
      */
     public static void slideInFromRight(Context context, View view) {
-        runSimpleAnimation(context, view, R.anim.slide_from_right);
+        runSimpleAnimation(context, view, R.anim.slide_in_right);
     }
 
     /**
@@ -49,7 +49,7 @@ public class SlideAnimation {
      * @param view
      */
     public static void slideOutToRight(Context context, View view) {
-        runSimpleAnimation(context, view, R.anim.slide_to_right);
+        runSimpleAnimation(context, view, R.anim.slide_out_right);
     }
 
     /**

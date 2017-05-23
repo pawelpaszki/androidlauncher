@@ -1,6 +1,5 @@
 package com.example.pawelpaszki.launcher;
 
-import android.app.admin.DevicePolicyManager;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -111,8 +110,6 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 SharedPrefs.setShowAppNames(((CheckBox) v).isChecked(), SettingsActivity.this);
-                Toast.makeText(SettingsActivity.this, String.valueOf(SharedPrefs.getShowAppNames(SettingsActivity.this)),
-                        Toast.LENGTH_LONG).show();
             }
         });
         showAppNamesCheckBox.setChecked(SharedPrefs.getShowAppNames(this));
@@ -175,7 +172,7 @@ public class SettingsActivity extends AppCompatActivity {
     private void onSwipeRight() {
         Intent i = new Intent(SettingsActivity.this, AppsListActivity.class);
         startActivity(i);
-        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
     }
 
     public void sortByName() {
@@ -222,22 +219,21 @@ public class SettingsActivity extends AppCompatActivity {
     public void onBackPressed() {
         Intent intent = new Intent(this, AppsListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-
         startActivity(intent);
-        //overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
         finish();
     }
 
     public void selectVisibleApps(View view) {
         Intent i = new Intent(this, SelectAppsActivity.class);
         startActivity(i);
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
     }
 
     public void changeWallpaper(View view) {
         Intent intent = new Intent(Intent.ACTION_SET_WALLPAPER);
         startActivity(Intent.createChooser(intent, "Select Wallpaper"));
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
     }
 
 }
