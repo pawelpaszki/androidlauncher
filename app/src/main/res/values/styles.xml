@@ -10,7 +10,7 @@
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="windowActionBar">false</item>
         <item name="android:statusBarColor">@color/colorTransparent</item>
-        
+
     </style>
     <style name="Divider">
         <item name="android:layout_width">match_parent</item>

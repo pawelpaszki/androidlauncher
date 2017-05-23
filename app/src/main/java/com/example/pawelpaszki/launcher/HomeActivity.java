@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.v4.view.GestureDetectorCompat;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -32,6 +33,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.pawelpaszki.launcher.services.MyIntentService;
+import com.example.pawelpaszki.launcher.utils.AppsSorter;
 import com.example.pawelpaszki.launcher.utils.IconLoader;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
@@ -93,6 +95,12 @@ public class HomeActivity extends Activity {
 
         Intent i = new Intent(Intent.ACTION_MAIN, null);
         i.addCategory(Intent.CATEGORY_LAUNCHER);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width/6, width/6);
 
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
         for(ResolveInfo ri:availableActivities){
@@ -103,16 +111,21 @@ public class HomeActivity extends Activity {
             app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
             if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(manager))) {
                 dockerApps.add(app);
+                Log.i("no of runs", app.getLabel() + ": " + String.valueOf(app.getNumberOfStarts()));
             }
         }
+        dockerApps = AppsSorter.sortApps(this, dockerApps, "most used");
         for(j = 0; j < dockerApps.size(); j++) {
             View view = LayoutInflater.from(this).inflate(R.layout.dock_item,null);
             view.setTag((String) dockerApps.get(j).getName());
             ImageView iv = (ImageView) view.findViewById(R.id.dock_app_icon);
+
             final TextView tv = (TextView) view.findViewById(R.id.dock_app_name);
             String path = this.getFilesDir().getAbsolutePath();
             Bitmap icon = IconLoader.loadImageFromStorage(path, (String) dockerApps.get(j).getLabel());
             iv.setImageDrawable(new BitmapDrawable(this.getResources(), icon));
+            iv.setLayoutParams(layoutParams);
+            tv.setText((String) dockerApps.get(j).getLabel());
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -131,14 +144,14 @@ public class HomeActivity extends Activity {
 
         }
 
-        container = (HorizontalScrollView) findViewById(R.id.carousel_container);
-        container.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-            @Override
-            public void onScrollChanged() {
-                Log.i("scroll: ", String.valueOf(container.getScrollX()));
-                Log.i("ScrollWidth",Integer.toString(container.getChildAt(0).getMeasuredWidth()));
-            }
-        });
+//        container = (HorizontalScrollView) findViewById(R.id.carousel_container);
+//        container.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+//            @Override
+//            public void onScrollChanged() {
+//                Log.i("scroll: ", String.valueOf(container.getScrollX()));
+//                Log.i("ScrollWidth",Integer.toString(container.getChildAt(0).getMeasuredWidth()));
+//            }
+//        });
 
     }
 
@@ -199,6 +212,12 @@ public class HomeActivity extends Activity {
         super.onResume();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        finish();
+    }
+
     public void startIntentService() {
 
         myResultReceiver = new MyResultReceiver(null);
@@ -225,10 +244,16 @@ public class HomeActivity extends Activity {
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             super.onReceiveResult(resultCode, resultData);
             if (resultCode == 1 && resultData != null) {
-                pb = (ProgressBar) findViewById(R.id.progress);
-                pb.setVisibility(View.VISIBLE);
-                textView = (TextView) findViewById(R.id.progress_text);
-                textView.setVisibility(View.VISIBLE);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        pb = (ProgressBar) findViewById(R.id.progress);
+                        pb.setVisibility(View.VISIBLE);
+                        textView = (TextView) findViewById(R.id.progress_text);
+                        textView.setVisibility(View.VISIBLE);
+                    }
+                });
+
              }
 
             Log.i("MyResultreceiver", Thread.currentThread().getName());

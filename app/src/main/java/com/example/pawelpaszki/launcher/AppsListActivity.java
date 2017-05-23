@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.adapters.GridAdapter;
+import com.example.pawelpaszki.launcher.utils.AppsSorter;
 import com.example.pawelpaszki.launcher.utils.NoOfStartsSorter;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
@@ -161,38 +162,38 @@ public class AppsListActivity extends Activity {
             Log.i("app starts", String.valueOf(ri.loadLabel(manager)) + " " + SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
         }
         Log.i("sorting method", SharedPrefs.getSortingMethod(this));
-        sortApps(SharedPrefs.getSortingMethod(this));
+        apps = AppsSorter.sortApps(this, apps, SharedPrefs.getSortingMethod(this));
     }
 
-    private void sortApps(String parameter) {
-
-        Log.i("sorting method", parameter);
-        if(parameter.equals("name")) {
-            Collections.sort(apps, new Comparator<AppDetail>() {
-                @Override
-                public int compare(AppDetail app1, AppDetail app2) {
-                    return app1.getLabel().toString().compareTo(app2.getLabel().toString());
-                }
-            });
-            if(SharedPrefs.getReverseListOrderFlag(this) == 1) {
-                Collections.reverse(apps);
-            }
-        } else {
-            Collections.sort(apps, new NoOfStartsSorter() {
-                @Override
-                public int compare(AppDetail app1, AppDetail app2) {
-                    if (app1.getNumberOfStarts() > app2.getNumberOfStarts())
-                        return 1;
-                    if (app1.getNumberOfStarts() < app2.getNumberOfStarts())
-                        return -1;
-                    return app1.getLabel().toString().compareTo(app2.getLabel().toString()) * -1;
-                }
-            });
-            if(!(SharedPrefs.getReverseListOrderFlag(this) == 1)) {
-                Collections.reverse(apps);
-            }
-        }
-    }
+//    private void sortApps(String parameter) {
+//
+//        Log.i("sorting method", parameter);
+//        if(parameter.equals("name")) {
+//            Collections.sort(apps, new Comparator<AppDetail>() {
+//                @Override
+//                public int compare(AppDetail app1, AppDetail app2) {
+//                    return app1.getLabel().toString().compareTo(app2.getLabel().toString());
+//                }
+//            });
+//            if(SharedPrefs.getReverseListOrderFlag(this) == 1) {
+//                Collections.reverse(apps);
+//            }
+//        } else {
+//            Collections.sort(apps, new NoOfStartsSorter() {
+//                @Override
+//                public int compare(AppDetail app1, AppDetail app2) {
+//                    if (app1.getNumberOfStarts() > app2.getNumberOfStarts())
+//                        return 1;
+//                    if (app1.getNumberOfStarts() < app2.getNumberOfStarts())
+//                        return -1;
+//                    return app1.getLabel().toString().compareTo(app2.getLabel().toString()) * -1;
+//                }
+//            });
+//            if(!(SharedPrefs.getReverseListOrderFlag(this) == 1)) {
+//                Collections.reverse(apps);
+//            }
+//        }
+//    }
 
 //    public void toggleMenu(View view) {
 //        Toast.makeText(this,String.valueOf(SharedPrefs.getNumberOfColumns(this)) ,
