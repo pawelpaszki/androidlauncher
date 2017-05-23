@@ -68,7 +68,13 @@ public class HomeActivity extends Activity {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        startIntentService();
+
+        /////////////// load/ process icons //////////////
+        //startIntentService();
+
+        // comment out if loading icons from local storage
+        loadCarousel();
+
         detector = new GestureDetectorCompat(this, new MyGestureListener());
         RelativeLayout home = (RelativeLayout) findViewById(R.id.home_container);
         home.setOnTouchListener(new View.OnTouchListener() {
@@ -119,7 +125,12 @@ public class HomeActivity extends Activity {
 
             final TextView tv = (TextView) view.findViewById(R.id.dock_app_name);
             String path = this.getFilesDir().getAbsolutePath();
-            Bitmap icon = IconLoader.loadImageFromStorage(path, (String) dockerApps.get(j).getLabel());
+
+            ////////////// load icon from storage ////////////
+            //Bitmap icon = IconLoader.loadImageFromStorage(path, (String) dockerApps.get(j).getLabel());
+            Bitmap icon  = ((BitmapDrawable) dockerApps.get(j).getIcon()).getBitmap();
+
+
             iv.setImageDrawable(new BitmapDrawable(this.getResources(), icon));
             iv.setLayoutParams(layoutParams);
             tv.setText((String) dockerApps.get(j).getLabel());

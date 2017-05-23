@@ -118,7 +118,9 @@ public class GridAdapter extends BaseAdapter{
 //        }
 
         String path = context.getFilesDir().getAbsolutePath();
-        Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
+        Bitmap icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
+        /////////////// load from storage /////////////
+        //Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
 //        // set foreground
 //        if(icon != null) {
 //            imageView.setImageDrawable(RoundedBitmapDrawableFactory.create(v.getResources(), icon));//Bitmap.createScaledBitmap(icon, icon.getWidth(), (icon.getHeight() / 6), false)
