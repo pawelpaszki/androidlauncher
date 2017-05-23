@@ -111,7 +111,7 @@ public class HomeActivity extends Activity {
                 Log.i("no of runs", app.getLabel() + ": " + String.valueOf(app.getNumberOfStarts()));
             }
         }
-        dockerApps = AppsSorter.sortApps(this, dockerApps, "most used");
+        dockerApps = AppsSorter.sortApps(this, dockerApps, "most used", true);
         for(j = 0; j < dockerApps.size(); j++) {
             View view = LayoutInflater.from(this).inflate(R.layout.dock_item,null);
             view.setTag((String) dockerApps.get(j).getName());

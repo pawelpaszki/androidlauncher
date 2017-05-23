@@ -16,7 +16,7 @@ import java.util.List;
 
 public class AppsSorter {
 
-    public static List<AppDetail> sortApps(Context context, List<AppDetail> apps, String parameter) {
+    public static List<AppDetail> sortApps(Context context, List<AppDetail> apps, String parameter, boolean isHomeActivity) {
 
         Log.i("sorting method", parameter);
         if(parameter.equals("name")) {
@@ -26,8 +26,10 @@ public class AppsSorter {
                     return app1.getLabel().toString().compareTo(app2.getLabel().toString());
                 }
             });
-            if(SharedPrefs.getReverseListOrderFlag(context) == 1) {
-                Collections.reverse(apps);
+            if(!isHomeActivity) {
+                if(SharedPrefs.getReverseListOrderFlag(context) == 1) {
+                    Collections.reverse(apps);
+                }
             }
         } else {
             Collections.sort(apps, new NoOfStartsSorter() {

@@ -155,7 +155,7 @@ public class AppsListActivity extends Activity {
             Log.i("app starts", String.valueOf(ri.loadLabel(manager)) + " " + SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
         }
         Log.i("sorting method", SharedPrefs.getSortingMethod(this));
-        apps = AppsSorter.sortApps(this, apps, SharedPrefs.getSortingMethod(this));
+        apps = AppsSorter.sortApps(this, apps, SharedPrefs.getSortingMethod(this), false);
     }
 
 //    private void sortApps(String parameter) {
