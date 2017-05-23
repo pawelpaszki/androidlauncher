@@ -105,6 +105,7 @@ public class GridAdapter extends BaseAdapter{
         if(noOfCols >= 5 || !SharedPrefs.getShowAppNames(context)) {
             textView.setVisibility(View.GONE);
             imageView.setLayoutParams(margins);
+            textView.setLayoutParams(margins);
         } else {
             String text = (String) apps.get(position).getLabel();
             textView.setText(text);

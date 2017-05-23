@@ -42,7 +42,11 @@ public class AppsSorter {
                     return app1.getLabel().toString().compareTo(app2.getLabel().toString()) * -1;
                 }
             });
-            if(!(SharedPrefs.getReverseListOrderFlag(context) == 1)) {
+            if(!isHomeActivity) {
+                if(SharedPrefs.getReverseListOrderFlag(context) == 1) {
+                    Collections.reverse(apps);
+                }
+            } else {
                 Collections.reverse(apps);
             }
         }

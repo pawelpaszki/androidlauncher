@@ -16,14 +16,18 @@
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">John Smith</string>
     <string name="settings">Settings</string>
-    <string name="sortby">Sort applications by</string>
+    <string name="sortby">Sort applications</string>
+    <string name="sortbydesc">Select criteria by which your apps will be sorted</string>
 
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string name="select_visible_apps">Select which apps are shown</string>
-    <string name="show_app_names">Show names of applications</string>
-    <string name="no_of_columns">Pick number of items per row</string>
+    <string name="select_visible_apps">Visible apps</string>
+    <string name="select_visible_apps_desc">Select which applications will be shown in the application list</string>
+    <string name="show_apps_names">Show Labels</string>
+    <string name="show_apps_names_desc">Choose whether names of applicaitons will be displayed under their icons</string>
+    <string name="no_of_columns">Number of columns</string>
+    <string name="no_of_columns_desc">Pick number of applications displayed per line</string>
     <string name="change_wallpaper">Change wallpaper</string>
-    <string name="change_lockscreen">Change lockscreen</string>
+    <string name="change_wallpaper_desc">Select an image to be set as a wallpaper</string>
     <string name="toolbar_select_apps">Select visible apps</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>
@@ -50,6 +54,8 @@
         <item>8</item>
         <item>9</item>
         <item>10</item>
+        <item>11</item>
+        <item>12</item>
     </string-array>
 
     <!-- Example settings for Data & Sync -->

@@ -132,7 +132,7 @@ public class AppsListActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-
+        finish();
     }
 
     private void loadApps(){
@@ -157,36 +157,6 @@ public class AppsListActivity extends Activity {
         Log.i("sorting method", SharedPrefs.getSortingMethod(this));
         apps = AppsSorter.sortApps(this, apps, SharedPrefs.getSortingMethod(this), false);
     }
-
-//    private void sortApps(String parameter) {
-//
-//        Log.i("sorting method", parameter);
-//        if(parameter.equals("name")) {
-//            Collections.sort(apps, new Comparator<AppDetail>() {
-//                @Override
-//                public int compare(AppDetail app1, AppDetail app2) {
-//                    return app1.getLabel().toString().compareTo(app2.getLabel().toString());
-//                }
-//            });
-//            if(SharedPrefs.getReverseListOrderFlag(this) == 1) {
-//                Collections.reverse(apps);
-//            }
-//        } else {
-//            Collections.sort(apps, new NoOfStartsSorter() {
-//                @Override
-//                public int compare(AppDetail app1, AppDetail app2) {
-//                    if (app1.getNumberOfStarts() > app2.getNumberOfStarts())
-//                        return 1;
-//                    if (app1.getNumberOfStarts() < app2.getNumberOfStarts())
-//                        return -1;
-//                    return app1.getLabel().toString().compareTo(app2.getLabel().toString()) * -1;
-//                }
-//            });
-//            if(!(SharedPrefs.getReverseListOrderFlag(this) == 1)) {
-//                Collections.reverse(apps);
-//            }
-//        }
-//    }
 
 //    public void toggleMenu(View view) {
 //        Toast.makeText(this,String.valueOf(SharedPrefs.getNumberOfColumns(this)) ,

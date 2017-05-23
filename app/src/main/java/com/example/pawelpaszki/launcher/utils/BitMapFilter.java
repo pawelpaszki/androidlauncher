@@ -27,7 +27,8 @@ public class BitMapFilter {
     public static Bitmap addTexture(Resources resources, Bitmap image) {
         int imageHeight = image.getHeight();
         int imageWidth = image.getWidth();
-        Bitmap texture = BitmapFactory.decodeResource(resources, R.mipmap.texture);
+        //Bitmap texture = BitmapFactory.decodeResource(resources, R.mipmap.texture);
+        Bitmap texture = BitmapFactory.decodeResource(resources, R.mipmap.broken);
         texture = Bitmap.createBitmap(texture, 0,0, image.getWidth(), image.getHeight());
         for (int x = 0; x < imageWidth; x++) {
             for (int y = 0; y < imageHeight; y++) {
@@ -40,7 +41,7 @@ public class BitMapFilter {
                 int r = (pp & 0xff0000) >> 16;
                 int g = (pp & 0x00ff00) >> 8;
                 int b = (pp & 0x0000ff) >> 0;
-                if (!GrayScaleConverter.isTransparent(image, x, y) && R < 25 && G < 25 && B < 25) { //&& !(r < 25 && g < 25 && b < 25)
+                if (!GrayScaleConverter.isTransparent(image, x, y) && R > 120 && G > 120 && B > 120){//&& R < 25 && G < 25 && B < 25) { && R > 220 && G > 220 && B > 220
                     double d = Math.random();
                     //image.setPixel(x, y, manipulateColor(pp, 0.7f));
                     image.setPixel(x, y, 0x3949AB);

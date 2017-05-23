@@ -97,7 +97,7 @@ public class HomeActivity extends Activity {
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
 
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width/6, width/6);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width/5, width/5);
 
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
         for(ResolveInfo ri:availableActivities){
@@ -108,10 +108,10 @@ public class HomeActivity extends Activity {
             app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
             if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(manager))) {
                 dockerApps.add(app);
-                Log.i("no of runs", app.getLabel() + ": " + String.valueOf(app.getNumberOfStarts()));
+                //Log.i("no of runs", app.getLabel() + ": " + String.valueOf(app.getNumberOfStarts()));
             }
         }
-        dockerApps = AppsSorter.sortApps(this, dockerApps, "most used", true);
+        AppsSorter.sortApps(this, dockerApps, "most used", true);
         for(j = 0; j < dockerApps.size(); j++) {
             View view = LayoutInflater.from(this).inflate(R.layout.dock_item,null);
             view.setTag((String) dockerApps.get(j).getName());

@@ -27,29 +27,42 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/toolbar"
         android:padding="12dp"
+        android:paddingBottom="-12dp"
         android:textSize="16sp"
         android:textColor="#1A237E"
         android:text="@string/sortby" />
+    <TextView
+        android:id="@+id/sort_by_text_view_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/sort_by_text_view"
+        android:padding="12dp"
+        android:layout_marginTop="-22dp"
+        android:textSize="14sp"
+        android:textColor="#303F9F"
+        android:text="@string/sortbydesc"/>
 
     <Spinner
         android:id="@+id/sort_by_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/div1"
         android:layout_alignParentEnd="true"
+        android:layout_below="@+id/toolbar"
         android:layout_gravity="end"
         android:background="#ffffff"
         android:drawSelectorOnTop="true"
         android:dropDownWidth="wrap_content"
         android:entries="@array/sort_values"
         android:padding="12dp"
+        android:paddingBottom="0dp"
         android:popupBackground="#ffffff"
         android:textAlignment="textEnd"
         android:textColor="#1A237E"
         android:textSize="16sp" />
     <View style="@style/Divider"
         android:id="@+id/div1"
-        android:layout_below="@+id/sort_by_text_view"/>
+        android:layout_below="@+id/sort_by_text_view_desc"/>
     <TextView
         android:id="@+id/show_visible_apps"
         android:layout_width="wrap_content"
@@ -61,9 +74,21 @@
         android:textColor="#1A237E"
         android:text="@string/select_visible_apps"
         android:onClick="selectVisibleApps"/>
+    <TextView
+        android:id="@+id/show_visible_apps_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/show_visible_apps"
+        android:padding="12dp"
+        android:layout_marginTop="-22dp"
+        android:textSize="14sp"
+        android:textColor="#303F9F"
+        android:text="@string/select_visible_apps_desc"
+        android:onClick="selectVisibleApps"/>
     <View style="@style/Divider"
         android:id="@+id/div2"
-        android:layout_below="@+id/show_visible_apps"/>
+        android:layout_below="@+id/show_visible_apps_desc"/>
     <TextView
         android:id="@+id/show_app_names"
         android:layout_width="wrap_content"
@@ -73,8 +98,7 @@
         android:padding="12dp"
         android:textSize="16sp"
         android:textColor="#1A237E"
-        android:text="@string/show_app_names"
-        android:onClick="selectVisibleApps"/>
+        android:text="@string/show_apps_names"/>
     <CheckBox
         android:id="@+id/show_names_checkbox"
         android:layout_width="wrap_content"
@@ -84,10 +108,20 @@
         android:layout_alignBottom="@+id/show_app_names"
         android:layout_alignEnd="@+id/div2"
         android:theme="@style/MyCheckBox"/>
+    <TextView
+        android:id="@+id/show_app_names_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/show_app_names"
+        android:padding="12dp"
+        android:layout_marginTop="-22dp"
+        android:textSize="14sp"
+        android:textColor="#303F9F"
+        android:text="@string/show_apps_names_desc"/>
     <View style="@style/Divider"
         android:id="@+id/div3"
-        android:layout_below="@+id/show_app_names"/>
-
+        android:layout_below="@+id/show_app_names_desc"/>
     <TextView
         android:id="@+id/no_of_columns"
         android:layout_width="wrap_content"
@@ -98,7 +132,6 @@
         android:textSize="16sp"
         android:textColor="#1A237E"
         android:text="@string/no_of_columns" />
-
     <Spinner
         android:id="@+id/no_of_apps_per_row"
         android:layout_width="wrap_content"
@@ -115,9 +148,20 @@
         android:textAlignment="textEnd"
         android:textColor="#1A237E"
         android:textSize="16sp" />
+    <TextView
+        android:id="@+id/no_of_columns_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/no_of_columns"
+        android:padding="12dp"
+        android:layout_marginTop="-22dp"
+        android:textSize="14sp"
+        android:textColor="#303F9F"
+        android:text="@string/no_of_columns_desc"/>
     <View style="@style/Divider"
         android:id="@+id/div4"
-        android:layout_below="@+id/no_of_columns"/>
+        android:layout_below="@+id/no_of_columns_desc"/>
     <TextView
         android:id="@+id/set_wallpaper"
         android:layout_width="wrap_content"
@@ -129,7 +173,18 @@
         android:textColor="#1A237E"
         android:text="@string/change_wallpaper"
         android:onClick="changeWallpaper"/>
+    <TextView
+        android:id="@+id/set_wallpaper_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/set_wallpaper"
+        android:padding="12dp"
+        android:layout_marginTop="-22dp"
+        android:textSize="14sp"
+        android:textColor="#303F9F"
+        android:text="@string/change_wallpaper_desc"/>
     <View style="@style/Divider"
         android:id="@+id/div5"
-        android:layout_below="@+id/set_wallpaper"/>
+        android:layout_below="@+id/set_wallpaper_desc"/>
 </RelativeLayout>

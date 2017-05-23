@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
@@ -122,6 +123,35 @@ public class SettingsActivity extends AppCompatActivity {
                 return false;
             }
         });
+        TextView sortDesc = (TextView) findViewById(R.id.sort_by_text_view_desc);
+        TextView visibleDesc = (TextView) findViewById(R.id.show_visible_apps_desc);
+        TextView showLabelsDesc = (TextView) findViewById(R.id.show_app_names_desc);
+        TextView noOfColsDesc = (TextView) findViewById(R.id.no_of_columns_desc);
+        TextView setWallaperDesc = (TextView) findViewById(R.id.set_wallpaper_desc);
+
+        sortDesc.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        int width = sortDesc.getMeasuredWidth() * 8 / 10;
+
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) sortDesc.getLayoutParams();
+        params.width = width;
+        sortDesc.setLayoutParams(params);
+
+        params = (RelativeLayout.LayoutParams) visibleDesc.getLayoutParams();
+        params.width = width;
+        visibleDesc.setLayoutParams(params);
+
+        params = (RelativeLayout.LayoutParams) showLabelsDesc.getLayoutParams();
+        params.width = width;
+        showLabelsDesc.setLayoutParams(params);
+
+        params = (RelativeLayout.LayoutParams) noOfColsDesc.getLayoutParams();
+        params.width = width;
+        noOfColsDesc.setLayoutParams(params);
+
+        params = (RelativeLayout.LayoutParams) setWallaperDesc.getLayoutParams();
+        params.width = width;
+        setWallaperDesc.setLayoutParams(params);
+
     }
 
     @Override
