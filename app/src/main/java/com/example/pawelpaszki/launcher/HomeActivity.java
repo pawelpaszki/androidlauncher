@@ -104,7 +104,6 @@ public class HomeActivity extends Activity {
         i.addCategory(Intent.CATEGORY_LAUNCHER);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width/5, width/5);

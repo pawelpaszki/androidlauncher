@@ -25,9 +25,11 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -45,6 +47,8 @@ public class ChangeIconsActivity extends AppCompatActivity {
     private List<AppDetail> apps;
     private static int RESULT_LOAD_IMAGE = 1;
     private String appName;
+    private int actionBarHeight;
+
     private void loadApps(){
         manager = getPackageManager();
         apps = new ArrayList<AppDetail>();
@@ -156,14 +160,14 @@ public class ChangeIconsActivity extends AppCompatActivity {
         toolbar.setTitle("Set Icons");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        int actionBarHeight = 0;
+        actionBarHeight = 0;
         TypedValue tv = new TypedValue();
         if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
         {
             actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
         }
-        FrameLayout imageView = (FrameLayout) findViewById(R.id.image_frame);
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) imageView
+        final FrameLayout imageView = (FrameLayout) findViewById(R.id.image_frame);
+        final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) imageView
                 .getLayoutParams();
 
         layoutParams.setMargins(0, actionBarHeight, 0, 0);
@@ -173,12 +177,82 @@ public class ChangeIconsActivity extends AppCompatActivity {
         parent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                int screenWidth = displayMetrics.widthPixels;
+
                 int height = parent.getMeasuredHeight();
                 int width = parent.getMeasuredWidth();
                 if(height>0) {
                     parent.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     Log.i("height", String.valueOf(height));
                     Log.i("width", String.valueOf(width));
+
+                    layoutParams.setMargins((screenWidth - width)/2, actionBarHeight, (screenWidth - width)/2, 0);
+
+                    imageView.setLayoutParams(layoutParams);
+
+                    Button topLeft = (Button) findViewById(R.id.top_left_crop);
+                    topLeft.setVisibility(View.VISIBLE);
+                    topLeft.getLayoutParams().height = 30;
+                    topLeft.getLayoutParams().width = 30;
+
+                    Button topRight = (Button) findViewById(R.id.top_right_crop);
+                    topRight.setVisibility(View.VISIBLE);
+                    FrameLayout.LayoutParams buttonParams = new FrameLayout.LayoutParams(topRight.getLayoutParams());
+                    buttonParams.setMargins(width-30,0,0,0);
+                    topRight.setLayoutParams(buttonParams);
+                    topRight.getLayoutParams().height = 30;
+                    topRight.getLayoutParams().width = 30;
+
+                    Button topCenter = (Button) findViewById(R.id.top_center_crop);
+                    topCenter.setVisibility(View.VISIBLE);
+                    buttonParams = new FrameLayout.LayoutParams(topCenter.getLayoutParams());
+                    buttonParams.setMargins(width / 2 - 15,0,0,0);
+                    topCenter.setLayoutParams(buttonParams);
+                    topCenter.getLayoutParams().height = 30;
+                    topCenter.getLayoutParams().width = 30;
+
+                    Button leftCenter = (Button) findViewById(R.id.left_center_crop);
+                    leftCenter.setVisibility(View.VISIBLE);
+                    buttonParams = new FrameLayout.LayoutParams(leftCenter.getLayoutParams());
+                    buttonParams.setMargins(0,height / 2 - 15,0,0);
+                    leftCenter.setLayoutParams(buttonParams);
+                    leftCenter.getLayoutParams().height = 30;
+                    leftCenter.getLayoutParams().width = 30;
+
+                    Button leftBottom = (Button) findViewById(R.id.left_bottom_crop);
+                    leftBottom.setVisibility(View.VISIBLE);
+                    buttonParams = new FrameLayout.LayoutParams(leftBottom.getLayoutParams());
+                    buttonParams.setMargins(0,height-30,0,0);
+                    leftBottom.setLayoutParams(buttonParams);
+                    leftBottom.getLayoutParams().height = 30;
+                    leftBottom.getLayoutParams().width = 30;
+
+                    Button bottomCenter = (Button) findViewById(R.id.bottom_center_crop);
+                    bottomCenter.setVisibility(View.VISIBLE);
+                    buttonParams = new FrameLayout.LayoutParams(bottomCenter.getLayoutParams());
+                    buttonParams.setMargins(width / 2 - 15,height-30,0,0);
+                    bottomCenter.setLayoutParams(buttonParams);
+                    bottomCenter.getLayoutParams().height = 30;
+                    bottomCenter.getLayoutParams().width = 30;
+
+
+                    Button rightCenter = (Button) findViewById(R.id.right_center_crop);
+                    rightCenter.setVisibility(View.VISIBLE);
+                    buttonParams = new FrameLayout.LayoutParams(rightCenter.getLayoutParams());
+                    buttonParams.setMargins(width -30,height/2-15,0,0);
+                    rightCenter.setLayoutParams(buttonParams);
+                    rightCenter.getLayoutParams().height = 30;
+                    rightCenter.getLayoutParams().width = 30;
+
+                    Button bottomRight = (Button) findViewById(R.id.bottom_right_crop);
+                    bottomRight.setVisibility(View.VISIBLE);
+                    buttonParams = new FrameLayout.LayoutParams(bottomRight.getLayoutParams());
+                    buttonParams.setMargins(width -30,height-30,0,0);
+                    bottomRight.setLayoutParams(buttonParams);
+                    bottomRight.getLayoutParams().height = 30;
+                    bottomRight.getLayoutParams().width = 30;
                 }
             }
         });
