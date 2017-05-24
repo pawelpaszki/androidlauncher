@@ -91,4 +91,18 @@ public class SharedPrefs {
         String key = "visible" + name;
         return prefs.getBoolean(key, true);
     }
+
+    public static void setIsFirstLaunch(boolean firstLaunch, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "firstLaunch";
+        editor.putBoolean(key, firstLaunch);
+        editor.commit();
+    }
+
+    public static boolean getIsFirstLaunch(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "firstLaunch";
+        return prefs.getBoolean(key, true);
+    }
 }

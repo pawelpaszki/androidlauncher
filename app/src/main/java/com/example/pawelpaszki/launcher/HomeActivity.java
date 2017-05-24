@@ -59,15 +59,19 @@ public class HomeActivity extends Activity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(Color.TRANSPARENT);
         window.setNavigationBarColor(Color.TRANSPARENT);
-
-        WallpaperManager myWallpaperManager
-                = WallpaperManager.getInstance(getApplicationContext());
-        try {
-            myWallpaperManager.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        boolean firstLaunch = SharedPrefs.getIsFirstLaunch(this);
+        if(firstLaunch) {
+            WallpaperManager myWallpaperManager
+                    = WallpaperManager.getInstance(getApplicationContext());
+            try {
+                myWallpaperManager.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background));
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            SharedPrefs.setIsFirstLaunch(false,this);
         }
+
 
         /////////////// load/ process icons //////////////
         //startIntentService();
