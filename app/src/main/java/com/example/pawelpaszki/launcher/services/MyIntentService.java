@@ -52,7 +52,7 @@ public class MyIntentService extends IntentService {
             }
         }).start();
 
-        Log.i(TAG, "onCreate, Thread name: " + Thread.currentThread().getName());
+        //Log.i(TAG, "onCreate, Thread name: " + Thread.currentThread().getName());
     }
 
     private void loadApps(){
@@ -83,14 +83,14 @@ public class MyIntentService extends IntentService {
             }
             apps.add(app);
             activities.add(ri.activityInfo.packageName);
-            Log.i("app package name", String.valueOf(ri.activityInfo.packageName));
-            Log.i("app label", String.valueOf(ri.loadLabel(manager)));
+            //Log.i("app package name", String.valueOf(ri.activityInfo.packageName));
+            //Log.i("app label", String.valueOf(ri.loadLabel(manager)));
         }
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.i(TAG, "onHandleIntent, Thread name: " + Thread.currentThread().getName());
+        //Log.i(TAG, "onHandleIntent, Thread name: " + Thread.currentThread().getName());
 
         ResultReceiver resultReceiver = intent.getParcelableExtra("receiver");
         Bundle bundle = new Bundle();
@@ -100,7 +100,7 @@ public class MyIntentService extends IntentService {
             new Thread(new Runnable(){
                 public void run() {
                     try {
-                        Log.i("thread sleep", String.valueOf(apps.size()));
+                        //Log.i("thread sleep", String.valueOf(apps.size()));
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -108,7 +108,7 @@ public class MyIntentService extends IntentService {
                 }
             }).start();
         }
-        Log.i("apps sent", "apps sent");
+        //Log.i("apps sent", "apps sent");
         bundle = new Bundle();
         bundle.putStringArrayList("apps", activities);
 
@@ -118,6 +118,6 @@ public class MyIntentService extends IntentService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i(TAG, "onDestroy, Thread name: " + Thread.currentThread().getName());
+        //Log.i(TAG, "onDestroy, Thread name: " + Thread.currentThread().getName());
     }
 }

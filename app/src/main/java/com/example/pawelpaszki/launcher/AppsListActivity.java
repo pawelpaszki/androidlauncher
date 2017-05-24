@@ -152,9 +152,9 @@ public class AppsListActivity extends Activity {
             if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(manager))) {
                 apps.add(app);
             }
-            Log.i("app starts", String.valueOf(ri.loadLabel(manager)) + " " + SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
+            //Log.i("app starts", String.valueOf(ri.loadLabel(manager)) + " " + SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
         }
-        Log.i("sorting method", SharedPrefs.getSortingMethod(this));
+        //Log.i("sorting method", SharedPrefs.getSortingMethod(this));
         apps = AppsSorter.sortApps(this, apps, SharedPrefs.getSortingMethod(this), false);
     }
 
@@ -200,9 +200,8 @@ public class AppsListActivity extends Activity {
     public void onBackPressed() {
         Intent intent = new Intent(this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-
         startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
         finish();
     }
 

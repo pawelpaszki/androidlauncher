@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:orientation="vertical"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:background="#FFFFFFFF"
+android:theme="@style/Theme.AppCompat"
+android:id="@+id/set_icons_container"
+tools:context="com.example.pawelpaszki.launcher.ChangeIconsActivity"
+android:weightSum="1">
+
+<android.support.v7.widget.Toolbar
+    android:id="@+id/set_icons_toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#1A237E"
+    android:minHeight="?attr/actionBarSize"
+    android:theme="?attr/actionBarTheme"
+    android:titleTextColor="#C5CAE9"
+    android:title="@string/toolbar_set_icons" />
+
+<ListView
+    android:id="@+id/set_icons_list"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="60dp"
+    >
+</ListView>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/image_frame"
+        android:visibility="gone">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/image_view"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:layout_gravity="center"
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/cropped_background"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:layout_gravity="center"/>
+        <Button
+            android:layout_height="20dp"
+            android:layout_width="20dp"
+            android:id="@+id/top_left_crop"
+            android:visibility="gone">
+        </Button>
+        <Button
+            android:layout_height="20dp"
+            android:layout_width="20dp"
+            android:id="@+id/top_right_crop"
+            android:visibility="gone">
+        </Button>
+        <Button
+            android:layout_height="20dp"
+            android:layout_width="20dp"
+            android:id="@+id/top_center_crop"
+            android:visibility="gone">
+        </Button>
+        <Button
+            android:layout_height="20dp"
+            android:layout_width="20dp"
+            android:id="@+id/left_center_crop"
+            android:visibility="gone">
+        </Button>
+        <Button
+            android:layout_height="20dp"
+            android:layout_width="20dp"
+            android:id="@+id/left_bottom_crop"
+            android:visibility="gone">
+        </Button>
+        <Button
+            android:layout_height="20dp"
+            android:layout_width="20dp"
+            android:id="@+id/bottom_center_crop"
+            android:visibility="gone">
+        </Button>
+        <Button
+            android:layout_height="20dp"
+            android:layout_width="20dp"
+            android:id="@+id/right_center_crop"
+            android:visibility="gone">
+        </Button>
+        <Button
+            android:layout_height="20dp"
+            android:layout_width="20dp"
+            android:id="@+id/bottom_right_crop"
+            android:visibility="gone">
+        </Button>
+    </FrameLayout>
+
+
+</RelativeLayout>

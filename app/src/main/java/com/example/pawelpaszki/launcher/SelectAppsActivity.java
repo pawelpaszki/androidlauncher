@@ -62,7 +62,8 @@ public class SelectAppsActivity extends AppCompatActivity {
                 }
 
                 String path = this.getContext().getFilesDir().getAbsolutePath();
-                Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
+                //Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
+                Bitmap icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
                 ImageView appIcon = (ImageView)convertView.findViewById(R.id.visible_app_icon);
 
                 appIcon.setImageDrawable(new BitmapDrawable(SelectAppsActivity.this.getResources(), icon));

@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -16,10 +18,12 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
@@ -45,6 +49,33 @@ public class SettingsActivity extends AppCompatActivity {
         View someView = findViewById(R.id.settings_container);
         View root = someView.getRootView();
         root.setBackgroundColor(0xC5CAE9);
+
+        int actionBarHeight = 0;
+        TypedValue tv = new TypedValue();
+        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+        {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
+        }
+        //Log.i("actionbar height", String.valueOf(actionBarHeight));
+        //RelativeLayout settings_container = (RelativeLayout) findViewById(R.id.form_layout);
+        ScrollView settings_scroll = (ScrollView) findViewById(R.id.settings_scroll);
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) settings_scroll
+                .getLayoutParams();
+        // layoutParams.bottomMargin = 100;
+
+        layoutParams.setMargins(0, actionBarHeight, 0, 0);
+
+        settings_scroll.setLayoutParams(layoutParams);
+//
+//        FrameLayout.LayoutParams linearParams = new FrameLayout.LayoutParams(
+//                new FrameLayout.LayoutParams(
+//                        FrameLayout.LayoutParams.FILL_PARENT,
+//                        FrameLayout.LayoutParams.WRAP_CONTENT));
+//        linearParams.setMargins(0, actionBarHeight, 0, 0);
+//        settings_container.setLayoutParams(linearParams);
+//        settings_container.requestLayout();
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Settings");
         setSupportActionBar(toolbar);
@@ -57,8 +88,8 @@ public class SettingsActivity extends AppCompatActivity {
         sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(SettingsActivity.this, parent.getItemAtPosition(position).toString(),
-                        Toast.LENGTH_LONG).show();
+//                Toast.makeText(SettingsActivity.this, parent.getItemAtPosition(position).toString(),
+//                        Toast.LENGTH_LONG).show();
                 if(parent.getItemAtPosition(position).toString().equals("by name")) {
                     sortByName();
                 } else {
@@ -127,7 +158,8 @@ public class SettingsActivity extends AppCompatActivity {
         TextView visibleDesc = (TextView) findViewById(R.id.show_visible_apps_desc);
         TextView showLabelsDesc = (TextView) findViewById(R.id.show_app_names_desc);
         TextView noOfColsDesc = (TextView) findViewById(R.id.no_of_columns_desc);
-        TextView setWallaperDesc = (TextView) findViewById(R.id.set_wallpaper_desc);
+        TextView setWallpaperDesc = (TextView) findViewById(R.id.set_wallpaper_desc);
+        TextView setIconsDesc = (TextView) findViewById(R.id.set_icons_desc);
 
         sortDesc.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         int width = sortDesc.getMeasuredWidth() * 8 / 10;
@@ -148,9 +180,13 @@ public class SettingsActivity extends AppCompatActivity {
         params.width = width;
         noOfColsDesc.setLayoutParams(params);
 
-        params = (RelativeLayout.LayoutParams) setWallaperDesc.getLayoutParams();
+        params = (RelativeLayout.LayoutParams) setWallpaperDesc.getLayoutParams();
         params.width = width;
-        setWallaperDesc.setLayoutParams(params);
+        setWallpaperDesc.setLayoutParams(params);
+
+        params = (RelativeLayout.LayoutParams) setIconsDesc.getLayoutParams();
+        params.width = width;
+        setIconsDesc.setLayoutParams(params);
 
     }
 
@@ -158,6 +194,12 @@ public class SettingsActivity extends AppCompatActivity {
     public boolean onTouchEvent(MotionEvent event) {
         detector.onTouchEvent(event);
         return super.onTouchEvent(event);
+    }
+
+    public void set_icons(View view) {
+        Intent i = new Intent(this, ChangeIconsActivity.class);
+        startActivity(i);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
     }
 
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {

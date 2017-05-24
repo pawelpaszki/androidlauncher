@@ -142,7 +142,7 @@ public class HomeActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = manager.getLaunchIntentForPackage(v.getTag().toString());
-                    Log.i("name", v.getTag().toString());
+                    //Log.i("name", v.getTag().toString());
                     SharedPrefs.increaseNumberOfActivityStarts(((TextView)v.findViewById(R.id.dock_app_name)).getText().toString(), context);
                     if(intent != null) {
                         context.startActivity(intent);
@@ -268,7 +268,7 @@ public class HomeActivity extends Activity {
 
              }
 
-            Log.i("MyResultreceiver", Thread.currentThread().getName());
+            //Log.i("MyResultreceiver", Thread.currentThread().getName());
 
             if (resultCode == 18 && resultData != null) {
 
@@ -277,7 +277,7 @@ public class HomeActivity extends Activity {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        Log.i("MyHandler", Thread.currentThread().getName());
+                        //Log.i("MyHandler", Thread.currentThread().getName());
 
                     }
                 });
