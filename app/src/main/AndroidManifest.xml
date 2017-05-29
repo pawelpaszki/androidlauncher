@@ -13,6 +13,8 @@
         android:orientation="vertical"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:clearTaskOnLaunch="true"
+        android:stateNotNeeded="true"
         android:theme="@style/Theme.AppCompat.Light">
         <service android:name=".services.MyIntentService" />
 

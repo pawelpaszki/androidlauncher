@@ -1,5 +1,6 @@
 package com.example.pawelpaszki.launcher;
 
+import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -18,7 +19,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.DragEvent;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -48,6 +51,10 @@ public class ChangeIconsActivity extends AppCompatActivity {
     private static int RESULT_LOAD_IMAGE = 1;
     private String appName;
     private int actionBarHeight;
+    private int minX;
+    private int minY;
+    private int maxX;
+    private int maxY;
 
     private void loadApps(){
         manager = getPackageManager();
@@ -145,10 +152,30 @@ public class ChangeIconsActivity extends AppCompatActivity {
         }
     }
 
+    private final class MyTouchListener implements View.OnTouchListener {
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                Log.i("motion starts", "x: " + motionEvent.getX());
+                Log.i("motion starts", "y: " + motionEvent.getY());
+                return true;
+            } else if (motionEvent.getAction() == MotionEvent.ACTION_UP){
+                Log.i("motion ends", "x: " + motionEvent.getX());
+                Log.i("motion ends", "y: " + motionEvent.getY());
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_icons);
+        findViewById(R.id.image_frame).setOnTouchListener(new MyTouchListener());
+        minX = 0;
+        minY = 0;
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(Color.TRANSPARENT);
@@ -183,6 +210,10 @@ public class ChangeIconsActivity extends AppCompatActivity {
 
                 int height = parent.getMeasuredHeight();
                 int width = parent.getMeasuredWidth();
+
+                int maxY = height;
+                int maxX = width;
+
                 if(height>0) {
                     parent.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     Log.i("height", String.valueOf(height));
@@ -192,67 +223,44 @@ public class ChangeIconsActivity extends AppCompatActivity {
 
                     imageView.setLayoutParams(layoutParams);
 
-                    Button topLeft = (Button) findViewById(R.id.top_left_crop);
-                    topLeft.setVisibility(View.VISIBLE);
-                    topLeft.getLayoutParams().height = 30;
-                    topLeft.getLayoutParams().width = 30;
-
-                    Button topRight = (Button) findViewById(R.id.top_right_crop);
-                    topRight.setVisibility(View.VISIBLE);
-                    FrameLayout.LayoutParams buttonParams = new FrameLayout.LayoutParams(topRight.getLayoutParams());
-                    buttonParams.setMargins(width-30,0,0,0);
-                    topRight.setLayoutParams(buttonParams);
-                    topRight.getLayoutParams().height = 30;
-                    topRight.getLayoutParams().width = 30;
-
-                    Button topCenter = (Button) findViewById(R.id.top_center_crop);
-                    topCenter.setVisibility(View.VISIBLE);
-                    buttonParams = new FrameLayout.LayoutParams(topCenter.getLayoutParams());
-                    buttonParams.setMargins(width / 2 - 15,0,0,0);
-                    topCenter.setLayoutParams(buttonParams);
-                    topCenter.getLayoutParams().height = 30;
-                    topCenter.getLayoutParams().width = 30;
-
-                    Button leftCenter = (Button) findViewById(R.id.left_center_crop);
-                    leftCenter.setVisibility(View.VISIBLE);
-                    buttonParams = new FrameLayout.LayoutParams(leftCenter.getLayoutParams());
-                    buttonParams.setMargins(0,height / 2 - 15,0,0);
-                    leftCenter.setLayoutParams(buttonParams);
-                    leftCenter.getLayoutParams().height = 30;
-                    leftCenter.getLayoutParams().width = 30;
-
-                    Button leftBottom = (Button) findViewById(R.id.left_bottom_crop);
-                    leftBottom.setVisibility(View.VISIBLE);
-                    buttonParams = new FrameLayout.LayoutParams(leftBottom.getLayoutParams());
-                    buttonParams.setMargins(0,height-30,0,0);
-                    leftBottom.setLayoutParams(buttonParams);
-                    leftBottom.getLayoutParams().height = 30;
-                    leftBottom.getLayoutParams().width = 30;
-
-                    Button bottomCenter = (Button) findViewById(R.id.bottom_center_crop);
-                    bottomCenter.setVisibility(View.VISIBLE);
-                    buttonParams = new FrameLayout.LayoutParams(bottomCenter.getLayoutParams());
-                    buttonParams.setMargins(width / 2 - 15,height-30,0,0);
-                    bottomCenter.setLayoutParams(buttonParams);
-                    bottomCenter.getLayoutParams().height = 30;
-                    bottomCenter.getLayoutParams().width = 30;
+//                    Button topLeft = (Button) findViewById(R.id.top_left_crop);
+//                    topLeft.setVisibility(View.VISIBLE);
+//                    topLeft.getLayoutParams().height = 60;
+//                    topLeft.getLayoutParams().width = 60;
+//
+//                    Button topRight = (Button) findViewById(R.id.top_right_crop);
+//                    topRight.setVisibility(View.VISIBLE);
+//                    FrameLayout.LayoutParams buttonParams = new FrameLayout.LayoutParams(topRight.getLayoutParams());
+//                    buttonParams.setMargins(width-30,0,0,0);
+//                    topRight.setLayoutParams(buttonParams);
+//                    topRight.getLayoutParams().height = 60;
+//                    topRight.getLayoutParams().width = 60;
 
 
-                    Button rightCenter = (Button) findViewById(R.id.right_center_crop);
-                    rightCenter.setVisibility(View.VISIBLE);
-                    buttonParams = new FrameLayout.LayoutParams(rightCenter.getLayoutParams());
-                    buttonParams.setMargins(width -30,height/2-15,0,0);
-                    rightCenter.setLayoutParams(buttonParams);
-                    rightCenter.getLayoutParams().height = 30;
-                    rightCenter.getLayoutParams().width = 30;
-
-                    Button bottomRight = (Button) findViewById(R.id.bottom_right_crop);
-                    bottomRight.setVisibility(View.VISIBLE);
-                    buttonParams = new FrameLayout.LayoutParams(bottomRight.getLayoutParams());
-                    buttonParams.setMargins(width -30,height-30,0,0);
-                    bottomRight.setLayoutParams(buttonParams);
-                    bottomRight.getLayoutParams().height = 30;
-                    bottomRight.getLayoutParams().width = 30;
+//                    Button leftBottom = (Button) findViewById(R.id.left_bottom_crop);
+//                    leftBottom.setVisibility(View.VISIBLE);
+//                    buttonParams = new FrameLayout.LayoutParams(leftBottom.getLayoutParams());
+//                    buttonParams.setMargins(0,height-30,0,0);
+//                    leftBottom.setLayoutParams(buttonParams);
+//                    leftBottom.getLayoutParams().height = 60;
+//                    leftBottom.getLayoutParams().width = 60;
+//
+//
+//                    Button center = (Button) findViewById(R.id.right_center_crop);
+//                    center.setVisibility(View.VISIBLE);
+//                    buttonParams = new FrameLayout.LayoutParams(center.getLayoutParams());
+//                    buttonParams.setMargins(width/2 -30,height/2-30,0,0);
+//                    rightCenter.setLayoutParams(buttonParams);
+//                    rightCenter.getLayoutParams().height = 60;
+//                    rightCenter.getLayoutParams().width = 60;
+//
+//                    Button bottomRight = (Button) findViewById(R.id.bottom_right_crop);
+//                    bottomRight.setVisibility(View.VISIBLE);
+//                    buttonParams = new FrameLayout.LayoutParams(bottomRight.getLayoutParams());
+//                    buttonParams.setMargins(width -30,height-30,0,0);
+//                    bottomRight.setLayoutParams(buttonParams);
+//                    bottomRight.getLayoutParams().height = 60;
+//                    bottomRight.getLayoutParams().width = 60
                 }
             }
         });
@@ -270,5 +278,14 @@ public class ChangeIconsActivity extends AppCompatActivity {
             finish();
         }
         return super.onOptionsItemSelected(menuItem);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+        finish();
     }
 }

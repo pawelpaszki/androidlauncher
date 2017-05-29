@@ -26,11 +26,11 @@ public class AppsSorter {
                     return app1.getLabel().toString().compareTo(app2.getLabel().toString());
                 }
             });
-            if(!isHomeActivity) {
-                if(SharedPrefs.getReverseListOrderFlag(context) == 1) {
-                    Collections.reverse(apps);
-                }
-            }
+//            if(!isHomeActivity) {
+//                if(SharedPrefs.getReverseListOrderFlag(context) == 1) {
+//                    Collections.reverse(apps);
+//                }
+//            }
         } else {
             Collections.sort(apps, new NoOfStartsSorter() {
                 @Override
@@ -42,13 +42,7 @@ public class AppsSorter {
                     return app1.getLabel().toString().compareTo(app2.getLabel().toString()) * -1;
                 }
             });
-            if(!isHomeActivity) {
-                if(SharedPrefs.getReverseListOrderFlag(context) == 1) {
-                    Collections.reverse(apps);
-                }
-            } else {
                 Collections.reverse(apps);
-            }
         }
         return apps;
     }

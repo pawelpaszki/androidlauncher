@@ -24,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
@@ -56,24 +57,13 @@ public class SettingsActivity extends AppCompatActivity {
         {
             actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
         }
-        //Log.i("actionbar height", String.valueOf(actionBarHeight));
-        //RelativeLayout settings_container = (RelativeLayout) findViewById(R.id.form_layout);
         ScrollView settings_scroll = (ScrollView) findViewById(R.id.settings_scroll);
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) settings_scroll
                 .getLayoutParams();
-        // layoutParams.bottomMargin = 100;
 
         layoutParams.setMargins(0, actionBarHeight, 0, 0);
 
         settings_scroll.setLayoutParams(layoutParams);
-//
-//        FrameLayout.LayoutParams linearParams = new FrameLayout.LayoutParams(
-//                new FrameLayout.LayoutParams(
-//                        FrameLayout.LayoutParams.FILL_PARENT,
-//                        FrameLayout.LayoutParams.WRAP_CONTENT));
-//        linearParams.setMargins(0, actionBarHeight, 0, 0);
-//        settings_container.setLayoutParams(linearParams);
-//        settings_container.requestLayout();
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -88,9 +78,9 @@ public class SettingsActivity extends AppCompatActivity {
         sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                Toast.makeText(SettingsActivity.this, parent.getItemAtPosition(position).toString(),
-//                        Toast.LENGTH_LONG).show();
-                if(parent.getItemAtPosition(position).toString().equals("by name")) {
+                Toast.makeText(SettingsActivity.this, parent.getItemAtPosition(position).toString(),
+                        Toast.LENGTH_SHORT).show();
+                if(parent.getItemAtPosition(position).toString().startsWith("by name")) {
                     sortByName();
                 } else {
                     sortByMostUsed();
@@ -242,37 +232,19 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void onSwipeRight() {
-        Intent i = new Intent(SettingsActivity.this, AppsListActivity.class);
-        startActivity(i);
+        Intent intent = new Intent(this, AppsListActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+        finish();
     }
 
     public void sortByName() {
-        if(SharedPrefs.getSortingMethod(this).equals("name")) {
-            if((SharedPrefs.getReverseListOrderFlag(this) == 1)) {
-                SharedPrefs.setReverseListOrderFlag(0,this);
-            } else {
-                SharedPrefs.setReverseListOrderFlag(1,this);
-            }
-        } else {
-            SharedPrefs.setReverseListOrderFlag(0,this);
-        }
         SharedPrefs.setSortingMethod(this,"name");
     }
 
 
-
     public void sortByMostUsed() {
-        if(!SharedPrefs.getSortingMethod(this).equals("name")) {
-            if((SharedPrefs.getReverseListOrderFlag(this) == 1)) {
-                SharedPrefs.setReverseListOrderFlag(0,this);
-            } else {
-                SharedPrefs.setReverseListOrderFlag(1,this);
-            }
-        } else {
-            SharedPrefs.setReverseListOrderFlag(0,this);
-        }
-
         SharedPrefs.setSortingMethod(this,"most used");
     }
 
