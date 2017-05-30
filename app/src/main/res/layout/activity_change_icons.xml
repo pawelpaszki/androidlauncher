@@ -40,39 +40,57 @@ android:weightSum="1">
             android:layout_gravity="center"
             />
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:id="@+id/cropped_background"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
+            android:background="@drawable/crop_background"
             android:layout_gravity="center"/>
+
         <Button
-            android:layout_height="20dp"
-            android:layout_width="20dp"
             android:id="@+id/top_left_crop"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@android:color/transparent"
+            android:drawableStart="@mipmap/crop_top_left"
+            android:scaleType="fitXY"
             android:visibility="gone"
-            android:background="#000">
+            android:padding="0dp"
+            android:tag="top_left">
         </Button>
         <Button
-            android:layout_height="20dp"
-            android:layout_width="20dp"
+            android:layout_height="60dp"
+            android:layout_width="60dp"
             android:id="@+id/top_right_crop"
+            android:background="@android:color/transparent"
             android:visibility="gone"
-            android:background="#000">
+            android:drawableStart="@mipmap/crop_top_right"
+            android:scaleType="fitXY"
+            android:padding="0dp"
+            android:tag="top_right">
         </Button>
         <Button
-            android:layout_height="20dp"
-            android:layout_width="20dp"
+            android:layout_height="60dp"
+            android:layout_width="60dp"
             android:id="@+id/left_bottom_crop"
+            android:background="@android:color/transparent"
             android:visibility="gone"
-            android:background="#000">
+            android:drawableStart="@mipmap/crop_bottom_left"
+            android:padding="0dp"
+            android:scaleType="fitXY"
+            android:tag="bottom_left">
         </Button>
         <Button
-            android:layout_height="20dp"
-            android:layout_width="20dp"
+            android:layout_height="60dp"
+            android:layout_width="60dp"
             android:id="@+id/bottom_right_crop"
+            android:background="@android:color/transparent"
             android:visibility="gone"
-            android:background="#000">
+            android:drawableStart="@mipmap/crop_bottom_right"
+            android:padding="0dp"
+            android:scaleType="fitXY"
+            android:tag="bottom_right">
         </Button>
     </FrameLayout>
 

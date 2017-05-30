@@ -12,6 +12,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -55,6 +56,22 @@ public class ChangeIconsActivity extends AppCompatActivity {
     private int minY;
     private int maxX;
     private int maxY;
+    private int startX;
+    private int startY;
+    private int buttonSide;
+    private String tag;
+    private Button topLeft;
+    private Button topRight;
+    private Button bottomLeft;
+    private Button bottomRight;
+    private int x;
+    private int y;
+    private FrameLayout.LayoutParams topLeftButtonParams;
+    private FrameLayout.LayoutParams topRightButtonParams;
+    private FrameLayout.LayoutParams bottomLeftButtonParams;
+    private FrameLayout.LayoutParams bottomRightButtonParams;
+    private int height;
+    private int width;
 
     private void loadApps(){
         manager = getPackageManager();
@@ -103,8 +120,6 @@ public class ChangeIconsActivity extends AppCompatActivity {
                 convertView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(ChangeIconsActivity.this, apps.get(index).getLabel().toString(),
-                        Toast.LENGTH_LONG).show();
                         appName = apps.get(index).getLabel().toString();
                         Intent i = new Intent(
                                 Intent.ACTION_PICK,
@@ -140,31 +155,81 @@ public class ChangeIconsActivity extends AppCompatActivity {
             ListView listView = (ListView) findViewById(R.id.set_icons_list);
             FrameLayout imageViewFrame = (FrameLayout) findViewById(R.id.image_frame);
             ImageView imageView = (ImageView) findViewById(R.id.image_view);
-            listView.setVisibility(View.GONE);
-            imageViewFrame.setVisibility(View.VISIBLE);
-            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
 
-            ImageView cropped_background = (ImageView) findViewById(R.id.cropped_background);
-            Drawable drawable = imageView.getDrawable();
-            drawable.mutate().setColorFilter( 0x500000FF, PorterDuff.Mode.MULTIPLY);
-            cropped_background.setImageDrawable(drawable);
-            cropped_background.requestLayout();
+            Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
+            int bitmapWidth = bitmap.getWidth();
+            int bitmapHeight = bitmap.getHeight();
+            if(bitmapHeight < 200 || bitmapHeight < 200) {
+                Toast.makeText(ChangeIconsActivity.this, "Selected image is too small",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                listView.setVisibility(View.GONE);
+                imageViewFrame.setVisibility(View.VISIBLE);
+                int resizeFactor;
+                if(bitmapWidth > bitmapHeight) {
+                    resizeFactor = bitmapWidth / 800;
+                } else {
+                    resizeFactor = bitmapHeight / 1200;
+                }
+                imageView.setImageBitmap(Bitmap.createScaledBitmap(BitmapFactory.decodeFile(picturePath), bitmapWidth / resizeFactor, bitmapHeight / resizeFactor, false) );
+
+            }
         }
     }
 
     private final class MyTouchListener implements View.OnTouchListener {
         public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                Log.i("motion starts", "x: " + motionEvent.getX());
-                Log.i("motion starts", "y: " + motionEvent.getY());
-                return true;
-            } else if (motionEvent.getAction() == MotionEvent.ACTION_UP){
-                Log.i("motion ends", "x: " + motionEvent.getX());
-                Log.i("motion ends", "y: " + motionEvent.getY());
-                return true;
-            } else {
-                return false;
+            topLeftButtonParams = new FrameLayout.LayoutParams(topLeft.getLayoutParams());
+            topRightButtonParams = new FrameLayout.LayoutParams(topRight.getLayoutParams());
+            bottomLeftButtonParams = new FrameLayout.LayoutParams(topLeft.getLayoutParams());
+            bottomRightButtonParams = new FrameLayout.LayoutParams(topRight.getLayoutParams());
+
+            switch (motionEvent.getAction()) {
+
+                case MotionEvent.ACTION_DOWN:
+                    tag = view.getTag().toString();
+                    startX = (int) (view.getX() - motionEvent.getRawX());
+                    startY = (int) (view.getY() - motionEvent.getRawY());
+                    break;
+
+                case MotionEvent.ACTION_MOVE:
+                    Log.i("x, y", motionEvent.getRawX() + startX + ", " + motionEvent.getRawY() + startY);
+                    boolean canMove = false;
+                    if(tag.equals("top_left")) {
+                        if(motionEvent.getRawX() + startX > 0 && motionEvent.getRawX() + startX < maxX - buttonSide * 2 -1
+                                && motionEvent.getRawY() + startY > 0 && motionEvent.getRawY() + startY < maxY - buttonSide * 2 -1) {
+                            canMove = true;
+                        }
+                        topLeftButtonParams.setMargins((int)motionEvent.getRawX() + startX, (int)motionEvent.getRawY() + startY,0,0);
+                        minX = (int)motionEvent.getRawX() + startX;
+                        minY = (int)motionEvent.getRawY() + startY;
+                    } else if (tag.equals("top_right")) {
+                        if(motionEvent.getRawX() + startX > minX + buttonSide * 2 && motionEvent.getRawX() + startX < width - buttonSide * 2 -1
+                                && motionEvent.getRawY() + startY > 0 && motionEvent.getRawY() + startY < height - buttonSide * 2 -1) {
+                            canMove = true;
+                        }
+                        topRightButtonParams.setMargins((int)motionEvent.getRawX() + startX, (int)motionEvent.getRawY() + startY,0,0);
+                        maxX = (int)motionEvent.getRawX() + startX;
+                        topLeftButtonParams.setMargins(topLeftButtonParams.leftMargin, (int)motionEvent.getRawY() + startY,0,0);
+                    } else if (tag.equals("bottom_left")) {
+
+                    } else if (tag.equals("bottom_right")) {
+
+                    }
+                    if(canMove) {
+                        view.animate()
+                                .x(motionEvent.getRawX() + startX)
+                                .y(motionEvent.getRawY() + startY)
+                                .setDuration(0)
+                                .start();
+                    }
+
+                    Log.i("view's top margin", String.valueOf(topLeftButtonParams.topMargin));
+                    break;
+                default:
+                    return false;
             }
+            return true;
         }
     }
 
@@ -173,7 +238,6 @@ public class ChangeIconsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_icons);
-        findViewById(R.id.image_frame).setOnTouchListener(new MyTouchListener());
         minX = 0;
         minY = 0;
         Window window = getWindow();
@@ -207,12 +271,26 @@ public class ChangeIconsActivity extends AppCompatActivity {
                 DisplayMetrics displayMetrics = new DisplayMetrics();
                 getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
                 int screenWidth = displayMetrics.widthPixels;
+                int screenHeight = displayMetrics.heightPixels;
+                buttonSide = 0;
+                if(screenWidth <= 240) {
+                    buttonSide = 20;
+                } else if(screenWidth <= 320) {
+                    buttonSide = 24;
+                } else if(screenWidth <= 480) {
+                    buttonSide = 36;
+                } else if(screenWidth <= 768) {
+                    buttonSide = 48;
+                } else if(screenWidth <= 1080) {
+                    buttonSide = 72;
+                } else {
+                    buttonSide = 96;
+                }
+                height = parent.getMeasuredHeight();
+                width = parent.getMeasuredWidth();
 
-                int height = parent.getMeasuredHeight();
-                int width = parent.getMeasuredWidth();
-
-                int maxY = height;
-                int maxX = width;
+                maxY = height;
+                maxX = width;
 
                 if(height>0) {
                     parent.getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -222,45 +300,65 @@ public class ChangeIconsActivity extends AppCompatActivity {
                     layoutParams.setMargins((screenWidth - width)/2, actionBarHeight, (screenWidth - width)/2, 0);
 
                     imageView.setLayoutParams(layoutParams);
+                    ImageView cropped_background = (ImageView) findViewById(R.id.cropped_background);
+                    cropped_background.setLayoutParams(new FrameLayout.LayoutParams(width, height));
 
-//                    Button topLeft = (Button) findViewById(R.id.top_left_crop);
-//                    topLeft.setVisibility(View.VISIBLE);
-//                    topLeft.getLayoutParams().height = 60;
-//                    topLeft.getLayoutParams().width = 60;
-//
-//                    Button topRight = (Button) findViewById(R.id.top_right_crop);
-//                    topRight.setVisibility(View.VISIBLE);
-//                    FrameLayout.LayoutParams buttonParams = new FrameLayout.LayoutParams(topRight.getLayoutParams());
-//                    buttonParams.setMargins(width-30,0,0,0);
-//                    topRight.setLayoutParams(buttonParams);
-//                    topRight.getLayoutParams().height = 60;
-//                    topRight.getLayoutParams().width = 60;
+                    topLeft = (Button) findViewById(R.id.top_left_crop);
+                    topLeft.setVisibility(View.VISIBLE);
+                    topLeft.getLayoutParams().height = buttonSide;
+                    topLeft.getLayoutParams().width = buttonSide;
+                    topLeft.setOnTouchListener(new MyTouchListener());
+
+                    Drawable dr = getResources().getDrawable(R.mipmap.crop_top_left, null);
+                    Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
+                    Drawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, buttonSide, buttonSide, true));
+                    topLeft.setBackground(d);
+
+                    topRight = (Button) findViewById(R.id.top_right_crop);
+                    topRight.setVisibility(View.VISIBLE);
+                    topRight.getLayoutParams().height = buttonSide;
+                    topRight.getLayoutParams().width = buttonSide;
+                    FrameLayout.LayoutParams buttonParams = new FrameLayout.LayoutParams(topRight.getLayoutParams());
+                    buttonParams.setMargins(width-buttonSide,0,0,0);
+                    topRight.setLayoutParams(buttonParams);
+                    topRight.setOnTouchListener(new MyTouchListener());
+
+                    dr = getResources().getDrawable(R.mipmap.crop_top_right, null);
+                    bitmap = ((BitmapDrawable) dr).getBitmap();
+                    d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, buttonSide, buttonSide, true));
+                    topRight.setBackground(d);
+
+                    bottomLeft = (Button) findViewById(R.id.left_bottom_crop);
+                    bottomLeft.setVisibility(View.VISIBLE);
+                    bottomLeft.getLayoutParams().height = buttonSide;
+                    bottomLeft.getLayoutParams().width = buttonSide;
+                    buttonParams = new FrameLayout.LayoutParams(bottomLeft.getLayoutParams());
+                    buttonParams.setMargins(0,height-buttonSide,0,0);
+                    bottomLeft.setLayoutParams(buttonParams);
+                    bottomLeft.setOnTouchListener(new MyTouchListener());
 
 
-//                    Button leftBottom = (Button) findViewById(R.id.left_bottom_crop);
-//                    leftBottom.setVisibility(View.VISIBLE);
-//                    buttonParams = new FrameLayout.LayoutParams(leftBottom.getLayoutParams());
-//                    buttonParams.setMargins(0,height-30,0,0);
-//                    leftBottom.setLayoutParams(buttonParams);
-//                    leftBottom.getLayoutParams().height = 60;
-//                    leftBottom.getLayoutParams().width = 60;
-//
-//
-//                    Button center = (Button) findViewById(R.id.right_center_crop);
-//                    center.setVisibility(View.VISIBLE);
-//                    buttonParams = new FrameLayout.LayoutParams(center.getLayoutParams());
-//                    buttonParams.setMargins(width/2 -30,height/2-30,0,0);
-//                    rightCenter.setLayoutParams(buttonParams);
-//                    rightCenter.getLayoutParams().height = 60;
-//                    rightCenter.getLayoutParams().width = 60;
-//
-//                    Button bottomRight = (Button) findViewById(R.id.bottom_right_crop);
-//                    bottomRight.setVisibility(View.VISIBLE);
-//                    buttonParams = new FrameLayout.LayoutParams(bottomRight.getLayoutParams());
-//                    buttonParams.setMargins(width -30,height-30,0,0);
-//                    bottomRight.setLayoutParams(buttonParams);
-//                    bottomRight.getLayoutParams().height = 60;
-//                    bottomRight.getLayoutParams().width = 60
+                    dr = getResources().getDrawable(R.mipmap.crop_bottom_left, null);
+                    bitmap = ((BitmapDrawable) dr).getBitmap();
+                    d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, buttonSide, buttonSide, true));
+                    bottomLeft.setBackground(d);
+
+
+                    bottomRight = (Button) findViewById(R.id.bottom_right_crop);
+                    bottomRight.setVisibility(View.VISIBLE);
+                    bottomRight.getLayoutParams().height = buttonSide;
+                    bottomRight.getLayoutParams().width = buttonSide;
+                    buttonParams = new FrameLayout.LayoutParams(bottomRight.getLayoutParams());
+                    buttonParams.setMargins(width -buttonSide,height-buttonSide,0,0);
+                    bottomRight.setLayoutParams(buttonParams);
+                    bottomRight.setOnTouchListener(new MyTouchListener());
+
+
+                    dr = getResources().getDrawable(R.mipmap.crop_bottom_right, null);
+                    bitmap = ((BitmapDrawable) dr).getBitmap();
+                    d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, buttonSide, buttonSide, true));
+                    bottomRight.setBackground(d);
+
                 }
             }
         });

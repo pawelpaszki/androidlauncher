@@ -1,9 +1,11 @@
 package com.example.pawelpaszki.launcher;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -51,6 +53,12 @@ public class HomeActivity extends Activity {
     private int j;
     private HorizontalScrollView container;
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +97,7 @@ public class HomeActivity extends Activity {
             }
         });
         context = this;
+
     }
 
     public Context getContext() {
@@ -226,7 +235,6 @@ public class HomeActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        finish();
     }
 
     public void startIntentService() {
