@@ -79,6 +79,7 @@ public class SelectAppsActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         SharedPrefs.setAppVisible(((CheckBox) v).isChecked(), (String) visible.getText(), SelectAppsActivity.this);
+                        SharedPrefs.setHomeReloadRequired(true, SelectAppsActivity.this);
 //                        Toast.makeText(SelectAppsActivity.this, String.valueOf(SharedPrefs.getAppVisible(SelectAppsActivity.this, (String) visible.getText())) + " " + (String) visible.getText(),
 //                                Toast.LENGTH_LONG).show();
                     }

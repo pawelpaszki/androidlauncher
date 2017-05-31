@@ -152,6 +152,7 @@ public class HomeActivity extends Activity {
                     Intent intent = manager.getLaunchIntentForPackage(v.getTag().toString());
                     //Log.i("name", v.getTag().toString());
                     SharedPrefs.increaseNumberOfActivityStarts(((TextView)v.findViewById(R.id.dock_app_name)).getText().toString(), context);
+                    SharedPrefs.setHomeReloadRequired(true, HomeActivity.this);
                     if(intent != null) {
                         context.startActivity(intent);
                     } else {
@@ -221,8 +222,8 @@ public class HomeActivity extends Activity {
     }
 
     private void onSwipeLeft() {
-        Intent i = new Intent(HomeActivity.this, AppsListActivity.class);
-        startActivity(i);
+        Intent intent = new Intent(HomeActivity.this, AppsListActivity.class);
+        startActivity(intent);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
     }
 
@@ -230,6 +231,10 @@ public class HomeActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        if(SharedPrefs.getHomeReloadRequired(this)) {
+            SharedPrefs.setHomeReloadRequired(false, this);
+            recreate();
+        }
     }
 
     @Override

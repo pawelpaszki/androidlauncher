@@ -105,4 +105,18 @@ public class SharedPrefs {
         String key = "firstLaunch";
         return prefs.getBoolean(key, true);
     }
+
+    public static void setHomeReloadRequired(boolean homeReloadRequired, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "homeReloadRequired";
+        editor.putBoolean(key, homeReloadRequired);
+        editor.commit();
+    }
+
+    public static boolean getHomeReloadRequired(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "homeReloadRequired";
+        return prefs.getBoolean(key, false);
+    }
 }
