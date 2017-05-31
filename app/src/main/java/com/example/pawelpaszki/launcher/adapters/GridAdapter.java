@@ -7,6 +7,7 @@ package com.example.pawelpaszki.launcher.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -17,14 +18,17 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.PictureDrawable;
+import android.net.Uri;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -35,6 +39,7 @@ import com.example.pawelpaszki.launcher.AppsListActivity;
 import com.example.pawelpaszki.launcher.R;
 import com.example.pawelpaszki.launcher.utils.BitMapFilter;
 import com.example.pawelpaszki.launcher.utils.IconLoader;
+import com.example.pawelpaszki.launcher.utils.MissedCallsCountRetriever;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
 import java.util.List;
@@ -96,23 +101,35 @@ public class GridAdapter extends BaseAdapter{
         }
         ImageView imageView=(ImageView) v.findViewById(R.id.item_app_icon);
         TextView textView=(TextView) v.findViewById(R.id.item_app_label);
-        LinearLayout.LayoutParams margins = new LinearLayout.LayoutParams(imageView.getLayoutParams());
+        FrameLayout.LayoutParams margins = new FrameLayout.LayoutParams(imageView.getLayoutParams());
         margins.topMargin = 80 / noOfCols;
         margins.bottomMargin = 80 / noOfCols;
         margins.leftMargin = noOfCols;
         margins.rightMargin = noOfCols;
-
+        String text = (String) apps.get(position).getLabel();
         if(noOfCols >= 5 || !SharedPrefs.getShowAppNames(context)) {
             textView.setVisibility(View.GONE);
             imageView.setLayoutParams(margins);
             textView.setLayoutParams(margins);
         } else {
-            String text = (String) apps.get(position).getLabel();
+            if(noOfCols <= 3) {
+                imageView.setLayoutParams(margins);
+            }
+
             textView.setText(text);
         }
-
-
-
+        TextView messagesCount = (TextView) v.findViewById(R.id.notifications);
+        if(text.equalsIgnoreCase("Messaging")) {
+            int messageCount = MissedCallsCountRetriever.getUnreadMessagesCount(context);
+            if(messageCount > 0) {
+                messagesCount.setText(String.valueOf(messageCount));
+                messagesCount.setVisibility(View.VISIBLE);
+            } else {
+                messagesCount.setVisibility(View.GONE);
+            }
+        } else {
+            messagesCount.setVisibility(View.GONE);
+        }
 //        if(text.length() > 14) {
 //            text = text.substring(0,11) + "...";
 //        }
@@ -134,7 +151,31 @@ public class GridAdapter extends BaseAdapter{
 //        }
 //        Bitmap bitmap = BitmapFactory.decodeResource(v.getResources(), R.mipmap.imageviewbg);
         //imageView.setImageDrawable(apps.get(position).getIcon());
-        imageView.setImageDrawable(new BitmapDrawable(v.getResources(), icon));
+        float fontSize = 11f;
+        if(noOfCols <=3) {
+            float ratio = 0f;
+            switch(noOfCols) {
+                case 1:
+                    ratio = 3f;
+                    fontSize = 24f;
+                    break;
+                case 2:
+                    ratio = 1.6f;
+                    fontSize = 18f;
+                    break;
+                case 3:
+                    ratio = 1.3f;
+                    fontSize = 14f;
+                    break;
+            }
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,fontSize);
+            messagesCount.setTextSize(TypedValue.COMPLEX_UNIT_SP,fontSize);
+            imageView.setImageDrawable(new BitmapDrawable(v.getResources(), Bitmap.createScaledBitmap(icon, (int) (icon.getWidth() * ratio), (int) (icon.getHeight() * ratio), true)));
+        } else {
+            imageView.setImageDrawable(new BitmapDrawable(v.getResources(), icon));
+        }
+
+
 
 
 //        Bitmap bgIcon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
@@ -156,8 +197,14 @@ public class GridAdapter extends BaseAdapter{
 
             @Override
             public void onClick(View v) {
-                Intent i = manager.getLaunchIntentForPackage(apps.get(position).getName().toString());
+                Intent i;
+                if(apps.get(position).getLabel().toString().equalsIgnoreCase("Phone")) {
+                    i = new Intent(Intent.ACTION_DIAL);
+                } else {
+                    i = manager.getLaunchIntentForPackage(apps.get(position).getName().toString());
+                }
                 SharedPrefs.increaseNumberOfActivityStarts(apps.get(position).getLabel().toString(), context);
+                SharedPrefs.setHomeReloadRequired(true, context);
                 context.startActivity(i);
             }
         });

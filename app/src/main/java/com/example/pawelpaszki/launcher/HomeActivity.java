@@ -1,11 +1,9 @@
 package com.example.pawelpaszki.launcher;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -24,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,8 +32,8 @@ import android.widget.TextView;
 
 import com.example.pawelpaszki.launcher.services.MyIntentService;
 import com.example.pawelpaszki.launcher.utils.AppsSorter;
-import com.example.pawelpaszki.launcher.utils.IconLoader;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
+import com.example.pawelpaszki.launcher.utils.MissedCallsCountRetriever;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,6 +51,7 @@ public class HomeActivity extends Activity {
     private Context context;
     private int j;
     private HorizontalScrollView container;
+    private TextView homeNotifications;
 
 
     @Override
@@ -96,8 +96,8 @@ public class HomeActivity extends Activity {
                 return false;
             }
         });
-        context = this;
 
+        context = this;
     }
 
     public Context getContext() {
@@ -105,6 +105,7 @@ public class HomeActivity extends Activity {
     }
 
     private void loadCarousel() {
+
         LinearLayout dock = (LinearLayout) findViewById(R.id.dock_list);
         manager = getPackageManager();
         dockerApps = new ArrayList<AppDetail>();
@@ -115,7 +116,7 @@ public class HomeActivity extends Activity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.widthPixels;
 
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width/5, width/5);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(width/5, width/5);
 
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
         for(ResolveInfo ri:availableActivities){
@@ -126,13 +127,38 @@ public class HomeActivity extends Activity {
             app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
             if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(manager))) {
                 dockerApps.add(app);
-                //Log.i("no of runs", app.getLabel() + ": " + String.valueOf(app.getNumberOfStarts()));
+                Log.i("no of runs", "label: " + app.getLabel() + ": " + " package name: " + String.valueOf(ri.activityInfo.packageName) + String.valueOf(app.getNumberOfStarts()));
             }
         }
         AppsSorter.sortApps(this, dockerApps, "most used", true);
         for(j = 0; j < dockerApps.size(); j++) {
+
             View view = LayoutInflater.from(this).inflate(R.layout.dock_item,null);
-            view.setTag((String) dockerApps.get(j).getName());
+            homeNotifications = (TextView) view.findViewById(R.id.home_notifications);
+            if(dockerApps.get(j).getLabel().toString().equalsIgnoreCase("Messaging")) {
+                int messageCount = MissedCallsCountRetriever.getUnreadMessagesCount(this);
+                if(messageCount > 0) {
+                    homeNotifications.setText(String.valueOf(messageCount));
+                    homeNotifications.setVisibility(View.VISIBLE);
+                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) homeNotifications.getLayoutParams();
+                    params.rightMargin = width / 36;
+                    params.bottomMargin = width / 36;
+                } else {
+                    homeNotifications.setVisibility(View.GONE);
+                }
+            }
+            if(dockerApps.get(j).getLabel().toString().equalsIgnoreCase("Phone")) {
+                view.setTag("Phone");
+                if(MissedCallsCountRetriever.getMissedCallsCount(this) > 0) {
+                    homeNotifications.setVisibility(View.VISIBLE);
+                    homeNotifications.setText(MissedCallsCountRetriever.getMissedCallsCount(this));
+                } else {
+                    homeNotifications.setVisibility(View.GONE);
+                }
+            } else {
+                view.setTag((String) dockerApps.get(j).getName());
+            }
+
             ImageView iv = (ImageView) view.findViewById(R.id.dock_app_icon);
 
             final TextView tv = (TextView) view.findViewById(R.id.dock_app_name);
@@ -149,10 +175,17 @@ public class HomeActivity extends Activity {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = manager.getLaunchIntentForPackage(v.getTag().toString());
-                    //Log.i("name", v.getTag().toString());
+                    Intent intent;
+                    if(v.getTag().toString().equalsIgnoreCase("Phone")) {
+                        intent = new Intent(Intent.ACTION_DIAL);
+                    } else {
+                        intent = manager.getLaunchIntentForPackage(v.getTag().toString());
+                    }
+
+                    Log.i("name", v.getTag().toString());
                     SharedPrefs.increaseNumberOfActivityStarts(((TextView)v.findViewById(R.id.dock_app_name)).getText().toString(), context);
                     SharedPrefs.setHomeReloadRequired(true, HomeActivity.this);
+
                     if(intent != null) {
                         context.startActivity(intent);
                     } else {
@@ -233,7 +266,15 @@ public class HomeActivity extends Activity {
         super.onResume();
         if(SharedPrefs.getHomeReloadRequired(this)) {
             SharedPrefs.setHomeReloadRequired(false, this);
-            recreate();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                     recreate();
+                }
+            }, 1);
         }
     }
 

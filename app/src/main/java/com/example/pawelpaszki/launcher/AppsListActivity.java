@@ -150,8 +150,10 @@ public class AppsListActivity extends Activity {
             app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
             if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(manager))) {
                 apps.add(app);
+                Log.i("app starts", String.valueOf(ri.loadLabel(manager)) + " " + String.valueOf(ri.activityInfo.packageName) + " "+ SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
             }
-            //Log.i("app starts", String.valueOf(ri.loadLabel(manager)) + " " + SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
+
+            //Log.i("name", String.valueOf(ri.loadLabel(manager)) + " " + SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
         }
         //Log.i("sorting method", SharedPrefs.getSortingMethod(this));
         apps = AppsSorter.sortApps(this, apps, SharedPrefs.getSortingMethod(this), false);

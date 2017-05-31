@@ -3,16 +3,32 @@
     android:layout_width="wrap_content" android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:id="@+id/dock_item">
-    <ImageView
-        android:id="@+id/dock_app_icon"
-        android:layout_gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:padding="10dp"
-        />
-
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/dock_app_icon"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:padding="10dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#1A237E"
+            android:background="@drawable/rounded_background"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:layout_gravity="bottom|right"
+            android:id="@+id/home_notifications"
+            android:visibility="gone"
+            />
+    </FrameLayout>
     <TextView
         android:id="@+id/dock_app_name"
         android:layout_width="wrap_content"

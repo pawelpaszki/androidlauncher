@@ -78,8 +78,8 @@ public class SettingsActivity extends AppCompatActivity {
         sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(SettingsActivity.this, parent.getItemAtPosition(position).toString(),
-                        Toast.LENGTH_SHORT).show();
+//                Toast.makeText(SettingsActivity.this, parent.getItemAtPosition(position).toString(),
+//                        Toast.LENGTH_SHORT).show();
                 if(parent.getItemAtPosition(position).toString().startsWith("by name")) {
                     sortByName();
                 } else {

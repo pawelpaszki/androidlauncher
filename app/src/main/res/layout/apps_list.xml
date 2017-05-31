@@ -5,22 +5,40 @@
     android:orientation="vertical"
     android:gravity="center_horizontal|center_vertical"
     android:id="@+id/apps_list">
-    <ImageView
-        android:id="@+id/item_app_icon"
-        android:layout_gravity="center_horizontal"
+    <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:adjustViewBounds="true"
-        />
+        android:layout_height="wrap_content">
 
+        <ImageView
+            android:id="@+id/item_app_icon"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#1A237E"
+            android:background="@drawable/rounded_background"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:layout_gravity="bottom|right"
+            android:visibility="gone"
+            android:id="@+id/notifications"
+            />
+    </FrameLayout>
     <TextView
         android:id="@+id/item_app_label"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textSize="11dp"
+        android:textSize="12sp"
         android:textStyle="bold"
         android:textColor="#ffffff"
         android:layout_marginBottom="12dp"
