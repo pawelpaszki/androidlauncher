@@ -203,91 +203,54 @@ public class ChangeIconsActivity extends AppCompatActivity {
 
                 case MotionEvent.ACTION_MOVE:
                     Log.i("x, y", motionEvent.getRawX() + startX + ", " + motionEvent.getRawY() + startY);
-                    boolean canMove = false;
                     if(tag.equals("top_left")) {
                         if(motionEvent.getRawX() + startX > 0 && motionEvent.getRawX() + startX < maxX - buttonSide * 2 -1
                                 && motionEvent.getRawY() + startY > 0 && motionEvent.getRawY() + startY < maxY - buttonSide * 2 -1) {
-                            canMove = true;
+                            minY = (int)motionEvent.getRawY() + startY;
+                            minX = (int)motionEvent.getRawX() + startX;
+
                             previousTopLeftX = (int)motionEvent.getRawX() + startX;
                             previousBottomLeftX = (int)motionEvent.getRawX() + startX;
                             previousTopLeftY = (int)motionEvent.getRawY() + startY;
                             previousTopRightY = (int)motionEvent.getRawY() + startY;
-
-                            topLeftButtonParams.setMargins((int)motionEvent.getRawX() + startX, (int)motionEvent.getRawY() + startY,0,0);
-                            minX = (int)motionEvent.getRawX() + startX;
-                            minY = (int)motionEvent.getRawY() + startY;
-
-                            topRightButtonParams.topMargin = (int)motionEvent.getRawY() + startY;
-                            topRightButtonParams.leftMargin = previousTopRightX;
-                            topRight.setLayoutParams(topRightButtonParams);
-                            topRight.setVisibility(View.GONE);
-                            topRight.setVisibility(View.VISIBLE);
-
-                            bottomLeftButtonParams.leftMargin = (int)motionEvent.getRawX() + startX;
-                            bottomLeftButtonParams.topMargin = previousBottomLeftY;
-                            bottomLeft.setLayoutParams(bottomLeftButtonParams);
-                            bottomLeft.setVisibility(View.GONE);
-                            bottomLeft.setVisibility(View.VISIBLE);
-
-
-                            topLeft.setVisibility(View.GONE);
-                            topLeft.setVisibility(View.VISIBLE);
-                            topLeft.setLayoutParams(topLeftButtonParams);
                         }
 
                     } else if (tag.equals("top_right")) {
-                        if(motionEvent.getRawX() + startX > minX + buttonSide * 2 && motionEvent.getRawX() + startX < width - buttonSide  -1
-                                && motionEvent.getRawY() + startY > 0 && motionEvent.getRawY() + startY < height - buttonSide * 2 -1) {
-                            canMove = true;
-                            topRightButtonParams.setMargins((int)motionEvent.getRawX() + startX, (int)motionEvent.getRawY() + startY,0,0);
-                            previousTopRightX = (int)motionEvent.getRawX() + startX;
-                            maxX = (int)motionEvent.getRawX() + startX + buttonSide;
+                        if(motionEvent.getRawX() + startX > minX + buttonSide && motionEvent.getRawX() + startX < width - buttonSide  -1
+                                && motionEvent.getRawY() + startY > 0 && motionEvent.getRawY() + startY < maxY - buttonSide) {
                             minY = (int)motionEvent.getRawY() + startY;
-                            topLeftButtonParams.topMargin = (int)motionEvent.getRawY() + startY;
-                            topLeftButtonParams.leftMargin = previousTopLeftX;
-                            topLeft.setLayoutParams(topLeftButtonParams);
-                            topRight.setLayoutParams(topRightButtonParams);
-                            topRight.setVisibility(View.GONE);
-                            topRight.setVisibility(View.VISIBLE);
-                            topLeft.setVisibility(View.GONE);
-                            topLeft.setVisibility(View.VISIBLE);
+                            maxX = (int)motionEvent.getRawX() + startX + buttonSide;
 
+                            previousTopRightX = (int)motionEvent.getRawX() + startX;
+                            previousTopLeftY = (int)motionEvent.getRawY() + startY;
+                            previousTopRightY = (int)motionEvent.getRawY() + startY;
+                            previousBottomRightX = (int)motionEvent.getRawX() + startX;
                         }
 
                     } else if (tag.equals("bottom_left")) {
-                        if(motionEvent.getRawX() + startX > 0 && motionEvent.getRawX() + startX < maxX - buttonSide * 2 -1
-                                && motionEvent.getRawY() + startY > minY + buttonSide*2 && motionEvent.getRawY() + startY < height - buttonSide -1) {
+                        if(motionEvent.getRawX() + startX > 0 && motionEvent.getRawX() + startX < maxX - buttonSide *2 -1
+                                && motionEvent.getRawY() + startY > minY + buttonSide && motionEvent.getRawY() + startY < height - buttonSide -1) {
                             minX = (int)motionEvent.getRawX() + startX;
                             maxY = (int)motionEvent.getRawY() + startY + buttonSide;
+
                             previousTopLeftX = (int)motionEvent.getRawX() + startX;
                             previousBottomLeftX = (int)motionEvent.getRawX() + startX;
                             previousBottomLeftY = (int)motionEvent.getRawY() + startY;
                             previousBottomRightY = (int)motionEvent.getRawY() + startY;
-
-                            topLeftButtonParams.setMargins(previousTopLeftX, previousTopLeftY,0,0);
-                            topLeft.setLayoutParams(topLeftButtonParams);
-                            topLeft.setVisibility(View.GONE);
-                            topLeft.setVisibility(View.VISIBLE);
-
-
-                            bottomLeftButtonParams.leftMargin = previousBottomLeftX;
-                            bottomLeftButtonParams.topMargin = previousBottomLeftY;
-                            bottomLeft.setLayoutParams(bottomLeftButtonParams);
-                            bottomLeft.setVisibility(View.GONE);
-                            bottomLeft.setVisibility(View.VISIBLE);
-
-                            bottomRightButtonParams.leftMargin = previousBottomRightX;
-                            bottomRightButtonParams.topMargin = previousBottomRightY;
-                            bottomRight.setLayoutParams(bottomRightButtonParams);
-                            bottomRight.setVisibility(View.GONE);
-                            bottomRight.setVisibility(View.VISIBLE);
-
                         }
                     } else if (tag.equals("bottom_right")) {
+                        if(motionEvent.getRawX() + startX > minX + buttonSide && motionEvent.getRawX() + startX < width - buttonSide  -1
+                                && motionEvent.getRawY() + startY > minY + buttonSide && motionEvent.getRawY() + startY < height - buttonSide -1) {
+                            maxX = (int)motionEvent.getRawX() + startX + buttonSide;
+                            maxY = (int)motionEvent.getRawY() + startY + buttonSide;
 
+                            previousTopRightX = (int)motionEvent.getRawX() + startX;
+                            previousBottomLeftY = (int)motionEvent.getRawY() + startY;
+                            previousBottomRightY = (int)motionEvent.getRawY() + startY;
+                            previousBottomRightX = (int)motionEvent.getRawX() + startX;
+                        }
                     }
-
-                    Log.i("view's top margin", String.valueOf(topLeftButtonParams.topMargin));
+                    repaintCropButtons();
                     break;
                 default:
                     return false;
@@ -296,6 +259,27 @@ public class ChangeIconsActivity extends AppCompatActivity {
         }
     }
 
+    private void repaintCropButtons() {
+        topLeftButtonParams.setMargins(previousTopLeftX, previousTopLeftY,0,0);
+        topLeft.setLayoutParams(topLeftButtonParams);
+        topLeft.setVisibility(View.GONE);
+        topLeft.setVisibility(View.VISIBLE);
+
+        topRightButtonParams.setMargins(previousTopRightX,previousTopRightY,0,0);
+        topRight.setLayoutParams(topRightButtonParams);
+        topRight.setVisibility(View.GONE);
+        topRight.setVisibility(View.VISIBLE);
+
+        bottomRightButtonParams.setMargins(previousBottomRightX,previousBottomRightY,0,0);
+        bottomRight.setLayoutParams(bottomRightButtonParams);
+        bottomRight.setVisibility(View.GONE);
+        bottomRight.setVisibility(View.VISIBLE);
+
+        bottomLeftButtonParams.setMargins(previousBottomLeftX,previousBottomLeftY,0,0);
+        bottomLeft.setLayoutParams(bottomLeftButtonParams);
+        bottomLeft.setVisibility(View.GONE);
+        bottomLeft.setVisibility(View.VISIBLE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
