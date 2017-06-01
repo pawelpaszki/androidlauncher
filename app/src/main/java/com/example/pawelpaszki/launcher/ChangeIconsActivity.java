@@ -70,10 +70,17 @@ public class ChangeIconsActivity extends AppCompatActivity {
     private FrameLayout.LayoutParams topRightButtonParams;
     private FrameLayout.LayoutParams bottomLeftButtonParams;
     private FrameLayout.LayoutParams bottomRightButtonParams;
-    private int previousTopRightX;
+
     private int height;
     private int width;
     private int previousTopLeftX;
+    private int previousTopRightX;
+    private int previousTopLeftY;
+    private int previousTopRightY;
+    private int previousBottomLeftX;
+    private int previousBottomLeftY;
+    private int previousBottomRightX;
+    private int previousBottomRightY;
 
     private void loadApps(){
         manager = getPackageManager();
@@ -202,14 +209,27 @@ public class ChangeIconsActivity extends AppCompatActivity {
                                 && motionEvent.getRawY() + startY > 0 && motionEvent.getRawY() + startY < maxY - buttonSide * 2 -1) {
                             canMove = true;
                             previousTopLeftX = (int)motionEvent.getRawX() + startX;
+                            previousBottomLeftX = (int)motionEvent.getRawX() + startX;
+                            previousTopLeftY = (int)motionEvent.getRawY() + startY;
+                            previousTopRightY = (int)motionEvent.getRawY() + startY;
+
                             topLeftButtonParams.setMargins((int)motionEvent.getRawX() + startX, (int)motionEvent.getRawY() + startY,0,0);
                             minX = (int)motionEvent.getRawX() + startX;
                             minY = (int)motionEvent.getRawY() + startY;
+
                             topRightButtonParams.topMargin = (int)motionEvent.getRawY() + startY;
                             topRightButtonParams.leftMargin = previousTopRightX;
                             topRight.setLayoutParams(topRightButtonParams);
                             topRight.setVisibility(View.GONE);
                             topRight.setVisibility(View.VISIBLE);
+
+                            bottomLeftButtonParams.leftMargin = (int)motionEvent.getRawX() + startX;
+                            bottomLeftButtonParams.topMargin = previousBottomLeftY;
+                            bottomLeft.setLayoutParams(bottomLeftButtonParams);
+                            bottomLeft.setVisibility(View.GONE);
+                            bottomLeft.setVisibility(View.VISIBLE);
+
+
                             topLeft.setVisibility(View.GONE);
                             topLeft.setVisibility(View.VISIBLE);
                             topLeft.setLayoutParams(topLeftButtonParams);
@@ -226,25 +246,46 @@ public class ChangeIconsActivity extends AppCompatActivity {
                             topLeftButtonParams.topMargin = (int)motionEvent.getRawY() + startY;
                             topLeftButtonParams.leftMargin = previousTopLeftX;
                             topLeft.setLayoutParams(topLeftButtonParams);
+                            topRight.setLayoutParams(topRightButtonParams);
                             topRight.setVisibility(View.GONE);
                             topRight.setVisibility(View.VISIBLE);
                             topLeft.setVisibility(View.GONE);
                             topLeft.setVisibility(View.VISIBLE);
-                            topRight.setLayoutParams(topRightButtonParams);
+
                         }
 
                     } else if (tag.equals("bottom_left")) {
+                        if(motionEvent.getRawX() + startX > 0 && motionEvent.getRawX() + startX < maxX - buttonSide * 2 -1
+                                && motionEvent.getRawY() + startY > minY + buttonSide*2 && motionEvent.getRawY() + startY < height - buttonSide -1) {
+                            minX = (int)motionEvent.getRawX() + startX;
+                            maxY = (int)motionEvent.getRawY() + startY + buttonSide;
+                            previousTopLeftX = (int)motionEvent.getRawX() + startX;
+                            previousBottomLeftX = (int)motionEvent.getRawX() + startX;
+                            previousBottomLeftY = (int)motionEvent.getRawY() + startY;
+                            previousBottomRightY = (int)motionEvent.getRawY() + startY;
 
+                            topLeftButtonParams.setMargins(previousTopLeftX, previousTopLeftY,0,0);
+                            topLeft.setLayoutParams(topLeftButtonParams);
+                            topLeft.setVisibility(View.GONE);
+                            topLeft.setVisibility(View.VISIBLE);
+
+
+                            bottomLeftButtonParams.leftMargin = previousBottomLeftX;
+                            bottomLeftButtonParams.topMargin = previousBottomLeftY;
+                            bottomLeft.setLayoutParams(bottomLeftButtonParams);
+                            bottomLeft.setVisibility(View.GONE);
+                            bottomLeft.setVisibility(View.VISIBLE);
+
+                            bottomRightButtonParams.leftMargin = previousBottomRightX;
+                            bottomRightButtonParams.topMargin = previousBottomRightY;
+                            bottomRight.setLayoutParams(bottomRightButtonParams);
+                            bottomRight.setVisibility(View.GONE);
+                            bottomRight.setVisibility(View.VISIBLE);
+
+                        }
                     } else if (tag.equals("bottom_right")) {
 
                     }
-//                    if(canMove) {
-//                        view.animate()
-//                                .x(motionEvent.getRawX() + startX)
-//                                .y(motionEvent.getRawY() + startY)
-//                                .setDuration(0)
-//                                .start();
-//                    }
 
                     Log.i("view's top margin", String.valueOf(topLeftButtonParams.topMargin));
                     break;
@@ -331,6 +372,7 @@ public class ChangeIconsActivity extends AppCompatActivity {
                     topLeft.getLayoutParams().width = buttonSide;
                     topLeft.setOnTouchListener(new MyTouchListener());
                     previousTopLeftX = 0;
+                    previousTopLeftY = 0;
 
                     Drawable dr = getResources().getDrawable(R.mipmap.crop_top_left, null);
                     Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
@@ -342,6 +384,7 @@ public class ChangeIconsActivity extends AppCompatActivity {
                     topRight.getLayoutParams().height = buttonSide;
                     topRight.getLayoutParams().width = buttonSide;
                     previousTopRightX = width-buttonSide-1;
+                    previousTopRightY = 0;
                     FrameLayout.LayoutParams buttonParams = new FrameLayout.LayoutParams(topRight.getLayoutParams());
                     buttonParams.setMargins(width-buttonSide-1,0,0,0);
                     topRight.setLayoutParams(buttonParams);
@@ -360,6 +403,8 @@ public class ChangeIconsActivity extends AppCompatActivity {
                     buttonParams.setMargins(0,height-buttonSide,0,0);
                     bottomLeft.setLayoutParams(buttonParams);
                     bottomLeft.setOnTouchListener(new MyTouchListener());
+                    previousBottomLeftX = 0;
+                    previousBottomLeftY = height-buttonSide -1;
 
 
                     dr = getResources().getDrawable(R.mipmap.crop_bottom_left, null);
@@ -376,6 +421,8 @@ public class ChangeIconsActivity extends AppCompatActivity {
                     buttonParams.setMargins(width -buttonSide,height-buttonSide,0,0);
                     bottomRight.setLayoutParams(buttonParams);
                     bottomRight.setOnTouchListener(new MyTouchListener());
+                    previousBottomRightX = width -buttonSide - 1;
+                    previousBottomRightY = height - buttonSide - 1;
 
 
                     dr = getResources().getDrawable(R.mipmap.crop_bottom_right, null);

@@ -27,8 +27,7 @@ public class BitMapFilter {
     public static Bitmap addTexture(Resources resources, Bitmap image) {
         int imageHeight = image.getHeight();
         int imageWidth = image.getWidth();
-        //Bitmap texture = BitmapFactory.decodeResource(resources, R.mipmap.texture);
-        Bitmap texture = BitmapFactory.decodeResource(resources, R.mipmap.broken);
+        Bitmap texture = BitmapFactory.decodeResource(resources, R.mipmap.texture);
         texture = Bitmap.createBitmap(texture, 0,0, image.getWidth(), image.getHeight());
         for (int x = 0; x < imageWidth; x++) {
             for (int y = 0; y < imageHeight; y++) {
