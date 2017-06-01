@@ -39,6 +39,7 @@ public class AppsListActivity extends Activity {
     private int noOfCols;
     private Handler handler;
     private int visibleCount = 0;
+    private int iconSide;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +54,7 @@ public class AppsListActivity extends Activity {
             SharedPrefs.setVisibleCount(visibleCount, this);
         }
         gv=(GridView) findViewById(R.id.gridView);
-        gv.setAdapter(new GridAdapter(this, apps, manager));
+        gv.setAdapter(new GridAdapter(this, apps, manager, iconSide));
         gv.setFastScrollEnabled(true);
         noOfCols = SharedPrefs.getNumberOfColumns(this);
         if(noOfCols != 0) {
@@ -152,6 +153,10 @@ public class AppsListActivity extends Activity {
             app.setName(ri.activityInfo.packageName);
             app.setIcon(ri.activityInfo.loadIcon(manager));
             app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
+            if(ri.loadLabel(manager).toString().equalsIgnoreCase("Settings")) {
+                iconSide = ri.activityInfo.loadIcon(manager).getIntrinsicWidth();
+                Log.i("icon side", String.valueOf(iconSide));
+            }
             if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(manager))) {
                 apps.add(app);
                 visibleCount++;

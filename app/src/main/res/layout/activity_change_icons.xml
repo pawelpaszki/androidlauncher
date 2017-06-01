@@ -17,7 +17,9 @@ android:weightSum="1">
     android:background="#1A237E"
     android:minHeight="?attr/actionBarSize"
     android:theme="?attr/actionBarTheme"
-    android:title="@string/toolbar_set_icons" />
+    android:title="@string/toolbar_set_icons" >
+
+</android.support.v7.widget.Toolbar>
 
 <ListView
     android:id="@+id/set_icons_list"
@@ -40,8 +42,8 @@ android:weightSum="1">
             android:layout_gravity="center"
             />
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/cropped_background"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
@@ -94,5 +96,19 @@ android:weightSum="1">
         </Button>
     </FrameLayout>
 
+    <Button
+        android:id="@+id/apply_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:text="@string/change_icon"
+        android:paddingTop="3dp"
+        android:background="#00000000"
+        android:textColor="#FFF"
+        android:visibility="gone"
+        android:onClick="saveIconToLocalStorage"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

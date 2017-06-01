@@ -40,17 +40,19 @@ import com.example.pawelpaszki.launcher.R;
 import com.example.pawelpaszki.launcher.utils.BitMapFilter;
 import com.example.pawelpaszki.launcher.utils.IconLoader;
 import com.example.pawelpaszki.launcher.utils.MissedCallsCountRetriever;
+import com.example.pawelpaszki.launcher.utils.RoundBitmapGenerator;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
 import java.util.List;
 
 public class GridAdapter extends BaseAdapter{
     private final Bitmap bgIcon;
+    private int iconSide;
     List<AppDetail> apps;
     Context context;
     PackageManager manager;
     private static LayoutInflater inflater=null;
-    public GridAdapter(AppsListActivity appsListActivity, List<AppDetail> apps, PackageManager manager) {
+    public GridAdapter(AppsListActivity appsListActivity, List<AppDetail> apps, PackageManager manager, int iconSide) {
         // TODO Auto-generated constructor stub
         this.apps=apps;
         context=appsListActivity;
@@ -61,7 +63,7 @@ public class GridAdapter extends BaseAdapter{
         this.manager = manager;
         inflater = ( LayoutInflater )context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
+        this.iconSide = iconSide;
     }
 
 
@@ -135,9 +137,17 @@ public class GridAdapter extends BaseAdapter{
 //        }
 
         String path = context.getFilesDir().getAbsolutePath();
-        Bitmap icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
+        //Bitmap icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
         /////////////// load from storage /////////////
-        //Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
+        Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
+        if(icon == null) {
+            icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
+        } else {
+            icon = RoundBitmapGenerator.getCircleBitmap(icon);
+        }
+        if(icon.getWidth() != iconSide || icon.getHeight() != iconSide) {
+            icon = Bitmap.createScaledBitmap(icon, iconSide, iconSide, false);
+        }
 //        // set foreground
 //        if(icon != null) {
 //            imageView.setImageDrawable(RoundedBitmapDrawableFactory.create(v.getResources(), icon));//Bitmap.createScaledBitmap(icon, icon.getWidth(), (icon.getHeight() / 6), false)

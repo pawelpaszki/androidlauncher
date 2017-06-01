@@ -22,6 +22,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.pawelpaszki.launcher.utils.IconLoader;
+import com.example.pawelpaszki.launcher.utils.RoundBitmapGenerator;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ public class SelectAppsActivity extends AppCompatActivity {
     private PackageManager manager;
     private List<AppDetail> apps;
     private int visibleCounter = 0;
+    private int iconSide;
+
     private void loadApps(){
         manager = getPackageManager();
         apps = new ArrayList<AppDetail>();
@@ -45,6 +48,10 @@ public class SelectAppsActivity extends AppCompatActivity {
             app.setLabel(ri.loadLabel(manager));
             app.setName(ri.activityInfo.packageName);
             app.setIcon(ri.activityInfo.loadIcon(manager));
+            if(ri.loadLabel(manager).toString().equalsIgnoreCase("Settings")) {
+                iconSide = ri.activityInfo.loadIcon(manager).getIntrinsicWidth();
+                Log.i("icon side", String.valueOf(iconSide));
+            }
             apps.add(app);
         }
     }
@@ -64,8 +71,18 @@ public class SelectAppsActivity extends AppCompatActivity {
 
                 String path = this.getContext().getFilesDir().getAbsolutePath();
                 //Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
-                Bitmap icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
+                Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
+                if(icon == null) {
+                    icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
+                } else {
+                    icon = RoundBitmapGenerator.getCircleBitmap(icon);
+                }
+
                 ImageView appIcon = (ImageView)convertView.findViewById(R.id.visible_app_icon);
+
+                if(icon.getWidth() != iconSide || icon.getHeight() != iconSide) {
+                    icon = Bitmap.createScaledBitmap(icon, iconSide, iconSide, false);
+                }
 
                 appIcon.setImageDrawable(new BitmapDrawable(SelectAppsActivity.this.getResources(), icon));
 

@@ -32,6 +32,8 @@ import android.widget.TextView;
 
 import com.example.pawelpaszki.launcher.services.MyIntentService;
 import com.example.pawelpaszki.launcher.utils.AppsSorter;
+import com.example.pawelpaszki.launcher.utils.IconLoader;
+import com.example.pawelpaszki.launcher.utils.RoundBitmapGenerator;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 import com.example.pawelpaszki.launcher.utils.MissedCallsCountRetriever;
 
@@ -166,7 +168,12 @@ public class HomeActivity extends Activity {
 
             ////////////// load icon from storage ////////////
             //Bitmap icon = IconLoader.loadImageFromStorage(path, (String) dockerApps.get(j).getLabel());
-            Bitmap icon  = ((BitmapDrawable) dockerApps.get(j).getIcon()).getBitmap();
+            Bitmap icon = IconLoader.loadImageFromStorage(path, (String) dockerApps.get(j).getLabel());
+            if(icon == null) {
+                icon  = ((BitmapDrawable) dockerApps.get(j).getIcon()).getBitmap();
+            } else {
+                icon = RoundBitmapGenerator.getCircleBitmap(icon);
+            }
 
 
             iv.setImageDrawable(new BitmapDrawable(this.getResources(), icon));
@@ -268,10 +275,11 @@ public class HomeActivity extends Activity {
         if(dock.getChildCount() > 0) {
             ((HorizontalScrollView) dock.getParent()).scrollTo(0,0);
         }
-        Log.i("carousel items", "carousel items: " + dock.getChildCount());
+        //Log.i("carousel items", "carousel items: " + dock.getChildCount());
 
         if(SharedPrefs.getHomeReloadRequired(this) || (SharedPrefs.getVisibleCount(this) > 0 && dock.getChildCount() != SharedPrefs.getVisibleCount(this))) {
             SharedPrefs.setHomeReloadRequired(false, this);
+            SharedPrefs.setVisibleCount(dock.getChildCount(), this);
             Handler handler = new Handler();
             handler.postDelayed(new Runnable()
             {

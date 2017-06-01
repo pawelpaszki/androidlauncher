@@ -7,10 +7,17 @@ import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.MediaStore;
@@ -40,8 +47,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.utils.IconLoader;
+import com.example.pawelpaszki.launcher.utils.RoundBitmapGenerator;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,6 +90,8 @@ public class ChangeIconsActivity extends AppCompatActivity {
     private int previousBottomLeftY;
     private int previousBottomRightX;
     private int previousBottomRightY;
+    private ImageView imageView;
+    private int iconSide;
 
     private void loadApps(){
         manager = getPackageManager();
@@ -95,7 +106,13 @@ public class ChangeIconsActivity extends AppCompatActivity {
             app.setLabel(ri.loadLabel(manager));
             app.setName(ri.activityInfo.packageName);
             app.setIcon(ri.activityInfo.loadIcon(manager));
-            apps.add(app);
+            if(ri.loadLabel(manager).toString().equalsIgnoreCase("Settings")) {
+                iconSide = ri.activityInfo.loadIcon(manager).getIntrinsicWidth();
+                Log.i("icon side", String.valueOf(iconSide));
+            }
+            if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(manager))) {
+                apps.add(app);
+            }
         }
     }
 
@@ -115,10 +132,17 @@ public class ChangeIconsActivity extends AppCompatActivity {
                 String path = this.getContext().getFilesDir().getAbsolutePath();
                 final int index = position;
                 //Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
-                Bitmap icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
+                Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
+                if(icon == null) {
+                    icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
+                } else {
+                    icon = RoundBitmapGenerator.getCircleBitmap(icon);
+                }
 
                 ImageView appIcon = (ImageView)convertView.findViewById(R.id.visible_app_icon);
-
+                if(icon.getWidth() != iconSide || icon.getHeight() != iconSide) {
+                    icon = Bitmap.createScaledBitmap(icon, iconSide, iconSide, false);
+                }
                 appIcon.setImageDrawable(new BitmapDrawable(ChangeIconsActivity.this.getResources(), icon));
 
                 TextView appLabel = (TextView)convertView.findViewById(R.id.visible_app_label);
@@ -163,9 +187,28 @@ public class ChangeIconsActivity extends AppCompatActivity {
             cursor.close();
             ListView listView = (ListView) findViewById(R.id.set_icons_list);
             FrameLayout imageViewFrame = (FrameLayout) findViewById(R.id.image_frame);
-            ImageView imageView = (ImageView) findViewById(R.id.image_view);
-
+            imageView = (ImageView) findViewById(R.id.image_view);
+            int orientation = 1;
             Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
+            try {
+                ExifInterface exif = new ExifInterface(picturePath);
+                orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+                Log.i("orientation", String.valueOf(exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1)));
+            } catch (IOException e) {
+
+            }
+            switch(orientation) {
+                case 6:
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    break;
+                case 8:
+                    matrix = new Matrix();
+                    matrix.postRotate(270);
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    break;
+            }
             int bitmapWidth = bitmap.getWidth();
             int bitmapHeight = bitmap.getHeight();
             if(bitmapHeight < 200 || bitmapHeight < 200) {
@@ -173,17 +216,29 @@ public class ChangeIconsActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             } else {
                 listView.setVisibility(View.GONE);
+                Button applyButton = (Button) findViewById(R.id.apply_image);
+                applyButton.setVisibility(View.VISIBLE);
                 imageViewFrame.setVisibility(View.VISIBLE);
                 int resizeFactor;
-                if(bitmapWidth > bitmapHeight) {
+                if(bitmapWidth > bitmapHeight && bitmapWidth > 800) {
                     resizeFactor = bitmapWidth / 800;
-                } else {
+                } else if (bitmapHeight > 1200){
                     resizeFactor = bitmapHeight / 1200;
+                } else {
+                    resizeFactor = 1;
                 }
-                imageView.setImageBitmap(Bitmap.createScaledBitmap(BitmapFactory.decodeFile(picturePath), bitmapWidth / resizeFactor, bitmapHeight / resizeFactor, false) );
+                imageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, bitmapWidth / resizeFactor, bitmapHeight / resizeFactor, false) );
 
             }
         }
+    }
+
+    public void saveIconToLocalStorage(View view) {
+        BitmapDrawable bitmapDrawable = (BitmapDrawable) imageView.getDrawable();
+        Bitmap bitmap = Bitmap.createBitmap(bitmapDrawable.getBitmap(),minX,minY,maxX-minX,maxY-minY);
+        IconLoader.saveIcon(this,bitmap,appName);
+        SharedPrefs.setHomeReloadRequired(true,this);
+        recreate();
     }
 
     private final class MyTouchListener implements View.OnTouchListener {
@@ -279,6 +334,17 @@ public class ChangeIconsActivity extends AppCompatActivity {
         bottomLeft.setLayoutParams(bottomLeftButtonParams);
         bottomLeft.setVisibility(View.GONE);
         bottomLeft.setVisibility(View.VISIBLE);
+
+
+        Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.crop_background);
+        ImageView croppedBackground = (ImageView) findViewById(R.id.cropped_background);
+        croppedBackground.setBackground(new BitmapDrawable(this.getResources(), Bitmap.createScaledBitmap(image, maxX - minX, maxY - minY, true)));
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(croppedBackground.getLayoutParams());
+        params.leftMargin = minX;
+        params.topMargin = minY;
+        params.width = maxX - minX;
+        params.height = maxY - minY;
+        croppedBackground.setLayoutParams(params);
     }
 
     @Override
@@ -318,7 +384,6 @@ public class ChangeIconsActivity extends AppCompatActivity {
                 DisplayMetrics displayMetrics = new DisplayMetrics();
                 getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
                 int screenWidth = displayMetrics.widthPixels;
-                int screenHeight = displayMetrics.heightPixels;
                 buttonSide = 0;
                 if(screenWidth <= 240) {
                     buttonSide = 20;
