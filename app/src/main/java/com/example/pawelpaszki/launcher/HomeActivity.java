@@ -105,7 +105,7 @@ public class HomeActivity extends Activity {
     }
 
     private void loadCarousel() {
-
+        Log.i("carousel loaded", "true");
         LinearLayout dock = (LinearLayout) findViewById(R.id.dock_list);
         manager = getPackageManager();
         dockerApps = new ArrayList<AppDetail>();
@@ -127,7 +127,7 @@ public class HomeActivity extends Activity {
             app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
             if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(manager))) {
                 dockerApps.add(app);
-                Log.i("no of runs", "label: " + app.getLabel() + ": " + " package name: " + String.valueOf(ri.activityInfo.packageName) + String.valueOf(app.getNumberOfStarts()));
+                //Log.i("no of runs", "label: " + app.getLabel() + ": " + " package name: " + String.valueOf(ri.activityInfo.packageName) + String.valueOf(app.getNumberOfStarts()));
             }
         }
         AppsSorter.sortApps(this, dockerApps, "most used", true);
@@ -182,7 +182,7 @@ public class HomeActivity extends Activity {
                         intent = manager.getLaunchIntentForPackage(v.getTag().toString());
                     }
 
-                    Log.i("name", v.getTag().toString());
+                   // Log.i("name", v.getTag().toString());
                     SharedPrefs.increaseNumberOfActivityStarts(((TextView)v.findViewById(R.id.dock_app_name)).getText().toString(), context);
                     SharedPrefs.setHomeReloadRequired(true, HomeActivity.this);
 
@@ -264,7 +264,13 @@ public class HomeActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(SharedPrefs.getHomeReloadRequired(this)) {
+        LinearLayout dock = (LinearLayout) findViewById(R.id.dock_list);
+        if(dock.getChildCount() > 0) {
+            ((HorizontalScrollView) dock.getParent()).scrollTo(0,0);
+        }
+        Log.i("carousel items", "carousel items: " + dock.getChildCount());
+
+        if(SharedPrefs.getHomeReloadRequired(this) || (SharedPrefs.getVisibleCount(this) > 0 && dock.getChildCount() != SharedPrefs.getVisibleCount(this))) {
             SharedPrefs.setHomeReloadRequired(false, this);
             Handler handler = new Handler();
             handler.postDelayed(new Runnable()

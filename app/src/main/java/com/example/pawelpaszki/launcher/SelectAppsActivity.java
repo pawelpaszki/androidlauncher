@@ -31,6 +31,7 @@ public class SelectAppsActivity extends AppCompatActivity {
 
     private PackageManager manager;
     private List<AppDetail> apps;
+    private int visibleCounter = 0;
     private void loadApps(){
         manager = getPackageManager();
         apps = new ArrayList<AppDetail>();
@@ -72,6 +73,9 @@ public class SelectAppsActivity extends AppCompatActivity {
                 appLabel.setText(apps.get(position).getLabel());
 
                 final CheckBox visible = (CheckBox)convertView.findViewById(R.id.toggle_visible);
+                if(SharedPrefs.getAppVisible(SelectAppsActivity.this, (String) apps.get(position).getLabel())) {
+                    visibleCounter++;
+                }
                 visible.setChecked(SharedPrefs.getAppVisible(SelectAppsActivity.this, (String) apps.get(position).getLabel()));
                 visible.setText(apps.get(position).getLabel());
                 visible.setTextSize(0);
@@ -79,6 +83,11 @@ public class SelectAppsActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         SharedPrefs.setAppVisible(((CheckBox) v).isChecked(), (String) visible.getText(), SelectAppsActivity.this);
+                        if(((CheckBox) v).isChecked()) {
+                            visibleCounter++;
+                        } else {
+                            visibleCounter--;
+                        }
                         SharedPrefs.setHomeReloadRequired(true, SelectAppsActivity.this);
 //                        Toast.makeText(SelectAppsActivity.this, String.valueOf(SharedPrefs.getAppVisible(SelectAppsActivity.this, (String) visible.getText())) + " " + (String) visible.getText(),
 //                                Toast.LENGTH_LONG).show();
@@ -90,6 +99,13 @@ public class SelectAppsActivity extends AppCompatActivity {
         };
 
         list.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onPause() {
+        SharedPrefs.setVisibleCount(visibleCounter, this);
+        super.onPause();
+
     }
 
     @Override

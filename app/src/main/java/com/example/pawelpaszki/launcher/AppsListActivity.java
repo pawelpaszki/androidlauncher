@@ -38,6 +38,7 @@ public class AppsListActivity extends Activity {
     private GridView gv;
     private int noOfCols;
     private Handler handler;
+    private int visibleCount = 0;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +49,9 @@ public class AppsListActivity extends Activity {
         window.setStatusBarColor(Color.TRANSPARENT);
         window.setNavigationBarColor(Color.TRANSPARENT);
         loadApps();
+        if(visibleCount != SharedPrefs.getVisibleCount(this)) {
+            SharedPrefs.setVisibleCount(visibleCount, this);
+        }
         gv=(GridView) findViewById(R.id.gridView);
         gv.setAdapter(new GridAdapter(this, apps, manager));
         gv.setFastScrollEnabled(true);
@@ -150,6 +154,7 @@ public class AppsListActivity extends Activity {
             app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
             if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(manager))) {
                 apps.add(app);
+                visibleCount++;
                 Log.i("app starts", String.valueOf(ri.loadLabel(manager)) + " " + String.valueOf(ri.activityInfo.packageName) + " "+ SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
             }
 

@@ -119,4 +119,18 @@ public class SharedPrefs {
         String key = "homeReloadRequired";
         return prefs.getBoolean(key, false);
     }
+
+    public static void setVisibleCount(int value, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "visibleCount";
+        editor.putInt(key, value);
+        editor.commit();
+    }
+
+    public static int getVisibleCount(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "visibleCount";
+        return prefs.getInt(key, 0);
+    }
 }
