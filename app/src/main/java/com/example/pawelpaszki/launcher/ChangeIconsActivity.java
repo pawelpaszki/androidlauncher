@@ -46,6 +46,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.pawelpaszki.launcher.utils.AppsSorter;
 import com.example.pawelpaszki.launcher.utils.IconLoader;
 import com.example.pawelpaszki.launcher.utils.NetworkConnectivityChecker;
 import com.example.pawelpaszki.launcher.utils.RoundBitmapGenerator;
@@ -108,6 +109,7 @@ public class ChangeIconsActivity extends AppCompatActivity {
             app.setLabel(ri.loadLabel(manager));
             app.setName(ri.activityInfo.packageName);
             app.setIcon(ri.activityInfo.loadIcon(manager));
+            app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
             if(ri.loadLabel(manager).toString().equalsIgnoreCase("Settings")) {
                 iconSide = ri.activityInfo.loadIcon(manager).getIntrinsicWidth();
                 Log.i("icon side", String.valueOf(iconSide));
@@ -116,6 +118,7 @@ public class ChangeIconsActivity extends AppCompatActivity {
                 apps.add(app);
             }
         }
+        apps = AppsSorter.sortApps(this,apps, "most used", false);
     }
 
     private ListView list;
