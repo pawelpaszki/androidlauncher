@@ -158,9 +158,9 @@ public class SettingsActivity extends AppCompatActivity {
         params.width = width;
         sortDesc.setLayoutParams(params);
 
-        params = (RelativeLayout.LayoutParams) visibleDesc.getLayoutParams();
-        params.width = width;
-        visibleDesc.setLayoutParams(params);
+//        params = (RelativeLayout.LayoutParams) visibleDesc.getLayoutParams();
+//        params.width = width;
+//        visibleDesc.setLayoutParams(params);
 
         params = (RelativeLayout.LayoutParams) showLabelsDesc.getLayoutParams();
         params.width = width;
@@ -170,13 +170,13 @@ public class SettingsActivity extends AppCompatActivity {
         params.width = width;
         noOfColsDesc.setLayoutParams(params);
 
-        params = (RelativeLayout.LayoutParams) setWallpaperDesc.getLayoutParams();
-        params.width = width;
-        setWallpaperDesc.setLayoutParams(params);
+//        params = (RelativeLayout.LayoutParams) setWallpaperDesc.getLayoutParams();
+//        params.width = width;
+//        setWallpaperDesc.setLayoutParams(params);
 
-        params = (RelativeLayout.LayoutParams) setIconsDesc.getLayoutParams();
-        params.width = width;
-        setIconsDesc.setLayoutParams(params);
+//        params = (RelativeLayout.LayoutParams) setIconsDesc.getLayoutParams();
+//        params.width = width;
+//        setIconsDesc.setLayoutParams(params);
 
     }
 
@@ -188,6 +188,14 @@ public class SettingsActivity extends AppCompatActivity {
 
     public void set_icons(View view) {
         Intent i = new Intent(this, ChangeIconsActivity.class);
+        i.putExtra("option", "gallery");
+        startActivity(i);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+    }
+
+    public void set_icons_web(View view) {
+        Intent i = new Intent(this, ChangeIconsActivity.class);
+        i.putExtra("option", "web");
         startActivity(i);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
     }

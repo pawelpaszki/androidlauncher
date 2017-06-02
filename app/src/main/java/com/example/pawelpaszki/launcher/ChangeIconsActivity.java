@@ -47,6 +47,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.utils.IconLoader;
+import com.example.pawelpaszki.launcher.utils.NetworkConnectivityChecker;
 import com.example.pawelpaszki.launcher.utils.RoundBitmapGenerator;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
@@ -92,6 +93,7 @@ public class ChangeIconsActivity extends AppCompatActivity {
     private int previousBottomRightY;
     private ImageView imageView;
     private int iconSide;
+    private String option;
 
     private void loadApps(){
         manager = getPackageManager();
@@ -124,7 +126,7 @@ public class ChangeIconsActivity extends AppCompatActivity {
                 R.layout.visible_app_item,
                 apps) {
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
+            public View getView(final int position, View convertView, ViewGroup parent) {
                 if(convertView == null){
                     convertView = getLayoutInflater().inflate(R.layout.visible_app_item, null);
                 }
@@ -136,7 +138,8 @@ public class ChangeIconsActivity extends AppCompatActivity {
                 if(icon == null) {
                     icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
                 } else {
-                    icon = RoundBitmapGenerator.getCircleBitmap(icon);
+                    // rounded ??
+                    //icon = RoundBitmapGenerator.getCircleBitmap(icon);
                 }
 
                 ImageView appIcon = (ImageView)convertView.findViewById(R.id.visible_app_icon);
@@ -154,11 +157,23 @@ public class ChangeIconsActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         appName = apps.get(index).getLabel().toString();
-                        Intent i = new Intent(
-                                Intent.ACTION_PICK,
-                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        if(option.equalsIgnoreCase("gallery")) {
+                            Intent i = new Intent(
+                                    Intent.ACTION_PICK,
+                                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
-                        startActivityForResult(i, RESULT_LOAD_IMAGE);
+                            startActivityForResult(i, RESULT_LOAD_IMAGE);
+                        } else {
+                            if(NetworkConnectivityChecker.isNetworkAvailable(ChangeIconsActivity.this)) {
+                                Intent i = new Intent(ChangeIconsActivity.this, LoadWebIconActivity.class);
+                                i.putExtra("label",apps.get(position).getLabel());
+                                startActivity(i);
+                                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+                            } else {
+                                Toast.makeText(ChangeIconsActivity.this, "Please check your internet connection",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
                     }
                 });
 
@@ -198,8 +213,13 @@ public class ChangeIconsActivity extends AppCompatActivity {
 
             }
             switch(orientation) {
-                case 6:
+                case 3:
                     Matrix matrix = new Matrix();
+                    matrix.postRotate(180);
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    break;
+                case 6:
+                    matrix = new Matrix();
                     matrix.postRotate(90);
                     bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                     break;
@@ -350,6 +370,8 @@ public class ChangeIconsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        option = getIntent().getExtras().getString("option");
+        Log.i("option", option);
         setContentView(R.layout.activity_change_icons);
         minX = 0;
         minY = 0;

@@ -20,6 +20,7 @@
     <string name="sortbydesc">Select criteria by which your apps will be sorted</string>
     <string name="change_icon">apply</string>
     <string name="rotate_image">rotate</string>
+    <string name="set_web_icon">Set Web Icon</string>
 
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
     <string name="select_visible_apps">Visible Apps</string>
@@ -30,8 +31,10 @@
     <string name="no_of_columns_desc">Pick number of applications displayed per line</string>
     <string name="change_wallpaper">Change Wallpaper</string>
     <string name="change_wallpaper_desc">Select an image to be set as a wallpaper</string>
-    <string name="set_icons">Set Icons</string>
+    <string name="set_icons">Set Icons using Gallery</string>
     <string name="set_icons_desc">Change icons of applications by using your own images</string>
+    <string name="set_icons_web">Set Icons using Online Web</string>
+    <string name="set_icons_desc_web">Change icons of applications by using images found in the browser</string>
     <string name="toolbar_select_apps">Select Visible Apps</string>
     <string name="toolbar_set_icons">Set Apps Icons</string>
     <string-array name="pref_example_list_titles">

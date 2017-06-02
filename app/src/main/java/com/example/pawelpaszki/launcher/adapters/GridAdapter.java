@@ -143,7 +143,8 @@ public class GridAdapter extends BaseAdapter{
         if(icon == null) {
             icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
         } else {
-            icon = RoundBitmapGenerator.getCircleBitmap(icon);
+            // rounded??
+            //icon = RoundBitmapGenerator.getCircleBitmap(icon);
         }
         if(icon.getWidth() != iconSide || icon.getHeight() != iconSide) {
             icon = Bitmap.createScaledBitmap(icon, iconSide, iconSide, false);

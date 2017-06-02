@@ -172,7 +172,8 @@ public class HomeActivity extends Activity {
             if(icon == null) {
                 icon  = ((BitmapDrawable) dockerApps.get(j).getIcon()).getBitmap();
             } else {
-                icon = RoundBitmapGenerator.getCircleBitmap(icon);
+                // rounded??
+                //icon = RoundBitmapGenerator.getCircleBitmap(icon);
             }
 
 

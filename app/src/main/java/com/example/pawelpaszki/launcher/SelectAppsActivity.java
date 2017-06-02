@@ -75,7 +75,8 @@ public class SelectAppsActivity extends AppCompatActivity {
                 if(icon == null) {
                     icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
                 } else {
-                    icon = RoundBitmapGenerator.getCircleBitmap(icon);
+                    //rounded??
+                    //icon = RoundBitmapGenerator.getCircleBitmap(icon);
                 }
 
                 ImageView appIcon = (ImageView)convertView.findViewById(R.id.visible_app_icon);
