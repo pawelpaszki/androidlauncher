@@ -21,7 +21,9 @@
     <string name="change_icon">apply</string>
     <string name="rotate_image">rotate</string>
     <string name="set_web_icon">Set Web Icon</string>
-
+    <string name="reset_icon">Reset Icons</string>
+    <string name="toolbar_reset_icons">Set Default Icons</string>
+    <string name="reset_icon_desc">Reset previously set icons to their default values</string>
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
     <string name="select_visible_apps">Visible Apps</string>
     <string name="select_visible_apps_desc">Select which applications will be shown in the application list</string>

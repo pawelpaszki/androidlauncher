@@ -133,4 +133,18 @@ public class SharedPrefs {
         String key = "visibleCount";
         return prefs.getInt(key, 0);
     }
+
+    public static void setNonDefaultIconsCount(int value, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "nonDefault";
+        editor.putInt(key, value);
+        editor.commit();
+    }
+
+    public static int getNonDefaultIconsCount(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "nonDefault";
+        return prefs.getInt(key, 0);
+    }
 }

@@ -246,6 +246,29 @@
             <View style="@style/Divider"
                 android:id="@+id/div7"
                 android:layout_below="@+id/set_icons_desc_web"/>
+            <TextView
+                android:id="@+id/reset_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/div7"
+                android:padding="12dp"
+                android:textSize="16sp"
+                android:textColor="#1A237E"
+                android:text="@string/reset_icon"
+                android:onClick="set_icons"/>
+            <TextView
+                android:id="@+id/reset_icon_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/reset_icon"
+                android:padding="12dp"
+                android:layout_marginTop="-22dp"
+                android:textSize="14sp"
+                android:textColor="#303F9F"
+                android:text="@string/reset_icon_desc"
+                android:onClick="reset_icons"/>
         </RelativeLayout>
     </ScrollView>
 </RelativeLayout>

@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MenuItem;
@@ -18,8 +17,6 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -198,6 +195,17 @@ public class SettingsActivity extends AppCompatActivity {
         i.putExtra("option", "web");
         startActivity(i);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+    }
+
+    public void reset_icons(View view) {
+        if(SharedPrefs.getNonDefaultIconsCount(this) == 0) {
+            Toast.makeText(SettingsActivity.this, "All icons are default icons",
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            Intent i = new Intent(this, ResetIconsActivity.class);
+            startActivity(i);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+        }
     }
 
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {

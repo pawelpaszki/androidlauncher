@@ -261,6 +261,7 @@ public class ChangeIconsActivity extends AppCompatActivity {
         Bitmap bitmap = Bitmap.createBitmap(bitmapDrawable.getBitmap(),minX,minY,maxX-minX,maxY-minY);
         IconLoader.saveIcon(this,bitmap,appName);
         SharedPrefs.setHomeReloadRequired(true,this);
+        SharedPrefs.setNonDefaultIconsCount(SharedPrefs.getNonDefaultIconsCount(this) + 1, this);
         recreate();
     }
 
