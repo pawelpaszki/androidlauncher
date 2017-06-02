@@ -79,7 +79,7 @@ public class LoadWebIconActivity extends AppCompatActivity {
                             e.getStackTrace();
                         }
                 } else if (webview.getHitTestResult().getType() == 8) {
-                    Toast.makeText(LoadWebIconActivity.this, "Can't select this image. Please try again",
+                    Toast.makeText(LoadWebIconActivity.this, "Can't select this image. Please try different one",
                             Toast.LENGTH_LONG).show();
                 }
                 return false;

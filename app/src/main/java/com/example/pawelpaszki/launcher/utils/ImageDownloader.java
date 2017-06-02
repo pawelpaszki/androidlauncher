@@ -50,6 +50,7 @@ public class ImageDownloader extends AsyncTask<String,Void,Bitmap>{
         Log.i("result name", appLabel);
         IconLoader.saveIcon(context, result, appLabel);
         SharedPrefs.setHomeReloadRequired(true, context);
+        SharedPrefs.setNonDefaultIconsCount(SharedPrefs.getNonDefaultIconsCount(context) + 1,context);
     }
 
 }

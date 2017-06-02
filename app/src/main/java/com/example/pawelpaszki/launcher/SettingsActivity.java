@@ -142,11 +142,8 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
         TextView sortDesc = (TextView) findViewById(R.id.sort_by_text_view_desc);
-        TextView visibleDesc = (TextView) findViewById(R.id.show_visible_apps_desc);
         TextView showLabelsDesc = (TextView) findViewById(R.id.show_app_names_desc);
         TextView noOfColsDesc = (TextView) findViewById(R.id.no_of_columns_desc);
-        TextView setWallpaperDesc = (TextView) findViewById(R.id.set_wallpaper_desc);
-        TextView setIconsDesc = (TextView) findViewById(R.id.set_icons_desc);
 
         sortDesc.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         int width = sortDesc.getMeasuredWidth() * 8 / 10;
@@ -154,11 +151,6 @@ public class SettingsActivity extends AppCompatActivity {
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) sortDesc.getLayoutParams();
         params.width = width;
         sortDesc.setLayoutParams(params);
-
-//        params = (RelativeLayout.LayoutParams) visibleDesc.getLayoutParams();
-//        params.width = width;
-//        visibleDesc.setLayoutParams(params);
-
         params = (RelativeLayout.LayoutParams) showLabelsDesc.getLayoutParams();
         params.width = width;
         showLabelsDesc.setLayoutParams(params);
@@ -166,15 +158,6 @@ public class SettingsActivity extends AppCompatActivity {
         params = (RelativeLayout.LayoutParams) noOfColsDesc.getLayoutParams();
         params.width = width;
         noOfColsDesc.setLayoutParams(params);
-
-//        params = (RelativeLayout.LayoutParams) setWallpaperDesc.getLayoutParams();
-//        params.width = width;
-//        setWallpaperDesc.setLayoutParams(params);
-
-//        params = (RelativeLayout.LayoutParams) setIconsDesc.getLayoutParams();
-//        params.width = width;
-//        setIconsDesc.setLayoutParams(params);
-
     }
 
     @Override

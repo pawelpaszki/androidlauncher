@@ -54,6 +54,7 @@ public class HomeActivity extends Activity {
     private int j;
     private HorizontalScrollView container;
     private TextView homeNotifications;
+    private LinearLayout dock;
 
 
     @Override
@@ -108,7 +109,7 @@ public class HomeActivity extends Activity {
 
     private void loadCarousel() {
         Log.i("carousel loaded", "true");
-        LinearLayout dock = (LinearLayout) findViewById(R.id.dock_list);
+        dock = (LinearLayout) findViewById(R.id.dock_list);
         manager = getPackageManager();
         dockerApps = new ArrayList<AppDetail>();
 
@@ -272,7 +273,7 @@ public class HomeActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        LinearLayout dock = (LinearLayout) findViewById(R.id.dock_list);
+        dock = (LinearLayout) findViewById(R.id.dock_list);
         if(dock.getChildCount() > 0) {
             ((HorizontalScrollView) dock.getParent()).scrollTo(0,0);
         }
@@ -287,7 +288,8 @@ public class HomeActivity extends Activity {
                 @Override
                 public void run()
                 {
-                     recreate();
+                    dock.removeAllViews();
+                    loadCarousel();
                 }
             }, 1);
         }
