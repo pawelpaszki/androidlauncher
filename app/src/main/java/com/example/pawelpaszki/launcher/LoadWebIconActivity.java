@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -71,12 +72,8 @@ public class LoadWebIconActivity extends AppCompatActivity {
                         try {
                             new ImageDownloader(LoadWebIconActivity.this, appLabel).execute(webview.getHitTestResult().getExtra());
 
-                            Intent intent = new Intent(LoadWebIconActivity.this,ChangeIconsActivity.class);
-                            intent.putExtra("option", "web");
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-                            finish();
+                            goBack();
+
 
                         } catch (Exception e) {
                             e.getStackTrace();
@@ -94,6 +91,22 @@ public class LoadWebIconActivity extends AppCompatActivity {
                 Log.i("about to download", url);
             }
         });
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if (menuItem.getItemId() == android.R.id.home) {
+            goBack();
+        }
+        return super.onOptionsItemSelected(menuItem);
+    }
+
+    private void goBack() {
+        Intent intent = new Intent(LoadWebIconActivity.this,ChangeIconsActivity.class);
+        intent.putExtra("option", "web");
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+        finish();
     }
 }

@@ -4,16 +4,10 @@ package com.example.pawelpaszki.launcher.utils;
  * Created by PawelPaszki on 02/06/2017.
  */
 
-import java.io.File;
-
-        import android.annotation.SuppressLint;
-        import android.app.DownloadManager;
-        import android.content.Context;
-        import android.net.Uri;
-        import android.os.Environment;
-import android.util.Log;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.webkit.WebView;
-        import android.webkit.WebViewClient;
+import android.webkit.WebViewClient;
 
 public class CustomWebView extends WebViewClient {
 
