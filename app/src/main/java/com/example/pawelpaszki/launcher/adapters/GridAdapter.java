@@ -52,9 +52,9 @@ public class GridAdapter extends BaseAdapter{
     List<AppDetail> apps;
     Context context;
     PackageManager manager;
-    private GridAdapter gridAdapter;
+    private LinearLayout uninstallPackage;
     private static LayoutInflater inflater=null;
-    public GridAdapter(AppsListActivity appsListActivity, List<AppDetail> apps, PackageManager manager, int iconSide) {
+    public GridAdapter(AppsListActivity appsListActivity, List<AppDetail> apps, PackageManager manager, int iconSide, LinearLayout uninstallPackage) {
         // TODO Auto-generated constructor stub
         this.apps=apps;
         context=appsListActivity;
@@ -66,7 +66,7 @@ public class GridAdapter extends BaseAdapter{
         inflater = ( LayoutInflater )context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.iconSide = iconSide;
-        gridAdapter = this;
+        this.uninstallPackage = uninstallPackage;
     }
 
 
@@ -231,9 +231,17 @@ public class GridAdapter extends BaseAdapter{
                 } catch (Exception e) {
                     Toast.makeText(context,"This application cannot be opened" ,
                             Toast.LENGTH_LONG).show();
-                    apps.remove(apps.get(position));
-                    gridAdapter.notifyDataSetChanged();
+                    ((AppsListActivity)context).recreate();
                 }
+            }
+        });
+
+        v.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                uninstallPackage.setVisibility(View.VISIBLE);
+                ((AppsListActivity)context).highlightView(v.getTag().toString());
+                return false;
             }
         });
 

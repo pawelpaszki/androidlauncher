@@ -1,13 +1,18 @@
 package com.example.pawelpaszki.launcher;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.GestureDetectorCompat;
@@ -17,18 +22,22 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.adapters.GridAdapter;
 import com.example.pawelpaszki.launcher.utils.AppsSorter;
 import com.example.pawelpaszki.launcher.utils.MissedCallsCountRetriever;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +57,8 @@ public class AppsListActivity extends Activity {
     private int visibleCount = 0;
     private int iconSide;
     private TextView tv;
+    private LinearLayout uninstallPackage;
+    private String highlightedViewTag;
     private BroadcastReceiver smsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -66,6 +77,7 @@ public class AppsListActivity extends Activity {
             }
         }
     };
+    private boolean uninstalled;
 
     @Override
     protected void onStart() {
@@ -94,16 +106,12 @@ public class AppsListActivity extends Activity {
         window.setStatusBarColor(Color.TRANSPARENT);
         window.setNavigationBarColor(Color.TRANSPARENT);
         loadApps();
-        loadView();
-
-    }
-
-    private void loadView() {
         if(visibleCount != SharedPrefs.getVisibleCount(this)) {
             SharedPrefs.setVisibleCount(visibleCount, this);
         }
+        uninstallPackage = (LinearLayout) findViewById(R.id.uninstall_package);
         gv=(GridView) findViewById(R.id.gridView);
-        gv.setAdapter(new GridAdapter(this, apps, manager, iconSide));
+        gv.setAdapter(new GridAdapter(this, apps, manager, iconSide, uninstallPackage));
         gv.setFastScrollEnabled(true);
         noOfCols = SharedPrefs.getNumberOfColumns(this);
         if(noOfCols != 0) {
@@ -118,6 +126,7 @@ public class AppsListActivity extends Activity {
                 return false;
             }
         });
+
     }
 
     private GestureDetectorCompat detector;
@@ -127,6 +136,53 @@ public class AppsListActivity extends Activity {
         detector.onTouchEvent(event);
         return super.onTouchEvent(event);
     }
+
+    public void hideUninstallView(View view) {
+        this.uninstallPackage.setVisibility(View.GONE);
+        unHighlightView();
+    }
+
+    public void uninstallPackage(View view) {
+        if(highlightedViewTag.equals("Messaging") || highlightedViewTag.equals("Phone")) {
+            Toast.makeText(this,"This application cannot be uninstalled" ,
+                Toast.LENGTH_LONG).show();
+            hideUninstallView(view);
+        } else {
+            int UNINSTALL_REQUEST_CODE = 1;
+            Log.i("package name", highlightedViewTag);
+            Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
+            intent.setData(Uri.parse("package:" + highlightedViewTag));
+            intent.putExtra(Intent.EXTRA_RETURN_RESULT, true);
+            startActivityForResult(intent, UNINSTALL_REQUEST_CODE);
+
+//            try {
+//
+//            } catch (Exception e) {
+//                Toast.makeText(this,"This application cannot be uninstalled" ,
+//                        Toast.LENGTH_LONG).show();
+//            }
+
+        }
+
+    }
+
+        @Override
+        protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+            if (requestCode == 1) {
+                if (resultCode == RESULT_OK) {
+                    uninstalled = true;
+                    hideUninstallView(null);
+                } else if (resultCode == RESULT_CANCELED) {
+                    hideUninstallView(null);
+                } else if (resultCode == RESULT_FIRST_USER) {
+                    Log.d("TAG", "onActivityResult: failed to (un)install");
+                }
+            } else {
+                unHighlightView();
+            }
+
+        }
 
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
@@ -215,6 +271,37 @@ public class AppsListActivity extends Activity {
         }
         //Log.i("sorting method", SharedPrefs.getSortingMethod(this));
         apps = AppsSorter.sortApps(this, apps, SharedPrefs.getSortingMethod(this), false);
+    }
+
+    public void highlightView(String tag) {
+        highlightedViewTag = tag;
+        for(int i = 0; i < gv.getChildCount(); i++) {
+            if (gv.getChildAt(i).getTag().equals(tag)) {
+                LinearLayout view = (LinearLayout) gv.getChildAt(i);
+                GradientDrawable border = new GradientDrawable();
+                border.setColor(0x00FFFFFF);
+                border.setStroke(3, 0xFFFF0000);
+                view.setBackground(border);
+                break;
+            }
+        }
+    }
+
+    public void unHighlightView() {
+        for(int i = 0; i < gv.getChildCount(); i++) {
+            if (gv.getChildAt(i).getTag().equals(highlightedViewTag)) {
+                LinearLayout view = (LinearLayout) gv.getChildAt(i);
+                GradientDrawable border = new GradientDrawable();
+                border.setColor(0x00000000);
+                view.setBackground(border);
+                break;
+            }
+        }
+        highlightedViewTag = "";
+        if(uninstalled){
+            uninstalled = false;
+            recreate();
+        }
     }
 
 //    public void toggleMenu(View view) {

@@ -5,7 +5,43 @@
     android:orientation="vertical"
     android:fitsSystemWindows="true"
     android:background="#40000000"
-    tools:context=".AppsListActivity" >
+    tools:context=".AppsListActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:id="@+id/uninstall_package"
+        android:visibility="gone"
+        >
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:text="@string/uninstall"
+            android:textColor="#40FF0000"
+            android:background="#80FFFFFF"
+            android:layout_weight="1"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:padding="6dp"
+            android:layout_margin="3dp"
+            android:onClick="uninstallPackage">
+        </Button>
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:layout_width="0dp"
+            android:padding="6dp"
+            android:text="@string/cancel"
+            android:textColor="#4000FF00"
+            android:background="#80FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            android:onClick="hideUninstallView">
+
+        </Button>
+    </LinearLayout>
 
     <GridView
         android:id="@+id/gridView"

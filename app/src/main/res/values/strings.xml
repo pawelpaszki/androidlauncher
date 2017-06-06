@@ -39,6 +39,8 @@
     <string name="set_icons_desc_web">Change icons of applications by using images found in the browser</string>
     <string name="toolbar_select_apps">Select Visible Apps</string>
     <string name="toolbar_set_icons">Set Apps Icons</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="cancel">Cancel</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>
         <item>When possible</item>
