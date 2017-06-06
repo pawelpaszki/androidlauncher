@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
 
     <application
         android:allowBackup="true"
@@ -23,12 +24,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light">
         <service android:name=".services.MyIntentService" />
-
         <activity
             android:name=".HomeActivity"
             android:clearTaskOnLaunch="true"
             android:excludeFromRecents="true"
-            android:label="Simple Launcher Home"
+            android:label="Launcher"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:stateNotNeeded="true"

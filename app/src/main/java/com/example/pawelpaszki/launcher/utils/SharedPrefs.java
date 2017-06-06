@@ -36,20 +36,6 @@ public class SharedPrefs {
         editor.commit();
     }
 
-    public static void setReverseListOrderFlag(int value, Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        String key = "reverseList";
-        editor.putInt(key, value);
-        editor.commit();
-    }
-
-    public static int getReverseListOrderFlag(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String key = "reverseList";
-        return prefs.getInt(key, 0);
-    }
-
     public static void setNumberOfColumns(int value, Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();

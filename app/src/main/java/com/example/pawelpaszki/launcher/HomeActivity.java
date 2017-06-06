@@ -2,8 +2,10 @@ package com.example.pawelpaszki.launcher;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -37,6 +39,8 @@ import com.example.pawelpaszki.launcher.utils.RoundBitmapGenerator;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 import com.example.pawelpaszki.launcher.utils.MissedCallsCountRetriever;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,14 +56,43 @@ public class HomeActivity extends Activity {
     private PackageManager manager;
     private Context context;
     private int j;
-    private HorizontalScrollView container;
     private TextView homeNotifications;
     private LinearLayout dock;
+    private BroadcastReceiver smsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i("message received", "msg");
+            for(int i = 0; i < dock.getChildCount(); i++) {
+                if(dock.getChildAt(i).getTag().equals("Messaging")) {
+                    Log.i("child", dock.getChildAt(i).toString());
+                    FrameLayout fLayout = (FrameLayout) ((LinearLayout) dock.getChildAt(i)).getChildAt(0);
+                    TextView tv = (TextView) fLayout.getChildAt(1);
+                    tv.setText(String.valueOf(MissedCallsCountRetriever.getUnreadMessagesCount(HomeActivity.this)));
+                    dock.removeAllViews();
+                    loadCarousel();
+                    break;
+                }
+
+            }
+        }
+    };
 
 
     @Override
     protected void onStart() {
+        registerReceiver(smsReceiver, new IntentFilter(
+                "android.provider.Telephony.SMS_RECEIVED"));
         super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        if(smsReceiver != null) {
+            unregisterReceiver(smsReceiver);
+            smsReceiver = null;
+        }
+        super.onStop();
+
     }
 
     @Override
@@ -139,6 +172,7 @@ public class HomeActivity extends Activity {
             View view = LayoutInflater.from(this).inflate(R.layout.dock_item,null);
             homeNotifications = (TextView) view.findViewById(R.id.home_notifications);
             if(dockerApps.get(j).getLabel().toString().equalsIgnoreCase("Messaging")) {
+                view.setTag("Messaging");
                 int messageCount = MissedCallsCountRetriever.getUnreadMessagesCount(this);
                 if(messageCount > 0) {
                     homeNotifications.setText(String.valueOf(messageCount));
@@ -149,8 +183,7 @@ public class HomeActivity extends Activity {
                 } else {
                     homeNotifications.setVisibility(View.GONE);
                 }
-            }
-            if(dockerApps.get(j).getLabel().toString().equalsIgnoreCase("Phone")) {
+            } else if(dockerApps.get(j).getLabel().toString().equalsIgnoreCase("Phone")) {
                 view.setTag("Phone");
                 if(MissedCallsCountRetriever.getMissedCallsCount(this) > 0) {
                     homeNotifications.setVisibility(View.VISIBLE);
@@ -176,8 +209,6 @@ public class HomeActivity extends Activity {
                 // rounded??
                 //icon = RoundBitmapGenerator.getCircleBitmap(icon);
             }
-
-
             iv.setImageDrawable(new BitmapDrawable(this.getResources(), icon));
             iv.setLayoutParams(layoutParams);
             tv.setText((String) dockerApps.get(j).getLabel());
@@ -206,16 +237,6 @@ public class HomeActivity extends Activity {
             dock.addView(view);
 
         }
-
-//        container = (HorizontalScrollView) findViewById(R.id.carousel_container);
-//        container.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-//            @Override
-//            public void onScrollChanged() {
-//                Log.i("scroll: ", String.valueOf(container.getScrollX()));
-//                Log.i("ScrollWidth",Integer.toString(container.getChildAt(0).getMeasuredWidth()));
-//            }
-//        });
-
     }
 
     @Override
@@ -274,7 +295,8 @@ public class HomeActivity extends Activity {
     protected void onResume() {
         super.onResume();
         dock = (LinearLayout) findViewById(R.id.dock_list);
-        if(dock.getChildCount() > 0) {
+        int dockCount = dock.getChildCount();
+        if(dockCount > 0) {
             ((HorizontalScrollView) dock.getParent()).scrollTo(0,0);
         }
         //Log.i("carousel items", "carousel items: " + dock.getChildCount());
