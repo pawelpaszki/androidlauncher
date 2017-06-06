@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.AppDetail;
 import com.example.pawelpaszki.launcher.AppsListActivity;
+import com.example.pawelpaszki.launcher.HomeActivity;
 import com.example.pawelpaszki.launcher.R;
 import com.example.pawelpaszki.launcher.utils.BitMapFilter;
 import com.example.pawelpaszki.launcher.utils.IconLoader;
@@ -51,6 +52,7 @@ public class GridAdapter extends BaseAdapter{
     List<AppDetail> apps;
     Context context;
     PackageManager manager;
+    private GridAdapter gridAdapter;
     private static LayoutInflater inflater=null;
     public GridAdapter(AppsListActivity appsListActivity, List<AppDetail> apps, PackageManager manager, int iconSide) {
         // TODO Auto-generated constructor stub
@@ -64,6 +66,7 @@ public class GridAdapter extends BaseAdapter{
         inflater = ( LayoutInflater )context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.iconSide = iconSide;
+        gridAdapter = this;
     }
 
 
@@ -215,15 +218,22 @@ public class GridAdapter extends BaseAdapter{
 
             @Override
             public void onClick(View v) {
-                Intent i;
-                if(apps.get(position).getLabel().toString().equalsIgnoreCase("Phone")) {
-                    i = new Intent(Intent.ACTION_DIAL);
-                } else {
-                    i = manager.getLaunchIntentForPackage(apps.get(position).getName().toString());
+                try {
+                    Intent i;
+                    if (apps.get(position).getLabel().toString().equalsIgnoreCase("Phone")) {
+                        i = new Intent(Intent.ACTION_DIAL);
+                    } else {
+                        i = manager.getLaunchIntentForPackage(apps.get(position).getName().toString());
+                    }
+                    SharedPrefs.increaseNumberOfActivityStarts(apps.get(position).getLabel().toString(), context);
+                    SharedPrefs.setHomeReloadRequired(true, context);
+                    context.startActivity(i);
+                } catch (Exception e) {
+                    Toast.makeText(context,"This application cannot be opened" ,
+                            Toast.LENGTH_LONG).show();
+                    apps.remove(apps.get(position));
+                    gridAdapter.notifyDataSetChanged();
                 }
-                SharedPrefs.increaseNumberOfActivityStarts(apps.get(position).getLabel().toString(), context);
-                SharedPrefs.setHomeReloadRequired(true, context);
-                context.startActivity(i);
             }
         });
 

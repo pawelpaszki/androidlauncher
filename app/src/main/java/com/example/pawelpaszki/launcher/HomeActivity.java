@@ -31,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.services.MyIntentService;
 import com.example.pawelpaszki.launcher.utils.AppsSorter;
@@ -212,22 +213,29 @@ public class HomeActivity extends Activity {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent;
-                    if(v.getTag().toString().equalsIgnoreCase("Phone")) {
-                        intent = new Intent(Intent.ACTION_DIAL);
-                    } else {
-                        intent = manager.getLaunchIntentForPackage(v.getTag().toString());
+                    try {
+                        Intent intent;
+                        if(v.getTag().toString().equalsIgnoreCase("Phone")) {
+                            intent = new Intent(Intent.ACTION_DIAL);
+                        } else {
+                            intent = manager.getLaunchIntentForPackage(v.getTag().toString());
+                        }
+
+                        // Log.i("name", v.getTag().toString());
+                        SharedPrefs.increaseNumberOfActivityStarts(((TextView)v.findViewById(R.id.dock_app_name)).getText().toString(), context);
+                        SharedPrefs.setHomeReloadRequired(true, HomeActivity.this);
+
+                        if(intent != null) {
+                            context.startActivity(intent);
+                        } else {
+                            context.startActivity(new Intent(v.getTag().toString()));
+                        }
+                    } catch (Exception e) {
+                        Toast.makeText(HomeActivity.this,"This application cannot be opened" ,
+                        Toast.LENGTH_LONG).show();
+                        recreate();
                     }
 
-                   // Log.i("name", v.getTag().toString());
-                    SharedPrefs.increaseNumberOfActivityStarts(((TextView)v.findViewById(R.id.dock_app_name)).getText().toString(), context);
-                    SharedPrefs.setHomeReloadRequired(true, HomeActivity.this);
-
-                    if(intent != null) {
-                        context.startActivity(intent);
-                    } else {
-                        context.startActivity(new Intent(v.getTag().toString()));
-                    }
 
                 }
             });
