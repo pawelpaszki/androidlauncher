@@ -62,18 +62,15 @@ public class HomeActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i("message received", "msg");
-            for(int i = 0; i < dock.getChildCount(); i++) {
-                if(dock.getChildAt(i).getTag().equals("Messaging")) {
-                    Log.i("child", dock.getChildAt(i).toString());
-                    FrameLayout fLayout = (FrameLayout) ((LinearLayout) dock.getChildAt(i)).getChildAt(0);
-                    TextView tv = (TextView) fLayout.getChildAt(1);
-                    tv.setText(String.valueOf(MissedCallsCountRetriever.getUnreadMessagesCount(HomeActivity.this)));
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
                     dock.removeAllViews();
                     loadCarousel();
-                    break;
                 }
+            }, 1000);
 
-            }
         }
     };
 
@@ -293,7 +290,7 @@ public class HomeActivity extends Activity {
 
     @Override
     protected void onResume() {
-        super.onResume();
+        Log.i("onResume","home activity");
         dock = (LinearLayout) findViewById(R.id.dock_list);
         int dockCount = dock.getChildCount();
         if(dockCount > 0) {
@@ -315,6 +312,7 @@ public class HomeActivity extends Activity {
                 }
             }, 1);
         }
+        super.onResume();
     }
 
     @Override

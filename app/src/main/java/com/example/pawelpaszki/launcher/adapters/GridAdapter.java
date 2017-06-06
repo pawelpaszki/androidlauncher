@@ -122,6 +122,7 @@ public class GridAdapter extends BaseAdapter{
         }
         TextView messagesCount = (TextView) v.findViewById(R.id.notifications);
         if(text.equalsIgnoreCase("Messaging")) {
+            v.setTag("Messaging");
             int messageCount = MissedCallsCountRetriever.getUnreadMessagesCount(context);
             if(messageCount > 0) {
                 messagesCount.setText(String.valueOf(messageCount));
@@ -129,12 +130,18 @@ public class GridAdapter extends BaseAdapter{
             } else {
                 messagesCount.setVisibility(View.GONE);
             }
+        } else if (text.equalsIgnoreCase("Phone")) {
+            v.setTag("Phone");
+            if(MissedCallsCountRetriever.getMissedCallsCount(context) > 0) {
+                messagesCount.setVisibility(View.VISIBLE);
+                messagesCount.setText(MissedCallsCountRetriever.getMissedCallsCount(context));
+            } else {
+                messagesCount.setVisibility(View.GONE);
+            }
         } else {
             messagesCount.setVisibility(View.GONE);
+            v.setTag(apps.get(position).getName());
         }
-//        if(text.length() > 14) {
-//            text = text.substring(0,11) + "...";
-//        }
 
         String path = context.getFilesDir().getAbsolutePath();
         //Bitmap icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();

@@ -1,7 +1,10 @@
 package com.example.pawelpaszki.launcher;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
@@ -15,11 +18,15 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.example.pawelpaszki.launcher.adapters.GridAdapter;
 import com.example.pawelpaszki.launcher.utils.AppsSorter;
+import com.example.pawelpaszki.launcher.utils.MissedCallsCountRetriever;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
 import java.util.ArrayList;
@@ -40,6 +47,43 @@ public class AppsListActivity extends Activity {
     private Handler handler;
     private int visibleCount = 0;
     private int iconSide;
+    private TextView tv;
+    private BroadcastReceiver smsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i("message received", "msg");
+            for(int i = 0; i < gv.getChildCount(); i++) {
+                if(gv.getChildAt(i).getTag().equals("Messaging")) {
+                    tv = (TextView) ((FrameLayout) ((LinearLayout) gv.getChildAt(i)).getChildAt(0)).getChildAt(1);
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            tv.setText(String.valueOf(MissedCallsCountRetriever.getUnreadMessagesCount(AppsListActivity.this)));
+                        }
+                    }, 1000);
+                }
+            }
+        }
+    };
+
+    @Override
+    protected void onStart() {
+        registerReceiver(smsReceiver, new IntentFilter(
+                "android.provider.Telephony.SMS_RECEIVED"));
+        SharedPrefs.setHomeReloadRequired(true,this);
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        if(smsReceiver != null) {
+            unregisterReceiver(smsReceiver);
+            smsReceiver = null;
+        }
+        super.onStop();
+
+    }
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +94,11 @@ public class AppsListActivity extends Activity {
         window.setStatusBarColor(Color.TRANSPARENT);
         window.setNavigationBarColor(Color.TRANSPARENT);
         loadApps();
+        loadView();
+
+    }
+
+    private void loadView() {
         if(visibleCount != SharedPrefs.getVisibleCount(this)) {
             SharedPrefs.setVisibleCount(visibleCount, this);
         }
@@ -69,7 +118,6 @@ public class AppsListActivity extends Activity {
                 return false;
             }
         });
-
     }
 
     private GestureDetectorCompat detector;
