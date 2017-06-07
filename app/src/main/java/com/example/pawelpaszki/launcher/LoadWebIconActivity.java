@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.example.pawelpaszki.launcher.utils.CustomWebView;
 import com.example.pawelpaszki.launcher.utils.IconLoader;
 import com.example.pawelpaszki.launcher.utils.ImageDownloader;
+import com.example.pawelpaszki.launcher.utils.MissedCallsCountRetriever;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,8 +73,14 @@ public class LoadWebIconActivity extends AppCompatActivity {
                     Log.i("extra", webview.getHitTestResult().getExtra());
                         try {
                             new ImageDownloader(LoadWebIconActivity.this, appLabel).execute(webview.getHitTestResult().getExtra());
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    goBack();
+                                }
+                            }, 500);
 
-                            goBack();
 
 
                         } catch (Exception e) {
@@ -103,6 +111,7 @@ public class LoadWebIconActivity extends AppCompatActivity {
 
     private void goBack() {
         Intent intent = new Intent(LoadWebIconActivity.this,ChangeIconsActivity.class);
+
         intent.putExtra("option", "web");
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);

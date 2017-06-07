@@ -2,6 +2,8 @@ package com.example.pawelpaszki.launcher;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
+import android.appwidget.AppWidgetHost;
+import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.BroadcastReceiver;
@@ -48,6 +50,7 @@ import org.w3c.dom.Text;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class HomeActivity extends Activity {
 
@@ -64,6 +67,7 @@ public class HomeActivity extends Activity {
     private LinearLayout dock;
     private LinearLayout topContainer;
     private boolean topContainerEnabled;
+    private int i = 0;
     private BroadcastReceiver smsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -79,6 +83,7 @@ public class HomeActivity extends Activity {
 
         }
     };
+    private AppWidgetHost appWidgetHost;
 
 
     @Override
@@ -136,6 +141,23 @@ public class HomeActivity extends Activity {
             }
         });
 
+        home.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if(topContainerEnabled) {
+                    topContainer.setVisibility(View.GONE);
+                    topContainer.setBackgroundColor(0x00000000);
+                } else {
+                    //topContainer.setBackgroundColor(0xffffffff);
+                    topContainer.setVisibility(View.VISIBLE);
+                    topContainer.setBackgroundColor(0xFF000000);
+
+                }
+                topContainerEnabled =!topContainerEnabled;
+                return false;
+            }
+        });
+
         context = this;
     }
 
@@ -159,30 +181,11 @@ public class HomeActivity extends Activity {
 
 
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(width/5, width/5);
-//        topContainer = (LinearLayout) findViewById(R.id.top_home_container);
-//        final RelativeLayout.LayoutParams topContainerParams = new RelativeLayout.LayoutParams(topContainer.getLayoutParams());
-//        topContainerParams.height = height - width/5 - getSoftButtonsBarHeight();
-//        topContainer.setLayoutParams(topContainerParams);
-//        topContainer.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                if(topContainerEnabled) {
-//                    topContainer.setBackgroundColor(0x00000000);
-//                } else {
-//                    topContainer.setBackgroundColor(0xffffffff);
-//                    AppWidgetManager manager = AppWidgetManager.getInstance(context);
-//                    List<AppWidgetProviderInfo> infoList = manager.getInstalledProviders();
-//                    Log.i("infolist", String.valueOf(infoList.size()));
-//                    for (AppWidgetProviderInfo info : infoList) {
-//                        Log.i("info", "Name: " + info.label);
-//                        Log.i("info", "Provider Name: " + info.provider);
-//                        Log.i("info", "Configure Name: " + info.configure);
-//                    }
-//                }
-//                topContainerEnabled =!topContainerEnabled;
-//                return false;
-//            }
-//        });
+        topContainer = (LinearLayout) findViewById(R.id.top_home_container);
+        final RelativeLayout.LayoutParams topContainerParams = new RelativeLayout.LayoutParams(topContainer.getLayoutParams());
+        topContainerParams.height = height - width/5 - getSoftButtonsBarHeight();
+        topContainer.setLayoutParams(topContainerParams);
+
 
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
         for(ResolveInfo ri:availableActivities){

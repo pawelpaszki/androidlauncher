@@ -164,12 +164,12 @@ public class ChangeIconsActivity extends AppCompatActivity {
                             Intent i = new Intent(
                                     Intent.ACTION_PICK,
                                     android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
                             startActivityForResult(i, RESULT_LOAD_IMAGE);
                         } else {
                             if(NetworkConnectivityChecker.isNetworkAvailable(ChangeIconsActivity.this)) {
                                 Intent i = new Intent(ChangeIconsActivity.this, LoadWebIconActivity.class);
                                 i.putExtra("label",apps.get(position).getLabel());
+                                i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                                 startActivity(i);
                                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
                             } else {
@@ -232,11 +232,25 @@ public class ChangeIconsActivity extends AppCompatActivity {
                     bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                     break;
             }
-            int bitmapWidth = bitmap.getWidth();
-            int bitmapHeight = bitmap.getHeight();
+            int bitmapWidth;
+            int bitmapHeight;
+            if(bitmap != null) {
+                bitmapWidth = bitmap.getWidth();
+                bitmapHeight = bitmap.getHeight();
+            } else {
+                bitmapWidth = 0;
+                bitmapHeight = 0;
+            }
+
             if(bitmapHeight < 200 || bitmapHeight < 200) {
-                Toast.makeText(ChangeIconsActivity.this, "Selected image is too small",
-                        Toast.LENGTH_SHORT).show();
+                if(bitmapHeight == 0) {
+                    Toast.makeText(ChangeIconsActivity.this, "This image cannot be loaded",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(ChangeIconsActivity.this, "Selected image is too small",
+                            Toast.LENGTH_SHORT).show();
+                }
+
             } else {
                 listView.setVisibility(View.GONE);
                 Button applyButton = (Button) findViewById(R.id.apply_image);

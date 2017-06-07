@@ -11,6 +11,7 @@
         android:layout_height="match_parent"
         android:background="#00ffffff"
         android:id="@+id/top_home_container"
+        android:gravity="center"
         android:visibility="gone">
     </LinearLayout>
     <ProgressBar
