@@ -2,6 +2,8 @@ package com.example.pawelpaszki.launcher;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProviderInfo;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +20,7 @@ import android.os.ResultReceiver;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -59,6 +62,8 @@ public class HomeActivity extends Activity {
     private int j;
     private TextView homeNotifications;
     private LinearLayout dock;
+    private LinearLayout topContainer;
+    private boolean topContainerEnabled;
     private BroadcastReceiver smsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -149,8 +154,35 @@ public class HomeActivity extends Activity {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.widthPixels;
+        int height = displayMetrics.heightPixels;
+
+
 
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(width/5, width/5);
+//        topContainer = (LinearLayout) findViewById(R.id.top_home_container);
+//        final RelativeLayout.LayoutParams topContainerParams = new RelativeLayout.LayoutParams(topContainer.getLayoutParams());
+//        topContainerParams.height = height - width/5 - getSoftButtonsBarHeight();
+//        topContainer.setLayoutParams(topContainerParams);
+//        topContainer.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                if(topContainerEnabled) {
+//                    topContainer.setBackgroundColor(0x00000000);
+//                } else {
+//                    topContainer.setBackgroundColor(0xffffffff);
+//                    AppWidgetManager manager = AppWidgetManager.getInstance(context);
+//                    List<AppWidgetProviderInfo> infoList = manager.getInstalledProviders();
+//                    Log.i("infolist", String.valueOf(infoList.size()));
+//                    for (AppWidgetProviderInfo info : infoList) {
+//                        Log.i("info", "Name: " + info.label);
+//                        Log.i("info", "Provider Name: " + info.provider);
+//                        Log.i("info", "Configure Name: " + info.configure);
+//                    }
+//                }
+//                topContainerEnabled =!topContainerEnabled;
+//                return false;
+//            }
+//        });
 
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
         for(ResolveInfo ri:availableActivities){
@@ -170,6 +202,7 @@ public class HomeActivity extends Activity {
             View view = LayoutInflater.from(this).inflate(R.layout.dock_item,null);
             homeNotifications = (TextView) view.findViewById(R.id.home_notifications);
             if(dockerApps.get(j).getLabel().toString().equalsIgnoreCase("Messaging")) {
+                SharedPrefs.setMessagingPackageName(this, (String) dockerApps.get(j).getName());
                 view.setTag("Messaging");
                 int messageCount = MissedCallsCountRetriever.getUnreadMessagesCount(this);
                 if(messageCount > 0) {
@@ -209,7 +242,7 @@ public class HomeActivity extends Activity {
             }
             iv.setImageDrawable(new BitmapDrawable(this.getResources(), icon));
             iv.setLayoutParams(layoutParams);
-            tv.setText((String) dockerApps.get(j).getLabel());
+            tv.setText(dockerApps.get(j).getLabel());
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -218,7 +251,11 @@ public class HomeActivity extends Activity {
                         if(v.getTag().toString().equalsIgnoreCase("Phone")) {
                             intent = new Intent(Intent.ACTION_DIAL);
                         } else {
-                            intent = manager.getLaunchIntentForPackage(v.getTag().toString());
+                            if(v.getTag().toString().equals("Messaging")) {
+                                intent = manager.getLaunchIntentForPackage(SharedPrefs.getMessagingPackageName(HomeActivity.this));
+                            } else {
+                                intent = manager.getLaunchIntentForPackage(v.getTag().toString());
+                            }
                         }
 
                         // Log.i("name", v.getTag().toString());
@@ -243,6 +280,19 @@ public class HomeActivity extends Activity {
 
         }
     }
+
+    private int getSoftButtonsBarHeight() {
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            int usableHeight = metrics.heightPixels;
+            getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+            int realHeight = metrics.heightPixels;
+            if (realHeight > usableHeight)
+                return realHeight - usableHeight;
+            else
+                return 0;
+    }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {

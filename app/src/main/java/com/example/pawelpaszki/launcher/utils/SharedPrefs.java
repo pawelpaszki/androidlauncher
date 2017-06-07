@@ -133,4 +133,16 @@ public class SharedPrefs {
         String key = "nonDefault";
         return prefs.getInt(key, 0);
     }
+
+    public static String getMessagingPackageName(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString("messaging", "");
+    }
+
+    public static void setMessagingPackageName(Context context, String name) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("messaging", name);
+        editor.commit();
+    }
 }
