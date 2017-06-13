@@ -32,8 +32,9 @@ public class WidgetPagerAdapter extends PagerAdapter {
         layout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                int value = Integer.parseInt(((TextView) layout.getChildAt(0)).getText().toString());
-                ((TextView) layout.getChildAt(0)).setText(String.valueOf(value + 1));
+//                int value = Integer.parseInt(((TextView) layout.getChildAt(0)).getText().toString());
+//                ((TextView) layout.getChildAt(0)).setText(String.valueOf(value + 1));
+                
                 return false;
             }
         });

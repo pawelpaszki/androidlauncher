@@ -52,12 +52,9 @@ import com.example.pawelpaszki.launcher.utils.RoundBitmapGenerator;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 import com.example.pawelpaszki.launcher.utils.MissedCallsCountRetriever;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class HomeActivity extends Activity {
 
@@ -90,9 +87,6 @@ public class HomeActivity extends Activity {
 
         }
     };
-    private ViewPager pager = null;
-    private WidgetPagerAdapter pagerAdapter = null;
-    private LayoutInflater inflater;
     private ContentObserver missedCallObserver = new ContentObserver(null) {
         @Override
         public void onChange(boolean selfChange) {
