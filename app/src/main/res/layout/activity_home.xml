@@ -5,15 +5,12 @@
     android:fitsSystemWindows="true"
     android:id="@+id/home_container"
     tools:context=".HomeActivity" >
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#00ffffff"
-        android:id="@+id/top_home_container"
-        android:gravity="center"
-        android:visibility="gone">
-    </LinearLayout>
+        <android.support.v4.view.ViewPager
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </android.support.v4.view.ViewPager>
     <ProgressBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

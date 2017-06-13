@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.ContentObserver;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -19,7 +21,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
+import android.provider.CallLog;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -27,6 +31,7 @@ import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -35,9 +40,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.pawelpaszki.launcher.adapters.WidgetPagerAdapter;
 import com.example.pawelpaszki.launcher.services.MyIntentService;
 import com.example.pawelpaszki.launcher.utils.AppsSorter;
 import com.example.pawelpaszki.launcher.utils.IconLoader;
@@ -65,8 +72,8 @@ public class HomeActivity extends Activity {
     private int j;
     private TextView homeNotifications;
     private LinearLayout dock;
-    private LinearLayout topContainer;
-    private boolean topContainerEnabled;
+    private ViewPager topContainer;
+    private boolean topContainerEnabled = true;
     private int i = 0;
     private BroadcastReceiver smsReceiver = new BroadcastReceiver() {
         @Override
@@ -83,13 +90,62 @@ public class HomeActivity extends Activity {
 
         }
     };
-    private AppWidgetHost appWidgetHost;
-
+    private ViewPager pager = null;
+    private WidgetPagerAdapter pagerAdapter = null;
+    private LayoutInflater inflater;
+    private ContentObserver missedCallObserver = new ContentObserver(null) {
+        @Override
+        public void onChange(boolean selfChange) {
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    dock.removeAllViews();
+                    loadCarousel();
+                }
+            }, 1000);
+        }
+    };
 
     @Override
     protected void onStart() {
+        smsReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i("message received", "msg");
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        dock.removeAllViews();
+                        loadCarousel();
+                    }
+                }, 500);
+
+            }
+        };
         registerReceiver(smsReceiver, new IntentFilter(
                 "android.provider.Telephony.SMS_RECEIVED"));
+        getApplicationContext().getContentResolver().registerContentObserver(CallLog.Calls.CONTENT_URI, true, missedCallObserver);
+        Log.i("on start", "on start");
+        int unreadMessages = MissedCallsCountRetriever.getUnreadMessagesCount(context);
+        if(dock != null) {
+            for(int i = 0; i < dock.getChildCount(); i++) {
+                if(dock.getChildAt(i).getTag().toString().equals("Messaging")) {
+                    if( Integer.parseInt(((TextView)((FrameLayout)((LinearLayout)(dock.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText().toString()) != unreadMessages) {
+                        final Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                dock.removeAllViews();
+                                loadCarousel();
+                            }
+                        }, 500);
+                    }
+                }
+            }
+        }
+
         super.onStart();
     }
 
@@ -98,6 +154,9 @@ public class HomeActivity extends Activity {
         if(smsReceiver != null) {
             unregisterReceiver(smsReceiver);
             smsReceiver = null;
+        }
+        if(missedCallObserver != null) {
+            getApplicationContext().getContentResolver().unregisterContentObserver(missedCallObserver);
         }
         super.onStop();
 
@@ -123,6 +182,7 @@ public class HomeActivity extends Activity {
             }
             SharedPrefs.setIsFirstLaunch(false,this);
         }
+        context = this;
 
 
         /////////////// load/ process icons //////////////
@@ -146,11 +206,11 @@ public class HomeActivity extends Activity {
             public boolean onLongClick(View v) {
                 if(topContainerEnabled) {
                     topContainer.setVisibility(View.GONE);
-                    topContainer.setBackgroundColor(0x00000000);
+                    //topContainer.setBackgroundColor(0x00000000);
                 } else {
                     //topContainer.setBackgroundColor(0xffffffff);
                     topContainer.setVisibility(View.VISIBLE);
-                    topContainer.setBackgroundColor(0xFF000000);
+                    //topContainer.setBackgroundColor(0xFF000000);
 
                 }
                 topContainerEnabled =!topContainerEnabled;
@@ -158,7 +218,7 @@ public class HomeActivity extends Activity {
             }
         });
 
-        context = this;
+
     }
 
     public Context getContext() {
@@ -181,10 +241,13 @@ public class HomeActivity extends Activity {
 
 
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(width/5, width/5);
-        topContainer = (LinearLayout) findViewById(R.id.top_home_container);
+        topContainer = (ViewPager) findViewById(R.id.view_pager);
         final RelativeLayout.LayoutParams topContainerParams = new RelativeLayout.LayoutParams(topContainer.getLayoutParams());
-        topContainerParams.height = height - width/5 - getSoftButtonsBarHeight();
+        topContainerParams.bottomMargin = height - (height - width/5 - getSoftButtonsBarHeight());
+        topContainerParams.topMargin = getSoftButtonsBarHeight();
+        //topContainerParams.height = height * 5;
         topContainer.setLayoutParams(topContainerParams);
+        topContainer.setAdapter(new WidgetPagerAdapter(this));
 
 
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
