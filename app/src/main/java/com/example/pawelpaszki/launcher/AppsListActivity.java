@@ -72,7 +72,7 @@ public class AppsListActivity extends Activity {
                         public void run() {
                             tv.setText(String.valueOf(MissedCallsCountRetriever.getUnreadMessagesCount(AppsListActivity.this)));
                         }
-                    }, 1000);
+                    }, 500);
                 }
             }
         }
@@ -81,6 +81,24 @@ public class AppsListActivity extends Activity {
 
     @Override
     protected void onStart() {
+        smsReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i("message received", "msg");
+                for(int i = 0; i < gv.getChildCount(); i++) {
+                    if(gv.getChildAt(i).getTag().equals("Messaging")) {
+                        tv = (TextView) ((FrameLayout) ((LinearLayout) gv.getChildAt(i)).getChildAt(0)).getChildAt(1);
+                        final Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                tv.setText(String.valueOf(MissedCallsCountRetriever.getUnreadMessagesCount(AppsListActivity.this)));
+                            }
+                        }, 500);
+                    }
+                }
+            }
+        };
         registerReceiver(smsReceiver, new IntentFilter(
                 "android.provider.Telephony.SMS_RECEIVED"));
         SharedPrefs.setHomeReloadRequired(true,this);
