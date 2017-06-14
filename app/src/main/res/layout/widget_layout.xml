@@ -3,10 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/widget_page"
+    android:background="#30ffffff"
+    android:padding="5dp"
     >
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#ffffff"/>
 
 </FrameLayout>

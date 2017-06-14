@@ -2,10 +2,6 @@ package com.example.pawelpaszki.launcher;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
-import android.appwidget.AppWidgetHost;
-import android.appwidget.AppWidgetHostView;
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProviderInfo;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +9,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.ContentObserver;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -22,16 +17,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.provider.CallLog;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -44,17 +37,17 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.pawelpaszki.launcher.adapters.WidgetPagerAdapter;
 import com.example.pawelpaszki.launcher.services.MyIntentService;
 import com.example.pawelpaszki.launcher.utils.AppsSorter;
 import com.example.pawelpaszki.launcher.utils.IconLoader;
-import com.example.pawelpaszki.launcher.utils.RoundBitmapGenerator;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 import com.example.pawelpaszki.launcher.utils.MissedCallsCountRetriever;
+import com.example.pawelpaszki.launcher.views.FullPageScrollView;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class HomeActivity extends Activity {
 
@@ -69,9 +62,12 @@ public class HomeActivity extends Activity {
     private int j;
     private TextView homeNotifications;
     private LinearLayout dock;
-    private ViewPager topContainer;
+    private RelativeLayout topContainer;
     private boolean topContainerEnabled = true;
     private int i = 0;
+    private FloatingActionButton addPage;
+    private FloatingActionButton removePage;
+    private boolean isWidgetPinned;
     private BroadcastReceiver smsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -83,7 +79,7 @@ public class HomeActivity extends Activity {
                     dock.removeAllViews();
                     loadCarousel();
                 }
-            }, 1000);
+            }, 500);
 
         }
     };
@@ -97,9 +93,16 @@ public class HomeActivity extends Activity {
                     dock.removeAllViews();
                     loadCarousel();
                 }
-            }, 1000);
+            }, 500);
         }
     };
+    private int topContainerWidth;
+    private int topContainerHeight;
+    private ScrollView scrollView;
+    private LinearLayout widgetContainer;
+    private int singleScrollHeight;
+    private int startScrollY;
+    private int endScrollY;
 
     @Override
     protected void onStart() {
@@ -139,7 +142,6 @@ public class HomeActivity extends Activity {
                 }
             }
         }
-
         super.onStart();
     }
 
@@ -171,7 +173,6 @@ public class HomeActivity extends Activity {
             try {
                 myWallpaperManager.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background));
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             SharedPrefs.setIsFirstLaunch(false,this);
@@ -184,6 +185,154 @@ public class HomeActivity extends Activity {
 
         // comment out if loading icons from local storage
         loadCarousel();
+
+        scrollView = (ScrollView) findViewById(R.id.widgets_scroll);
+
+//        scrollView.setOnEndScrollListener(new FullPageScrollView.OnEndScrollListener() {
+//            @Override
+//            public void onEndScroll(int x, int y, int oldX, int oldY) {
+//                final int childCount = ((LinearLayout) scrollView.getChildAt(0)).getChildCount();
+//                singleScrollHeight = scrollView.getChildAt(0).getHeight() / childCount;
+//                int scrollY;
+//                if(oldY > y) {
+//                    scrollY = scrollView.getScrollY() / singleScrollHeight;
+//                } else {
+//                    scrollY = (scrollView.getScrollY() + singleScrollHeight * 3 / 4) / singleScrollHeight;
+//                }
+//                final int scrollYvalue = scrollY;
+//                Log.i("scrollview height", String.valueOf(scrollView.getChildAt(0).getHeight()));
+//                Log.i("scrollview y", String.valueOf(scrollView.getScrollY()));
+//                Log.i("single scroll height y", String.valueOf(singleScrollHeight));
+//                Log.i("linear layout height", String.valueOf(topContainer.getHeight()));
+//                Log.i("single page height", String.valueOf(topContainer.getChildAt(0).getHeight()));
+//                if(scrollY == 0) {
+//                    scrollView.post(new Runnable() {
+//                        public void run() {
+//                            scrollView.smoothScrollTo(0, 0);
+//                        }
+//                    });
+//                } else {
+//                    scrollView.post(new Runnable() {
+//                        public void run() {
+//                            int y = scrollYvalue * singleScrollHeight;
+//                            scrollView.smoothScrollTo(0, y);
+//                            Log.i("scroll to", String.valueOf(scrollYvalue * singleScrollHeight));
+//                        }
+//                    });
+//                }
+//            }
+//        });
+
+        scrollView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    startScrollY = scrollView.getScrollY();
+                    Log.i("start scroll: ", String.valueOf(startScrollY));
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    int childCount = ((LinearLayout) scrollView.getChildAt(0)).getChildCount();
+                    singleScrollHeight = scrollView.getChildAt(0).getHeight() / childCount;
+                    endScrollY = scrollView.getScrollY();
+                    Log.i("end scroll: ", String.valueOf(endScrollY));
+                    Log.i("scrollview height", String.valueOf(scrollView.getChildAt(0).getHeight()));
+                    Log.i("scrollview y", String.valueOf(scrollView.getScrollY()));
+                    Log.i("single scroll height y", String.valueOf(singleScrollHeight));
+                    Log.i("linear layout height", String.valueOf(topContainer.getHeight()));
+                    Log.i("single page height", String.valueOf(topContainer.getChildAt(0).getHeight()));
+                    if(startScrollY < endScrollY) {
+                        if(startScrollY < singleScrollHeight) {
+                            startScrollY = 1;
+                        } else {
+                            startScrollY = scrollView.getScrollY() / singleScrollHeight + 1;
+                            if(startScrollY > childCount) {
+                                startScrollY--;
+                            }
+                        }
+
+                    } else {
+                        startScrollY = scrollView.getScrollY() / singleScrollHeight;
+                    }
+                    scrollView.post(new Runnable() {
+                        public void run() {
+                            scrollView.smoothScrollTo(0, startScrollY * singleScrollHeight);
+                        }
+                    });
+                }
+                return isWidgetPinned;
+            }
+        });
+
+        LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        widgetContainer = (LinearLayout) findViewById (R.id.widget_container);
+
+        final FrameLayout widgetPage = (FrameLayout) inflater.inflate(R.layout.widget_layout, widgetContainer, false);
+        widgetPage.getLayoutParams().height = topContainerHeight;
+        widgetPage.getLayoutParams().width = topContainerWidth;
+        widgetPage.setTag(new Random().nextLong());
+        TextView testTV = new TextView(this);
+        testTV.setText(widgetPage.getTag().toString());
+        testTV.setTextSize(30);
+        testTV.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT));
+        widgetPage.addView(testTV);
+        widgetContainer.addView(widgetPage);
+
+
+        ///// add saved widgets later //////////
+
+        addPage = (FloatingActionButton) findViewById(R.id.add_page_button);
+        addPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(widgetContainer.getChildCount() <= 10) {
+                    LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    FrameLayout widgetPage = (FrameLayout) inflater.inflate(R.layout.widget_layout, widgetContainer, false);
+                    widgetPage.getLayoutParams().height = topContainerHeight;
+                    widgetPage.getLayoutParams().width = topContainerWidth;
+                    widgetPage.setTag(new Random().nextLong());
+                    TextView testTV = new TextView(context);
+                    testTV.setText(widgetPage.getTag().toString());
+                    testTV.setTextSize(30);
+                    testTV.setLayoutParams(new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.MATCH_PARENT));
+                    widgetPage.addView(testTV);
+                    widgetContainer.addView(widgetPage);
+                    if(widgetContainer.getChildCount() == 10) {
+                        addPage.setVisibility(View.GONE);
+                    } else if(widgetContainer.getChildCount() == 1) {
+                        removePage.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    Toast.makeText(HomeActivity.this,"Only 10 widget pages allowed" ,
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        removePage = (FloatingActionButton) findViewById(R.id.remove_page_button);
+        removePage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(widgetContainer.getChildCount() > 0) {
+                    int viewToRemoveIndex;
+                    if(scrollView.getScrollY() == 0) {
+                        viewToRemoveIndex = 0;
+                    } else {
+                        viewToRemoveIndex= scrollView.getScrollY() / singleScrollHeight;
+                    }
+
+                    widgetContainer.removeViewAt(viewToRemoveIndex);
+                    if(widgetContainer.getChildCount() == 0) {
+                        removePage.setVisibility(View.GONE);
+                    } else if(widgetContainer.getChildCount() == 9) {
+                        addPage.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
 
         detector = new GestureDetectorCompat(this, new MyGestureListener());
         RelativeLayout home = (RelativeLayout) findViewById(R.id.home_container);
@@ -211,8 +360,6 @@ public class HomeActivity extends Activity {
                 return false;
             }
         });
-
-
     }
 
     public Context getContext() {
@@ -232,16 +379,15 @@ public class HomeActivity extends Activity {
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
 
-
-
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(width/5, width/5);
-        topContainer = (ViewPager) findViewById(R.id.view_pager);
+        topContainer = (RelativeLayout) findViewById(R.id.top_container);
         final RelativeLayout.LayoutParams topContainerParams = new RelativeLayout.LayoutParams(topContainer.getLayoutParams());
-        topContainerParams.bottomMargin = height - (height - width/5 - getSoftButtonsBarHeight());
+        topContainerWidth = width;
+        topContainerHeight = height - width/5 - getSoftButtonsBarHeight() * 2;
+        topContainerParams.height = topContainerHeight;
         topContainerParams.topMargin = getSoftButtonsBarHeight();
         //topContainerParams.height = height * 5;
         topContainer.setLayoutParams(topContainerParams);
-        topContainer.setAdapter(new WidgetPagerAdapter(this));
 
 
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
