@@ -27,15 +27,14 @@
             android:id="@+id/remove_page_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="10dp"
+            android:layout_alignTop="@+id/add_page_button"
             android:clickable="true"
-            android:src="@android:drawable/ic_delete"
-            app:backgroundTint="@color/colorTransparent"
+            android:src="@drawable/remove"
+            android:tint="@color/semiTransparent"
+            app:backgroundTint="@color/semiTransparent"
             app:elevation="0dp"
-            app:fabSize="mini"
-            app:rippleColor="@color/colorTransparent" />
+            app:fabSize="normal"
+            app:rippleColor="@color/semiTransparent" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/add_page_button"
@@ -46,11 +45,12 @@
             android:layout_marginBottom="10dp"
             android:layout_marginEnd="10dp"
             android:clickable="true"
-            app:backgroundTint="@color/colorTransparent"
+            android:src="@drawable/add"
+            android:tint="@color/semiTransparent"
+            app:backgroundTint="@color/semiTransparent"
             app:elevation="0dp"
-            app:fabSize="mini"
-            app:rippleColor="@color/colorTransparent"
-            app:srcCompat="@android:drawable/ic_input_add" />
+            app:fabSize="normal"
+            app:rippleColor="@color/semiTransparent" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/pin_page"
@@ -59,12 +59,13 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:clickable="true"
-            android:src="@android:drawable/ic_lock_lock"
+            android:src="@drawable/lock"
+            android:tint="@color/semiTransparent"
+            android:visibility="gone"
             app:backgroundTint="@color/colorTransparent"
             app:elevation="0dp"
-            app:fabSize="mini"
-            android:visibility="gone"
-            app:rippleColor="@color/colorTransparent" />
+            app:fabSize="normal"
+            app:rippleColor="@color/semiTransparent" />
 
     </RelativeLayout>
 

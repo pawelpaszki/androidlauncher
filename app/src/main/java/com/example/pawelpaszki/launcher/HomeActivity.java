@@ -277,26 +277,6 @@ public class HomeActivity extends Activity {
                 LinearLayout.LayoutParams.MATCH_PARENT));
         widgetPage.addView(testTV);
         widgetContainer.addView(widgetPage);
-//        widgetContainer.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                Log.i("long pressed", "scrollview");
-//                if(isWidgetPinned) {
-//                    isWidgetPinned = false;
-//                    if(widgetContainer.getChildCount() > 0) {
-//                        removePage.setVisibility(View.VISIBLE);
-//                    }
-//                    if(widgetContainer.getChildCount() < 10) {
-//                        addPage.setVisibility(View.VISIBLE);
-//                    }
-//                    pinPage.setVisibility(View.VISIBLE);
-//                    return true;
-//                } else {
-//                    startScrollY = (int) v.getY();
-//                    return false;
-//                }
-//            }
-//        });
 
         ///// add saved widgets later //////////
 
@@ -371,6 +351,7 @@ public class HomeActivity extends Activity {
                 if(isWidgetPinned) {
                     addPage.setVisibility(View.GONE);
                     removePage.setVisibility(View.GONE);
+                    pinPage.setImageDrawable(getResources().getDrawable(R.drawable.unlock));
                     pinPage.setVisibility(View.GONE);
                 } else {
                     if( widgetContainer.getChildCount() < 10) {
@@ -378,6 +359,7 @@ public class HomeActivity extends Activity {
                     }
                     if(widgetContainer.getChildCount() > 0) {
                         removePage.setVisibility(View.VISIBLE);
+                        pinPage.setImageDrawable(getResources().getDrawable(R.drawable.lock));
                         pinPage.setVisibility(View.VISIBLE);
                     }
                 }
