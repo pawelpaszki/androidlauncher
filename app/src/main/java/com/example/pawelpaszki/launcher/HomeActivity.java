@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 import android.provider.CallLog;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.Loader;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -42,10 +43,11 @@ import com.example.pawelpaszki.launcher.utils.AppsSorter;
 import com.example.pawelpaszki.launcher.utils.IconLoader;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 import com.example.pawelpaszki.launcher.utils.MissedCallsCountRetriever;
-import com.example.pawelpaszki.launcher.views.FullPageScrollView;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -67,7 +69,16 @@ public class HomeActivity extends Activity {
     private int i = 0;
     private FloatingActionButton addPage;
     private FloatingActionButton removePage;
+    private FloatingActionButton pinPage;
     private boolean isWidgetPinned;
+    private int topContainerWidth;
+    private int topContainerHeight;
+    private ScrollView scrollView;
+    private LinearLayout widgetContainer;
+    private int singleScrollHeight;
+    private int startScrollY;
+    private int endScrollY;
+
     private BroadcastReceiver smsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -96,13 +107,7 @@ public class HomeActivity extends Activity {
             }, 500);
         }
     };
-    private int topContainerWidth;
-    private int topContainerHeight;
-    private ScrollView scrollView;
-    private LinearLayout widgetContainer;
-    private int singleScrollHeight;
-    private int startScrollY;
-    private int endScrollY;
+    private Handler pinPageHandler;
 
     @Override
     protected void onStart() {
@@ -129,15 +134,17 @@ public class HomeActivity extends Activity {
         if(dock != null) {
             for(int i = 0; i < dock.getChildCount(); i++) {
                 if(dock.getChildAt(i).getTag().toString().equals("Messaging")) {
-                    if( Integer.parseInt(((TextView)((FrameLayout)((LinearLayout)(dock.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText().toString()) != unreadMessages) {
-                        final Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                dock.removeAllViews();
-                                loadCarousel();
-                            }
-                        }, 500);
+                    if(! ((TextView)((FrameLayout)((LinearLayout)(dock.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText().equals("") && ! (((TextView)((FrameLayout)((LinearLayout)(dock.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText()== null)) {
+                        if( Integer.parseInt(((TextView)((FrameLayout)((LinearLayout)(dock.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText().toString()) != unreadMessages) {
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    dock.removeAllViews();
+                                    loadCarousel();
+                                }
+                            }, 500);
+                        }
                     }
                 }
             }
@@ -162,6 +169,7 @@ public class HomeActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        pinPageHandler = new Handler();
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(Color.TRANSPARENT);
@@ -188,49 +196,14 @@ public class HomeActivity extends Activity {
 
         scrollView = (ScrollView) findViewById(R.id.widgets_scroll);
 
-//        scrollView.setOnEndScrollListener(new FullPageScrollView.OnEndScrollListener() {
-//            @Override
-//            public void onEndScroll(int x, int y, int oldX, int oldY) {
-//                final int childCount = ((LinearLayout) scrollView.getChildAt(0)).getChildCount();
-//                singleScrollHeight = scrollView.getChildAt(0).getHeight() / childCount;
-//                int scrollY;
-//                if(oldY > y) {
-//                    scrollY = scrollView.getScrollY() / singleScrollHeight;
-//                } else {
-//                    scrollY = (scrollView.getScrollY() + singleScrollHeight * 3 / 4) / singleScrollHeight;
-//                }
-//                final int scrollYvalue = scrollY;
-//                Log.i("scrollview height", String.valueOf(scrollView.getChildAt(0).getHeight()));
-//                Log.i("scrollview y", String.valueOf(scrollView.getScrollY()));
-//                Log.i("single scroll height y", String.valueOf(singleScrollHeight));
-//                Log.i("linear layout height", String.valueOf(topContainer.getHeight()));
-//                Log.i("single page height", String.valueOf(topContainer.getChildAt(0).getHeight()));
-//                if(scrollY == 0) {
-//                    scrollView.post(new Runnable() {
-//                        public void run() {
-//                            scrollView.smoothScrollTo(0, 0);
-//                        }
-//                    });
-//                } else {
-//                    scrollView.post(new Runnable() {
-//                        public void run() {
-//                            int y = scrollYvalue * singleScrollHeight;
-//                            scrollView.smoothScrollTo(0, y);
-//                            Log.i("scroll to", String.valueOf(scrollYvalue * singleScrollHeight));
-//                        }
-//                    });
-//                }
-//            }
-//        });
-
         scrollView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+            if(((LinearLayout) scrollView.getChildAt(0)).getChildCount() > 1) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     startScrollY = scrollView.getScrollY();
                     Log.i("start scroll: ", String.valueOf(startScrollY));
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     int childCount = ((LinearLayout) scrollView.getChildAt(0)).getChildCount();
                     singleScrollHeight = scrollView.getChildAt(0).getHeight() / childCount;
                     endScrollY = scrollView.getScrollY();
@@ -249,7 +222,6 @@ public class HomeActivity extends Activity {
                                 startScrollY--;
                             }
                         }
-
                     } else {
                         startScrollY = scrollView.getScrollY() / singleScrollHeight;
                     }
@@ -258,8 +230,32 @@ public class HomeActivity extends Activity {
                             scrollView.smoothScrollTo(0, startScrollY * singleScrollHeight);
                         }
                     });
+                    if(!isWidgetPinned) {
+                        return true;
+                    }
                 }
-                return isWidgetPinned;
+                if(isWidgetPinned) {
+                    pinPage.setVisibility(View.VISIBLE);
+                    if(pinPageHandler != null) {
+                        pinPageHandler.removeCallbacksAndMessages(null);
+                    }
+                    pinPageHandler.postDelayed(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            if(isWidgetPinned) {
+                                pinPage.setVisibility(View.GONE);
+                            }
+                        }
+                    }, 3000);
+                    detector.onTouchEvent(event);
+                }
+            } else {
+                detector.onTouchEvent(event);
+            }
+
+            return isWidgetPinned;
             }
         });
 
@@ -271,14 +267,36 @@ public class HomeActivity extends Activity {
         widgetPage.getLayoutParams().width = topContainerWidth;
         widgetPage.setTag(new Random().nextLong());
         TextView testTV = new TextView(this);
-        testTV.setText(widgetPage.getTag().toString());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        String currentDateandTime = "textview created at: " + sdf.format(new Date());
+
+        testTV.setText(currentDateandTime);
         testTV.setTextSize(30);
         testTV.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT));
         widgetPage.addView(testTV);
         widgetContainer.addView(widgetPage);
-
+//        widgetContainer.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                Log.i("long pressed", "scrollview");
+//                if(isWidgetPinned) {
+//                    isWidgetPinned = false;
+//                    if(widgetContainer.getChildCount() > 0) {
+//                        removePage.setVisibility(View.VISIBLE);
+//                    }
+//                    if(widgetContainer.getChildCount() < 10) {
+//                        addPage.setVisibility(View.VISIBLE);
+//                    }
+//                    pinPage.setVisibility(View.VISIBLE);
+//                    return true;
+//                } else {
+//                    startScrollY = (int) v.getY();
+//                    return false;
+//                }
+//            }
+//        });
 
         ///// add saved widgets later //////////
 
@@ -287,13 +305,17 @@ public class HomeActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if(widgetContainer.getChildCount() <= 10) {
+                    Log.i("addPage dimensions", addPage.getHeight() + ":" + addPage.getWidth());
                     LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                     FrameLayout widgetPage = (FrameLayout) inflater.inflate(R.layout.widget_layout, widgetContainer, false);
                     widgetPage.getLayoutParams().height = topContainerHeight;
                     widgetPage.getLayoutParams().width = topContainerWidth;
                     widgetPage.setTag(new Random().nextLong());
                     TextView testTV = new TextView(context);
-                    testTV.setText(widgetPage.getTag().toString());
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                    String currentDateandTime = "textview created at: " + sdf.format(new Date());
+
+                    testTV.setText(currentDateandTime);
                     testTV.setTextSize(30);
                     testTV.setLayoutParams(new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
@@ -302,9 +324,14 @@ public class HomeActivity extends Activity {
                     widgetContainer.addView(widgetPage);
                     if(widgetContainer.getChildCount() == 10) {
                         addPage.setVisibility(View.GONE);
-                    } else if(widgetContainer.getChildCount() == 1) {
+                    }
+                    if (widgetContainer.getChildCount() == 1) {
                         removePage.setVisibility(View.VISIBLE);
                     }
+                    if (widgetContainer.getChildCount() > 1) {
+                        pinPage.setVisibility(View.VISIBLE);
+                    }
+
                 } else {
                     Toast.makeText(HomeActivity.this,"Only 10 widget pages allowed" ,
                             Toast.LENGTH_LONG).show();
@@ -318,19 +345,43 @@ public class HomeActivity extends Activity {
             public void onClick(View v) {
                 if(widgetContainer.getChildCount() > 0) {
                     int viewToRemoveIndex;
-                    if(scrollView.getScrollY() == 0) {
+                    if (scrollView.getScrollY() == 0) {
                         viewToRemoveIndex = 0;
                     } else {
-                        viewToRemoveIndex= scrollView.getScrollY() / singleScrollHeight;
+                        viewToRemoveIndex = scrollView.getScrollY() / singleScrollHeight;
                     }
 
                     widgetContainer.removeViewAt(viewToRemoveIndex);
-                    if(widgetContainer.getChildCount() == 0) {
+                    if (widgetContainer.getChildCount() == 1) {
+                        pinPage.setVisibility(View.GONE);
+                    } else if( widgetContainer.getChildCount() == 0) {
                         removePage.setVisibility(View.GONE);
                     } else if(widgetContainer.getChildCount() == 9) {
                         addPage.setVisibility(View.VISIBLE);
                     }
                 }
+            }
+        });
+
+        pinPage = (FloatingActionButton) findViewById(R.id.pin_page);
+        pinPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isWidgetPinned = !isWidgetPinned;
+                if(isWidgetPinned) {
+                    addPage.setVisibility(View.GONE);
+                    removePage.setVisibility(View.GONE);
+                    pinPage.setVisibility(View.GONE);
+                } else {
+                    if( widgetContainer.getChildCount() < 10) {
+                        addPage.setVisibility(View.VISIBLE);
+                    }
+                    if(widgetContainer.getChildCount() > 0) {
+                        removePage.setVisibility(View.VISIBLE);
+                        pinPage.setVisibility(View.VISIBLE);
+                    }
+                }
+
             }
         });
 
@@ -347,17 +398,19 @@ public class HomeActivity extends Activity {
         home.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if(topContainerEnabled) {
-                    topContainer.setVisibility(View.GONE);
-                    //topContainer.setBackgroundColor(0x00000000);
-                } else {
-                    //topContainer.setBackgroundColor(0xffffffff);
-                    topContainer.setVisibility(View.VISIBLE);
-                    //topContainer.setBackgroundColor(0xFF000000);
+            if(topContainerEnabled) {
+                topContainer.setVisibility(View.INVISIBLE);
+                topContainer.setEnabled(false);
+                //topContainer.setBackgroundColor(0x00000000);
+            } else {
+                //topContainer.setBackgroundColor(0xffffffff);
+                topContainer.setVisibility(View.VISIBLE);
+                topContainer.setEnabled(true);
+                //topContainer.setBackgroundColor(0xFF000000);
 
-                }
-                topContainerEnabled =!topContainerEnabled;
-                return false;
+            }
+            topContainerEnabled =!topContainerEnabled;
+            return false;
             }
         });
     }
@@ -386,9 +439,7 @@ public class HomeActivity extends Activity {
         topContainerHeight = height - width/5 - getSoftButtonsBarHeight() * 2;
         topContainerParams.height = topContainerHeight;
         topContainerParams.topMargin = getSoftButtonsBarHeight();
-        //topContainerParams.height = height * 5;
         topContainer.setLayoutParams(topContainerParams);
-
 
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
         for(ResolveInfo ri:availableActivities){
@@ -475,7 +526,7 @@ public class HomeActivity extends Activity {
                         }
                     } catch (Exception e) {
                         Toast.makeText(HomeActivity.this,"This application cannot be opened" ,
-                        Toast.LENGTH_LONG).show();
+                                Toast.LENGTH_LONG).show();
                         recreate();
                     }
 
@@ -488,15 +539,15 @@ public class HomeActivity extends Activity {
     }
 
     private int getSoftButtonsBarHeight() {
-            DisplayMetrics metrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            int usableHeight = metrics.heightPixels;
-            getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-            int realHeight = metrics.heightPixels;
-            if (realHeight > usableHeight)
-                return realHeight - usableHeight;
-            else
-                return 0;
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int usableHeight = metrics.heightPixels;
+        getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+        int realHeight = metrics.heightPixels;
+        if (realHeight > usableHeight)
+            return realHeight - usableHeight;
+        else
+            return 0;
     }
 
 
@@ -560,7 +611,6 @@ public class HomeActivity extends Activity {
         if(dockCount > 0) {
             ((HorizontalScrollView) dock.getParent()).scrollTo(0,0);
         }
-        //Log.i("carousel items", "carousel items: " + dock.getChildCount());
 
         if(SharedPrefs.getHomeReloadRequired(this) || (SharedPrefs.getVisibleCount(this) > 0 && dock.getChildCount() != SharedPrefs.getVisibleCount(this))) {
             SharedPrefs.setHomeReloadRequired(false, this);
@@ -620,7 +670,7 @@ public class HomeActivity extends Activity {
                     }
                 });
 
-             }
+            }
 
             //Log.i("MyResultreceiver", Thread.currentThread().getName());
 

@@ -27,7 +27,8 @@
             android:id="@+id/remove_page_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_alignParentBottom="true"
             android:layout_marginTop="10dp"
             android:clickable="true"
             android:src="@android:drawable/ic_delete"
@@ -49,7 +50,21 @@
             app:elevation="0dp"
             app:fabSize="mini"
             app:rippleColor="@color/colorTransparent"
-            app:srcCompat="@android:drawable/ic_menu_add" />
+            app:srcCompat="@android:drawable/ic_input_add" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/pin_page"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:clickable="true"
+            android:src="@android:drawable/ic_lock_lock"
+            app:backgroundTint="@color/colorTransparent"
+            app:elevation="0dp"
+            app:fabSize="mini"
+            android:visibility="gone"
+            app:rippleColor="@color/colorTransparent" />
 
     </RelativeLayout>
 
