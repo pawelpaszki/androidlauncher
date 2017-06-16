@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 import android.provider.CallLog;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.DisplayMetrics;
@@ -202,17 +203,17 @@ public class HomeActivity extends Activity {
             if(((LinearLayout) scrollView.getChildAt(0)).getChildCount() > 1) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     startScrollY = scrollView.getScrollY();
-                    Log.i("start scroll: ", String.valueOf(startScrollY));
+//                    Log.i("start scroll: ", String.valueOf(startScrollY));
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     int childCount = ((LinearLayout) scrollView.getChildAt(0)).getChildCount();
                     singleScrollHeight = scrollView.getChildAt(0).getHeight() / childCount;
                     endScrollY = scrollView.getScrollY();
-                    Log.i("end scroll: ", String.valueOf(endScrollY));
-                    Log.i("scrollview height", String.valueOf(scrollView.getChildAt(0).getHeight()));
-                    Log.i("scrollview y", String.valueOf(scrollView.getScrollY()));
-                    Log.i("single scroll height y", String.valueOf(singleScrollHeight));
-                    Log.i("linear layout height", String.valueOf(topContainer.getHeight()));
-                    Log.i("single page height", String.valueOf(topContainer.getChildAt(0).getHeight()));
+//                    Log.i("end scroll: ", String.valueOf(endScrollY));
+//                    Log.i("scrollview height", String.valueOf(scrollView.getChildAt(0).getHeight()));
+//                    Log.i("scrollview y", String.valueOf(scrollView.getScrollY()));
+//                    Log.i("single scroll height y", String.valueOf(singleScrollHeight));
+//                    Log.i("linear layout height", String.valueOf(topContainer.getHeight()));
+//                    Log.i("single page height", String.valueOf(topContainer.getChildAt(0).getHeight()));
                     if(startScrollY < endScrollY) {
                         if(startScrollY < singleScrollHeight) {
                             startScrollY = 1;
@@ -262,21 +263,21 @@ public class HomeActivity extends Activity {
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         widgetContainer = (LinearLayout) findViewById (R.id.widget_container);
 
-        final FrameLayout widgetPage = (FrameLayout) inflater.inflate(R.layout.widget_layout, widgetContainer, false);
-        widgetPage.getLayoutParams().height = topContainerHeight;
-        widgetPage.getLayoutParams().width = topContainerWidth;
-        widgetPage.setTag(new Random().nextLong());
-        TextView testTV = new TextView(this);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        String currentDateandTime = "textview created at: " + sdf.format(new Date());
-
-        testTV.setText(currentDateandTime);
-        testTV.setTextSize(30);
-        testTV.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT));
-        widgetPage.addView(testTV);
-        widgetContainer.addView(widgetPage);
+//        final FrameLayout widgetPage = (FrameLayout) inflater.inflate(R.layout.widget_layout, widgetContainer, false);
+//        widgetPage.getLayoutParams().height = topContainerHeight;
+//        widgetPage.getLayoutParams().width = topContainerWidth;
+//        widgetPage.setTag(new Random().nextLong());
+//        TextView testTV = new TextView(this);
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+//        String currentDateandTime = "textview created at: " + sdf.format(new Date());
+//
+//        testTV.setText(currentDateandTime);
+//        testTV.setTextSize(30);
+//        testTV.setLayoutParams(new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.MATCH_PARENT,
+//                LinearLayout.LayoutParams.MATCH_PARENT));
+//        widgetPage.addView(testTV);
+//        widgetContainer.addView(widgetPage);
 
         ///// add saved widgets later //////////
 
@@ -351,7 +352,7 @@ public class HomeActivity extends Activity {
                 if(isWidgetPinned) {
                     addPage.setVisibility(View.GONE);
                     removePage.setVisibility(View.GONE);
-                    pinPage.setImageDrawable(getResources().getDrawable(R.drawable.unlock));
+                    pinPage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.unlock));
                     pinPage.setVisibility(View.GONE);
                 } else {
                     if( widgetContainer.getChildCount() < 10) {
@@ -359,7 +360,7 @@ public class HomeActivity extends Activity {
                     }
                     if(widgetContainer.getChildCount() > 0) {
                         removePage.setVisibility(View.VISIBLE);
-                        pinPage.setImageDrawable(getResources().getDrawable(R.drawable.lock));
+                        pinPage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.lock));
                         pinPage.setVisibility(View.VISIBLE);
                     }
                 }
