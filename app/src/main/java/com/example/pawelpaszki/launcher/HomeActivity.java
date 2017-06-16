@@ -256,12 +256,15 @@ public class HomeActivity extends Activity {
                         currentWidgetPage = startScrollY;
                     }
                     Log.i("start scroll: ", String.valueOf(startScrollY));
-                    scrollView.postDelayed(new Runnable() {
-                        public void run() {
-                            scrollView.smoothScrollTo(0, startScrollY * singleScrollHeight);
-                        }
-                    },100);
-                    ((WidgetFrame) widgetContainer.getChildAt(currentWidgetPage)).getAppWidgetHost().startListening();
+                    if(!isWidgetPinned) {
+                        scrollView.postDelayed(new Runnable() {
+                            public void run() {
+                                scrollView.smoothScrollTo(0, startScrollY * singleScrollHeight);
+                            }
+                        },100);
+                        ((WidgetFrame) widgetContainer.getChildAt(currentWidgetPage)).getAppWidgetHost().startListening();
+                    }
+
                     if(!isWidgetPinned) {
                         return false;
                     }
@@ -325,15 +328,6 @@ public class HomeActivity extends Activity {
 //                    widgetPage.addView(testTV);
 
                     newWidgetPage.getAppWidgetHost().startListening();
-                    if(widgetContainer.getChildCount() == 10) {
-                        addPage.setVisibility(View.GONE);
-                    }
-                    if (widgetContainer.getChildCount() == 1) {
-                        removePage.setVisibility(View.VISIBLE);
-                    }
-                    if (widgetContainer.getChildCount() > 1) {
-                        pinPage.setVisibility(View.VISIBLE);
-                    }
 
                 } else {
                     Toast.makeText(HomeActivity.this,"Only 10 widget pages allowed" ,
@@ -373,11 +367,15 @@ public class HomeActivity extends Activity {
             public void onClick(View v) {
                 isWidgetPinned = !isWidgetPinned;
                 if(isWidgetPinned) {
+                    scrollView.setVerticalScrollBarEnabled(false);
+                    //scrollView.setHorizontalScrollBarEnabled(false);
                     addPage.setVisibility(View.GONE);
                     removePage.setVisibility(View.GONE);
                     pinPage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.unlock));
                     pinPage.setVisibility(View.GONE);
                 } else {
+                    scrollView.setVerticalScrollBarEnabled(true);
+                    //scrollView.setHorizontalScrollBarEnabled(false);
                     if( widgetContainer.getChildCount() < 10) {
                         addPage.setVisibility(View.VISIBLE);
                     }
@@ -456,6 +454,15 @@ public class HomeActivity extends Activity {
         launcherInfo.hostView.setTag(launcherInfo);
         newWidgetPage.setWidgetView(launcherInfo);
         widgetContainer.addView(newWidgetPage);
+        if(widgetContainer.getChildCount() == 10) {
+            addPage.setVisibility(View.GONE);
+        }
+        if (widgetContainer.getChildCount() == 1) {
+            removePage.setVisibility(View.VISIBLE);
+        }
+        if (widgetContainer.getChildCount() > 1) {
+            pinPage.setVisibility(View.VISIBLE);
+        }
     }
 
     private void addAppWidget(Intent data) {

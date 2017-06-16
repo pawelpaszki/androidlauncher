@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/widget_page"
-    android:background="#30ffffff"
+    android:background="#00ffffff"
     android:padding="5dp"
     layout_gravity = "center"
     >
