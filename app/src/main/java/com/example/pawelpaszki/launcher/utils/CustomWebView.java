@@ -6,20 +6,12 @@ package com.example.pawelpaszki.launcher.utils;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.os.Build;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 public class CustomWebView extends WebViewClient {
-
-    private Context context;
-
-    public CustomWebView(Context context) {
-        this.context = context;
-    }
-
 
     @SuppressWarnings("deprecation")
     @SuppressLint("NewApi")
