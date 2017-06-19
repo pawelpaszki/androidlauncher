@@ -4,15 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Created by PawelPaszki on 10/05/2017.
+ * Last edited on 19/06/2017
  */
 
 public class SharedPrefs {
@@ -26,7 +22,7 @@ public class SharedPrefs {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("sortingMethod", sortValue);
-        editor.commit();
+        editor.apply();
     }
 
     public static int getNumberOfActivityStarts(String name, Context context) {
@@ -40,7 +36,7 @@ public class SharedPrefs {
         SharedPreferences.Editor editor = prefs.edit();
         String key = name + "_starts";
         editor.putInt(key, (getNumberOfActivityStarts(name, context)) + 1);
-        editor.commit();
+        editor.apply();
     }
 
     public static void setNumberOfColumns(int value, Context context) {
@@ -48,7 +44,7 @@ public class SharedPrefs {
         SharedPreferences.Editor editor = prefs.edit();
         String key = "noOfColumns";
         editor.putInt(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     public static int getNumberOfColumns(Context context) {
@@ -62,7 +58,7 @@ public class SharedPrefs {
         SharedPreferences.Editor editor = prefs.edit();
         String key = "showAppNames";
         editor.putBoolean(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     public static boolean getShowAppNames(Context context) {
@@ -76,7 +72,7 @@ public class SharedPrefs {
         SharedPreferences.Editor editor = prefs.edit();
         String key = "visible" + name;
         editor.putBoolean(key, visible);
-        editor.commit();
+        editor.apply();
     }
 
     public static boolean getAppVisible(Context context, String name) {
@@ -90,7 +86,7 @@ public class SharedPrefs {
         SharedPreferences.Editor editor = prefs.edit();
         String key = "firstLaunch";
         editor.putBoolean(key, firstLaunch);
-        editor.commit();
+        editor.apply();
     }
 
     public static boolean getIsFirstLaunch(Context context) {
@@ -104,7 +100,7 @@ public class SharedPrefs {
         SharedPreferences.Editor editor = prefs.edit();
         String key = "homeReloadRequired";
         editor.putBoolean(key, homeReloadRequired);
-        editor.commit();
+        editor.apply();
     }
 
     public static boolean getHomeReloadRequired(Context context) {
@@ -118,7 +114,7 @@ public class SharedPrefs {
         SharedPreferences.Editor editor = prefs.edit();
         String key = "visibleCount";
         editor.putInt(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     public static int getVisibleCount(Context context) {
@@ -132,7 +128,7 @@ public class SharedPrefs {
         SharedPreferences.Editor editor = prefs.edit();
         String key = "nonDefault";
         editor.putInt(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     public static int getNonDefaultIconsCount(Context context) {
@@ -150,7 +146,7 @@ public class SharedPrefs {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("messaging", name);
-        editor.commit();
+        editor.apply();
     }
 
     public static void saveWidgetsIds(Context context, ArrayList<Integer> widgetsIds){
@@ -159,14 +155,14 @@ public class SharedPrefs {
             StringBuilder sb = new StringBuilder();
             for(int i = 0; i < widgetsIds.size(); i++) {
                 if(i + 1 < widgetsIds.size()) {
-                    sb.append(widgetsIds.get(i) + ",");
+                    sb.append(widgetsIds.get(i)).append(",");
                 } else {
                     sb.append(widgetsIds.get(i));
                 }
             }
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString("widgetsids", sb.toString());
-            editor.commit();
+            editor.apply();
         }
     }
 
@@ -174,12 +170,12 @@ public class SharedPrefs {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         if (prefs != null){
             SharedPreferences.Editor editor = prefs.edit();
-            editor.remove("widgetsids").commit();
+            editor.remove("widgetsids").apply();
         }
     }
 
     public static ArrayList<Integer> getWidgetsIds(Context context){
-        ArrayList<Integer> widgetsIds = new ArrayList<Integer>();
+        ArrayList<Integer> widgetsIds = new ArrayList<>();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         if (prefs != null) {
             String concatenatedString = prefs.getString("widgetsids", "");
@@ -187,11 +183,11 @@ public class SharedPrefs {
                 return widgetsIds;
             } else {
                 String[] ids = concatenatedString.split(",");
-                for(int i = 0; i < ids.length; i++) {
+                for (String id : ids) {
                     try {
-                        widgetsIds.add(Integer.parseInt(ids[i]));
+                        widgetsIds.add(Integer.parseInt(id));
                     } catch (Exception e) {
-                        return new ArrayList<Integer>();
+                        return new ArrayList<>();
                     }
 
                 }

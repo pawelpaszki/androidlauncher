@@ -15,7 +15,4 @@ public class WidgetInfo {
         this.appWidgetId = appWidgetId;
     }
 
-    public int getAppWidgetId() {
-        return appWidgetId;
-    }
 }

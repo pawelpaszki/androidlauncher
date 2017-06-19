@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.example.pawelpaszki.launcher.AppDetail;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;

@@ -1,29 +1,17 @@
 package com.example.pawelpaszki.launcher.services;
 
 import android.app.IntentService;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.util.Log;
-import android.widget.ImageView;
 
 import com.example.pawelpaszki.launcher.AppDetail;
-import com.example.pawelpaszki.launcher.utils.BitMapFilter;
 import com.example.pawelpaszki.launcher.utils.IconLoader;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,14 +21,12 @@ import java.util.List;
 
 public class MyIntentService extends IntentService {
 
-    private static final String TAG = MyIntentService.class.getSimpleName();
-    private PackageManager manager;
-    private List<AppDetail> apps = new ArrayList<AppDetail>();;
-    private ArrayList<String> activities = new ArrayList<String>();
+    private List<AppDetail> mApps = new ArrayList<>();
+    private ArrayList<String> mActivities = new ArrayList<>();
     private int listSize = 0;
 
     public MyIntentService() {
-        super("MyWorkerThread"); // Give the name to the worker thread
+        super("MyWorkerThread");
     }
 
     @Override
@@ -51,12 +37,10 @@ public class MyIntentService extends IntentService {
                 loadApps();
             }
         }).start();
-
-        //Log.i(TAG, "onCreate, Thread name: " + Thread.currentThread().getName());
     }
 
     private void loadApps(){
-        manager = getPackageManager();
+        PackageManager manager = getPackageManager();
 
         Intent i = new Intent(Intent.ACTION_MAIN, null);
         i.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -74,15 +58,14 @@ public class MyIntentService extends IntentService {
             } else {
                 Bitmap immutableBmp= ((BitmapDrawable) ri.activityInfo.loadIcon(manager)).getBitmap();
                 Bitmap mutableBitmap=immutableBmp.copy(Bitmap.Config.ARGB_8888, true);
-                Bitmap iconToSet = mutableBitmap;//
                 
                 //BitMapFilter.addTexture(this.getResources(), mutableBitmap);
                 //Bitmap iconToSet = BitMapFilter.getShadow(this.getResources(), mutableBitmap);// BitMapFilter.applyEdgeColors(this.getResources(), mutableBitmap));
                 //app.setIcon(RoundedBitmapDrawableFactory.create(this.getResources(),iconToSet));
-                IconLoader.saveIcon(this, iconToSet, (String) ri.loadLabel(manager));
+                IconLoader.saveIcon(this, mutableBitmap, (String) ri.loadLabel(manager));
             }
-            apps.add(app);
-            activities.add(ri.activityInfo.packageName);
+            mApps.add(app);
+            mActivities.add(ri.activityInfo.packageName);
             //Log.i("app package name", String.valueOf(ri.activityInfo.packageName));
             //Log.i("app label", String.valueOf(ri.loadLabel(manager)));
         }
@@ -96,11 +79,11 @@ public class MyIntentService extends IntentService {
         Bundle bundle = new Bundle();
         bundle.putString("wait", "wait");
         resultReceiver.send(1, bundle);
-        while (apps.size() == 0 || apps.size() < listSize) {
+        while (mApps.size() == 0 || mApps.size() < listSize) {
             new Thread(new Runnable(){
                 public void run() {
                     try {
-                        //Log.i("thread sleep", String.valueOf(apps.size()));
+                        //Log.i("thread sleep", String.valueOf(mApps.size()));
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -108,9 +91,9 @@ public class MyIntentService extends IntentService {
                 }
             }).start();
         }
-        //Log.i("apps sent", "apps sent");
+        //Log.i("mApps sent", "mApps sent");
         bundle = new Bundle();
-        bundle.putStringArrayList("apps", activities);
+        bundle.putStringArrayList("mApps", mActivities);
 
         resultReceiver.send(18, bundle);
     }

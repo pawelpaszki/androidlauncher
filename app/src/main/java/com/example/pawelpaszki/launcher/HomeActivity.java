@@ -51,6 +51,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Last Edited by PawelPaszki on 19/06/2017.
+ */
+
 public class HomeActivity extends Activity {
 
 //    private ProgressBar mProgressBar;

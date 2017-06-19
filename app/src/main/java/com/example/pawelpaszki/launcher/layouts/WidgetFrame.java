@@ -4,7 +4,6 @@ import android.appwidget.AppWidgetHost;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.FrameLayout;
 
 /**
@@ -12,7 +11,6 @@ import android.widget.FrameLayout;
  */
 
 public class WidgetFrame extends FrameLayout {
-    private String TAG;
 
     private AppWidgetHost appWidgetHost;
     public WidgetFrame(@NonNull Context context) {
