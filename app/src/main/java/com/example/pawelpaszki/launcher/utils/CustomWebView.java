@@ -1,15 +1,16 @@
 package com.example.pawelpaszki.launcher.utils;
 
-/**
- * Created by PawelPaszki on 02/06/2017.
- */
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+/**
+ * Created by PawelPaszki on 02/06/2017.
+ * Last edited on 19/06/2017
+ */
 
 public class CustomWebView extends WebViewClient {
 

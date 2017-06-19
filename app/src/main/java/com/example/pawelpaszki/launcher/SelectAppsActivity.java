@@ -6,6 +6,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -23,7 +24,6 @@ import android.widget.TextView;
 
 import com.example.pawelpaszki.launcher.utils.AppsSorter;
 import com.example.pawelpaszki.launcher.utils.IconLoader;
-import com.example.pawelpaszki.launcher.utils.RoundBitmapGenerator;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
 import java.util.ArrayList;
@@ -31,52 +31,51 @@ import java.util.List;
 
 public class SelectAppsActivity extends AppCompatActivity {
 
-    private PackageManager manager;
-    private List<AppDetail> apps;
-    private int visibleCounter = 0;
-    private int iconSide;
+    private List<AppDetail> mApps;
+    private int mVisibleCounter = 0;
+    private int mIconside;
 
     private void loadApps(){
-        manager = getPackageManager();
-        apps = new ArrayList<AppDetail>();
+        PackageManager mPackageManager = getPackageManager();
+        mApps = new ArrayList<>();
 
         Intent i = new Intent(Intent.ACTION_MAIN, null);
         i.addCategory(Intent.CATEGORY_LAUNCHER);
 
-        List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
+        List<ResolveInfo> availableActivities = mPackageManager.queryIntentActivities(i, 0);
         for(ResolveInfo ri:availableActivities){
             AppDetail app = new AppDetail();
-            app.setLabel(ri.loadLabel(manager));
-            app.setName(ri.activityInfo.packageName);
-            app.setIcon(ri.activityInfo.loadIcon(manager));
-            app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
-            if(ri.loadLabel(manager).toString().equalsIgnoreCase("Settings")) {
-                iconSide = ri.activityInfo.loadIcon(manager).getIntrinsicWidth();
-                Log.i("icon side", String.valueOf(iconSide));
+            app.setmLabel(ri.loadLabel(mPackageManager));
+            app.setmName(ri.activityInfo.packageName);
+            app.setmIcon(ri.activityInfo.loadIcon(mPackageManager));
+            app.setmNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getmLabel().toString(), this));
+            if(ri.loadLabel(mPackageManager).toString().equalsIgnoreCase("Settings")) {
+                mIconside = ri.activityInfo.loadIcon(mPackageManager).getIntrinsicWidth();
+                Log.i("icon side", String.valueOf(mIconside));
             }
-            apps.add(app);
+            mApps.add(app);
         }
-        apps = AppsSorter.sortApps(this,apps, "most used", false);
+        mApps = AppsSorter.sortApps(this,mApps, "most used", false);
     }
 
-    private ListView list;
     private void loadListView(){
-        list = (ListView)findViewById(R.id.visible_apps_list);
+        ListView list = (ListView) findViewById(R.id.visible_apps_list);
 
         ArrayAdapter<AppDetail> adapter = new ArrayAdapter<AppDetail>(this,
                 R.layout.visible_app_item,
-                apps) {
+                mApps) {
+            @NonNull
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
+            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
                 if(convertView == null){
                     convertView = getLayoutInflater().inflate(R.layout.visible_app_item, null);
                 }
 
                 String path = this.getContext().getFilesDir().getAbsolutePath();
-                //Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
-                Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
+                //Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getmLabel());
+                Bitmap icon = IconLoader.loadImageFromStorage(path, (String) mApps.get(position).getmLabel());
                 if(icon == null) {
-                    icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
+                    icon  = ((BitmapDrawable) mApps.get(position).getmIcon()).getBitmap();
                 } else {
                     //rounded??
                     //icon = RoundBitmapGenerator.getCircleBitmap(icon);
@@ -84,30 +83,30 @@ public class SelectAppsActivity extends AppCompatActivity {
 
                 ImageView appIcon = (ImageView)convertView.findViewById(R.id.visible_app_icon);
 
-                if(icon.getWidth() != iconSide || icon.getHeight() != iconSide) {
-                    icon = Bitmap.createScaledBitmap(icon, iconSide, iconSide, false);
+                if(icon.getWidth() != mIconside || icon.getHeight() != mIconside) {
+                    icon = Bitmap.createScaledBitmap(icon, mIconside, mIconside, false);
                 }
 
                 appIcon.setImageDrawable(new BitmapDrawable(SelectAppsActivity.this.getResources(), icon));
 
                 TextView appLabel = (TextView)convertView.findViewById(R.id.visible_app_label);
-                appLabel.setText(apps.get(position).getLabel());
+                appLabel.setText(mApps.get(position).getmLabel());
 
                 final CheckBox visible = (CheckBox)convertView.findViewById(R.id.toggle_visible);
-                if(SharedPrefs.getAppVisible(SelectAppsActivity.this, (String) apps.get(position).getLabel())) {
-                    visibleCounter++;
+                if(SharedPrefs.getAppVisible(SelectAppsActivity.this, (String) mApps.get(position).getmLabel())) {
+                    mVisibleCounter++;
                 }
-                visible.setChecked(SharedPrefs.getAppVisible(SelectAppsActivity.this, (String) apps.get(position).getLabel()));
-                visible.setText(apps.get(position).getLabel());
+                visible.setChecked(SharedPrefs.getAppVisible(SelectAppsActivity.this, (String) mApps.get(position).getmLabel()));
+                visible.setText(mApps.get(position).getmLabel());
                 visible.setTextSize(0);
                 visible.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         SharedPrefs.setAppVisible(((CheckBox) v).isChecked(), (String) visible.getText(), SelectAppsActivity.this);
                         if(((CheckBox) v).isChecked()) {
-                            visibleCounter++;
+                            mVisibleCounter++;
                         } else {
-                            visibleCounter--;
+                            mVisibleCounter--;
                         }
                         SharedPrefs.setHomeReloadRequired(true, SelectAppsActivity.this);
 //                        Toast.makeText(SelectAppsActivity.this, String.valueOf(SharedPrefs.getAppVisible(SelectAppsActivity.this, (String) visible.getText())) + " " + (String) visible.getText(),
@@ -124,7 +123,7 @@ public class SelectAppsActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        SharedPrefs.setVisibleCount(visibleCounter, this);
+        SharedPrefs.setVisibleCount(mVisibleCounter, this);
         super.onPause();
 
     }

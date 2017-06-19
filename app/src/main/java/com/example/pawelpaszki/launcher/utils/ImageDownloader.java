@@ -1,20 +1,18 @@
 package com.example.pawelpaszki.launcher.utils;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
  * Created by PawelPaszki on 02/06/2017.
+ * Used to save online icons and use them as custom app icons
  */
 
 public class ImageDownloader extends AsyncTask<String,Void,Bitmap>{
@@ -35,11 +33,8 @@ public class ImageDownloader extends AsyncTask<String,Void,Bitmap>{
             connection.setDoInput(true);
             connection.connect();
             in = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(in);
-            return myBitmap;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+            return BitmapFactory.decodeStream(in);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

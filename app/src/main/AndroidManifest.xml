@@ -23,7 +23,6 @@
         android:stateNotNeeded="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light">
-        <service android:name=".services.MyIntentService" />
         <activity
             android:name=".HomeActivity"
             android:clearTaskOnLaunch="true"

@@ -27,14 +27,13 @@ import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
 /**
  * Created by PawelPaszki on 11/05/2017.
+ * Settings view
  */
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private Spinner sortSpinner;
-    private CheckBox showAppNamesCheckBox;
-    private Spinner noOfColsSpinner;
-    private GestureDetectorCompat detector;
+    private CheckBox mShowAppNamesCheckBox;
+    private GestureDetectorCompat mDetector;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,7 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
         toolbar.setTitle("Settings");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        sortSpinner = (Spinner) findViewById(R.id.sort_by_spinner);
+        Spinner sortSpinner = (Spinner) findViewById(R.id.sort_by_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.sort_values, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(R.layout.spinner_item);
@@ -94,7 +93,7 @@ public class SettingsActivity extends AppCompatActivity {
             sortSpinner.setSelection(1);
         }
 
-        noOfColsSpinner = (Spinner) findViewById(R.id.no_of_apps_per_row);
+        Spinner noOfColsSpinner = (Spinner) findViewById(R.id.no_of_apps_per_row);
         ArrayAdapter<CharSequence> colsAdapter = ArrayAdapter.createFromResource(this,
                 R.array.no_of_cols, android.R.layout.simple_spinner_item);
         colsAdapter.setDropDownViewResource(R.layout.spinner_item);
@@ -104,11 +103,11 @@ public class SettingsActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 SharedPrefs.setNumberOfColumns(Integer.parseInt(parent.getItemAtPosition(position).toString()), SettingsActivity.this);
                 if(Integer.parseInt(parent.getItemAtPosition(position).toString()) >=5) {
-                    showAppNamesCheckBox.setChecked(false);
+                    mShowAppNamesCheckBox.setChecked(false);
                     SharedPrefs.setShowAppNames(false, SettingsActivity.this);
-                    showAppNamesCheckBox.setEnabled(false);
+                    mShowAppNamesCheckBox.setEnabled(false);
                 } else {
-                    showAppNamesCheckBox.setEnabled(true);
+                    mShowAppNamesCheckBox.setEnabled(true);
                 }
             }
 
@@ -124,20 +123,20 @@ public class SettingsActivity extends AppCompatActivity {
 
         noOfColsSpinner.setSelection(spinnerPosition - 1);
 
-        showAppNamesCheckBox = (CheckBox) findViewById(R.id.show_names_checkbox);
-        showAppNamesCheckBox.setOnClickListener(new View.OnClickListener() {
+        mShowAppNamesCheckBox = (CheckBox) findViewById(R.id.show_names_checkbox);
+        mShowAppNamesCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SharedPrefs.setShowAppNames(((CheckBox) v).isChecked(), SettingsActivity.this);
             }
         });
-        showAppNamesCheckBox.setChecked(SharedPrefs.getShowAppNames(this));
-        detector = new GestureDetectorCompat(this, new MyGestureListener());
+        mShowAppNamesCheckBox.setChecked(SharedPrefs.getShowAppNames(this));
+        mDetector = new GestureDetectorCompat(this, new MyGestureListener());
         RelativeLayout container = (RelativeLayout) findViewById(R.id.settings_container);
         container.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                detector.onTouchEvent(event);
+                mDetector.onTouchEvent(event);
                 return false;
             }
         });
@@ -162,7 +161,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        detector.onTouchEvent(event);
+        mDetector.onTouchEvent(event);
         return super.onTouchEvent(event);
     }
 
@@ -191,7 +190,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+    private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         private static final int SWIPE_THRESHOLD = 100;
         private static final int SWIPE_VELOCITY_THRESHOLD = 100;
@@ -211,14 +210,6 @@ public class SettingsActivity extends AppCompatActivity {
                     if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                         if (diffX > 0) {
                             onSwipeRight();
-                        } else {
-
-                        }
-                    }
-                } else {
-                    if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                        if (diffY > 0) {
-
                         } else {
 
                         }

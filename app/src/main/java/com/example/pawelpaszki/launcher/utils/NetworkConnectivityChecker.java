@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 
 /**
  * Created by PawelPaszki on 02/06/2017.
+ * Used to determine, if there is an internet connection available
  */
 
 public class NetworkConnectivityChecker {

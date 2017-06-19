@@ -1,7 +1,6 @@
 package com.example.pawelpaszki.launcher.utils;
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -13,12 +12,12 @@ import java.io.IOException;
 
 /**
  * Created by PawelPaszki on 09/05/2017.
+ * Used to save/load icons from local storage
  */
 
 public class IconLoader {
 
     public static void saveIcon(Context context, Bitmap bitmap, String name) {
-        ContextWrapper cw = new ContextWrapper(context);
         // path to /data/data/yourapp/app_data/imageDir
         File directory = new File(context.getFilesDir().getAbsolutePath());//cw.getDir(String.valueOf(context.getFilesDir()), Context.MODE_PRIVATE);
         // Create imageDir
@@ -33,7 +32,9 @@ public class IconLoader {
             e.printStackTrace();
         } finally {
             try {
-                fos.close();
+                if(fos!= null) {
+                    fos.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -44,8 +45,7 @@ public class IconLoader {
     {
         try {
             File f=new File(path, name + ".jpg");
-            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-            return b;
+            return BitmapFactory.decodeStream(new FileInputStream(f));
         }
         catch (FileNotFoundException e)
         {

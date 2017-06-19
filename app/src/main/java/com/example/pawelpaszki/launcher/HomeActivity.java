@@ -232,10 +232,10 @@ public class HomeActivity extends Activity {
                     Log.i("end scroll: ", String.valueOf(mEndScrollY));
                     Log.i("y", String.valueOf(Math.abs(mStartScrollY - mEndScrollY)));
                     Log.i("x", String.valueOf(endScrollX - startScrollX));
-                    if(Math.abs(mStartScrollY - mEndScrollY) < 20) {
-                        if(endScrollX - startScrollX > 100) {
+                    if(Math.abs(mStartScrollY - mEndScrollY) < 50) {
+                        if(endScrollX - startScrollX > 200) {
                             showWidgetControlButtonsOnSwipeRight();
-                        } else if (startScrollX - endScrollX > 100){
+                        } else if (startScrollX - endScrollX > 400 || (mIsWidgetPinned && startScrollX - endScrollX > 100)){
                             onSwipeLeft();
                         }
                         return true;
@@ -272,6 +272,7 @@ public class HomeActivity extends Activity {
                             }
                         },100);
                         ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
+                        return true;
                     }
 
                     if(!mIsWidgetPinned) {
@@ -549,13 +550,13 @@ public class HomeActivity extends Activity {
         List<ResolveInfo> availableActivities = mPackageManager.queryIntentActivities(i, 0);
         for(ResolveInfo ri:availableActivities){
             AppDetail app = new AppDetail();
-            app.setLabel(ri.loadLabel(mPackageManager));
-            app.setName(ri.activityInfo.packageName);
-            app.setIcon(ri.activityInfo.loadIcon(mPackageManager));
-            app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
+            app.setmLabel(ri.loadLabel(mPackageManager));
+            app.setmName(ri.activityInfo.packageName);
+            app.setmIcon(ri.activityInfo.loadIcon(mPackageManager));
+            app.setmNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getmLabel().toString(), this));
             if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(mPackageManager))) {
                 dockerApps.add(app);
-                //Log.i("no of runs", "label: " + app.getLabel() + ": " + " package name: " + String.valueOf(ri.activityInfo.packageName) + String.valueOf(app.getNumberOfStarts()));
+                //Log.i("no of runs", "label: " + app.getmLabel() + ": " + " package name: " + String.valueOf(ri.activityInfo.packageName) + String.valueOf(app.getmNumberOfStarts()));
             }
         }
         AppsSorter.sortApps(this, dockerApps, "most used", true);
@@ -563,8 +564,8 @@ public class HomeActivity extends Activity {
         for(j = 0; j < dockerApps.size(); j++) {
             View view = LayoutInflater.from(this).inflate(R.layout.dock_item,null);
             TextView homeNotifications = (TextView) view.findViewById(R.id.home_notifications);
-            if(dockerApps.get(j).getLabel().toString().equalsIgnoreCase("Messaging")) {
-                SharedPrefs.setMessagingPackageName(this, (String) dockerApps.get(j).getName());
+            if(dockerApps.get(j).getmLabel().toString().equalsIgnoreCase("Messaging")) {
+                SharedPrefs.setMessagingPackageName(this, (String) dockerApps.get(j).getmName());
                 view.setTag("Messaging");
                 int messageCount = MissedCallsCountRetriever.getUnreadMessagesCount(this);
                 if(messageCount > 0) {
@@ -576,7 +577,7 @@ public class HomeActivity extends Activity {
                 } else {
                     homeNotifications.setVisibility(View.GONE);
                 }
-            } else if(dockerApps.get(j).getLabel().toString().equalsIgnoreCase("Phone")) {
+            } else if(dockerApps.get(j).getmLabel().toString().equalsIgnoreCase("Phone")) {
                 view.setTag("Phone");
                 if(MissedCallsCountRetriever.getMissedCallsCount(this) > 0) {
                     homeNotifications.setVisibility(View.VISIBLE);
@@ -585,7 +586,7 @@ public class HomeActivity extends Activity {
                     homeNotifications.setVisibility(View.GONE);
                 }
             } else {
-                view.setTag(dockerApps.get(j).getName());
+                view.setTag(dockerApps.get(j).getmName());
             }
 
             ImageView iv = (ImageView) view.findViewById(R.id.dock_app_icon);
@@ -594,10 +595,10 @@ public class HomeActivity extends Activity {
             String path = this.getFilesDir().getAbsolutePath();
 
             ////////////// load icon from storage ////////////
-            //Bitmap icon = IconLoader.loadImageFromStorage(path, (String) dockerApps.get(j).getLabel());
-            Bitmap icon = IconLoader.loadImageFromStorage(path, (String) dockerApps.get(j).getLabel());
+            //Bitmap icon = IconLoader.loadImageFromStorage(path, (String) dockerApps.get(j).getmLabel());
+            Bitmap icon = IconLoader.loadImageFromStorage(path, (String) dockerApps.get(j).getmLabel());
             if(icon == null) {
-                icon = ((BitmapDrawable) dockerApps.get(j).getIcon()).getBitmap();
+                icon = ((BitmapDrawable) dockerApps.get(j).getmIcon()).getBitmap();
             }
 //            else {
 //                // rounded??
@@ -605,7 +606,7 @@ public class HomeActivity extends Activity {
 //            }
             iv.setImageDrawable(new BitmapDrawable(this.getResources(), icon));
             iv.setLayoutParams(layoutParams);
-            tv.setText(dockerApps.get(j).getLabel());
+            tv.setText(dockerApps.get(j).getmLabel());
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

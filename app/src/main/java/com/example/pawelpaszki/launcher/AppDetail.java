@@ -1,46 +1,47 @@
 package com.example.pawelpaszki.launcher;
 
-/**
- * Created by PawelPaszki on 02/05/2017.
- */
-
 import android.graphics.drawable.Drawable;
 
+/**
+ * Created by PawelPaszki on 02/05/2017.
+ * Used to keep information about apps
+ */
+
 public class AppDetail {
-    private CharSequence label;
-    private CharSequence name;
-    private Drawable icon;
-    private int numberOfStarts;
+    private CharSequence mLabel;
+    private CharSequence mName;
+    private Drawable mIcon;
+    private int mNumberOfStarts;
 
-    public CharSequence getLabel() {
-        return this.label;
+    public CharSequence getmLabel() {
+        return this.mLabel;
     }
 
-    public void setLabel(CharSequence label) {
-        this.label = label;
+    void setmLabel(CharSequence mLabel) {
+        this.mLabel = mLabel;
     }
 
-    public CharSequence getName() {
-        return this.name;
+    public CharSequence getmName() {
+        return this.mName;
     }
 
-    public void setName(CharSequence name) {
-        this.name = name;
+    void setmName(CharSequence mName) {
+        this.mName = mName;
     }
 
-    public Drawable getIcon() {
-        return this.icon;
+    public Drawable getmIcon() {
+        return this.mIcon;
     }
 
-    public void setIcon(Drawable icon) {
-        this.icon = icon;
+    void setmIcon(Drawable mIcon) {
+        this.mIcon = mIcon;
     }
 
-    public int getNumberOfStarts() {
-        return numberOfStarts;
+    public int getmNumberOfStarts() {
+        return mNumberOfStarts;
     }
 
-    public void setNumberOfStarts(int numberOfStarts) {
-        this.numberOfStarts = numberOfStarts;
+    void setmNumberOfStarts(int mNumberOfStarts) {
+        this.mNumberOfStarts = mNumberOfStarts;
     }
 }

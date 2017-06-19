@@ -1,7 +1,6 @@
 package com.example.pawelpaszki.launcher.adapters;
 
 import android.content.Context;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,8 +35,8 @@ public class AppIconAdapter extends ArrayAdapter<AppDetail> {
         TextView iconName = (TextView) convertView.findViewById(R.id.dock_app_name);
         ImageView appIcon = (ImageView) convertView.findViewById(R.id.dock_app_icon);
         // Populate the data into the template view using the data object
-        appIcon.setImageDrawable(app.getIcon());
-        iconName.setText(app.getName());
+        appIcon.setImageDrawable(app.getmIcon());
+        iconName.setText(app.getmName());
         // Return the completed view to render on screen
         return convertView;
     }

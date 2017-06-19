@@ -22,7 +22,7 @@ public class AppsSorter {
             Collections.sort(apps, new Comparator<AppDetail>() {
                 @Override
                 public int compare(AppDetail app1, AppDetail app2) {
-                    return app1.getLabel().toString().compareTo(app2.getLabel().toString());
+                    return app1.getmLabel().toString().compareTo(app2.getmLabel().toString());
                 }
             });
 //            if(!isHomeActivity) {
@@ -34,11 +34,11 @@ public class AppsSorter {
             Collections.sort(apps, new NoOfStartsSorter() {
                 @Override
                 public int compare(AppDetail app1, AppDetail app2) {
-                    if (app1.getNumberOfStarts() > app2.getNumberOfStarts())
+                    if (app1.getmNumberOfStarts() > app2.getmNumberOfStarts())
                         return 1;
-                    if (app1.getNumberOfStarts() < app2.getNumberOfStarts())
+                    if (app1.getmNumberOfStarts() < app2.getmNumberOfStarts())
                         return -1;
-                    return app1.getLabel().toString().compareTo(app2.getLabel().toString()) * -1;
+                    return app1.getmLabel().toString().compareTo(app2.getmLabel().toString()) * -1;
                 }
             });
                 Collections.reverse(apps);

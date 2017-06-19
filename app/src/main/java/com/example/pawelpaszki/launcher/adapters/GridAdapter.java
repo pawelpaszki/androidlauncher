@@ -97,7 +97,7 @@ public class GridAdapter extends BaseAdapter{
         margins.bottomMargin = 80 / noOfCols;
         margins.leftMargin = noOfCols;
         margins.rightMargin = noOfCols;
-        String text = (String) mApps.get(position).getLabel();
+        String text = (String) mApps.get(position).getmLabel();
         if(noOfCols >= 5 || !SharedPrefs.getShowAppNames(mContext)) {
             textView.setVisibility(View.GONE);
             imageView.setLayoutParams(margins);
@@ -129,15 +129,15 @@ public class GridAdapter extends BaseAdapter{
             }
         } else {
             messagesCount.setVisibility(View.GONE);
-            v.setTag(mApps.get(position).getName());
+            v.setTag(mApps.get(position).getmName());
         }
 
         String path = mContext.getFilesDir().getAbsolutePath();
-        //Bitmap icon  = ((BitmapDrawable) mApps.get(position).getIcon()).getBitmap();
+        //Bitmap icon  = ((BitmapDrawable) mApps.get(position).getmIcon()).getBitmap();
         /////////////// load from storage /////////////
-        Bitmap icon = IconLoader.loadImageFromStorage(path, (String) mApps.get(position).getLabel());
+        Bitmap icon = IconLoader.loadImageFromStorage(path, (String) mApps.get(position).getmLabel());
         if(icon == null) {
-            icon  = ((BitmapDrawable) mApps.get(position).getIcon()).getBitmap();
+            icon  = ((BitmapDrawable) mApps.get(position).getmIcon()).getBitmap();
         }
 //        else {
             // rounded??
@@ -150,15 +150,15 @@ public class GridAdapter extends BaseAdapter{
 //        if(icon != null) {
 //            imageView.setImageDrawable(RoundedBitmapDrawableFactory.create(v.getResources(), icon));//Bitmap.createScaledBitmap(icon, icon.getWidth(), (icon.getHeight() / 6), false)
 //        } else {
-//            Bitmap immutableBmp= ((BitmapDrawable) mApps.get(position).getIcon()).getBitmap();
+//            Bitmap immutableBmp= ((BitmapDrawable) mApps.get(position).getmIcon()).getBitmap();
 //            Bitmap mutableBitmap=immutableBmp.copy(Bitmap.Config.ARGB_8888, true);
 //            Bitmap iconToSet = BitMapFilter.applyEdgeColors(mContext.getResources(), mutableBitmap);
-//            //app.setIcon(RoundedBitmapDrawableFactory.create(this.getResources(),iconToSet));
-//            IconLoader.saveIcon(mContext, iconToSet, (String) mApps.get(position).getLabel());
+//            //app.setmIcon(RoundedBitmapDrawableFactory.create(this.getResources(),iconToSet));
+//            IconLoader.saveIcon(mContext, iconToSet, (String) mApps.get(position).getmLabel());
 //            imageView.setImageDrawable(RoundedBitmapDrawableFactory.create(v.getResources(), iconToSet));
 //        }
 //        Bitmap bitmap = BitmapFactory.decodeResource(v.getResources(), R.mipmap.imageviewbg);
-        //imageView.setImageDrawable(mApps.get(position).getIcon());
+        //imageView.setImageDrawable(mApps.get(position).getmIcon());
         float fontSize = 11f;
         if(noOfCols <=3) {
             float ratio = 0f;
@@ -186,15 +186,15 @@ public class GridAdapter extends BaseAdapter{
 
 
 
-//        Bitmap mBgIcon = IconLoader.loadImageFromStorage(path, (String) mApps.get(position).getLabel());
+//        Bitmap mBgIcon = IconLoader.loadImageFromStorage(path, (String) mApps.get(position).getmLabel());
 //        if(mBgIcon != null) {
 //            //imageView.setImageDrawable(RoundedBitmapDrawableFactory.create(v.getResources(), icon));//Bitmap.createScaledBitmap(icon, icon.getWidth(), (icon.getHeight() / 6), false)
 //        } else {
-//            Bitmap immutableBmp= ((BitmapDrawable) mApps.get(position).getIcon()).getBitmap();
+//            Bitmap immutableBmp= ((BitmapDrawable) mApps.get(position).getmIcon()).getBitmap();
 //            Bitmap mutableBitmap=immutableBmp.copy(Bitmap.Config.ARGB_8888, true);
 //            Bitmap iconToSet = BitMapFilter.getShadow(mContext.getResources(), mutableBitmap);
-//            //app.setIcon(RoundedBitmapDrawableFactory.create(this.getResources(),iconToSet));
-//            IconLoader.saveIcon(mContext, iconToSet, (String) mApps.get(position).getLabel());
+//            //app.setmIcon(RoundedBitmapDrawableFactory.create(this.getResources(),iconToSet));
+//            IconLoader.saveIcon(mContext, iconToSet, (String) mApps.get(position).getmLabel());
 //            //imageView.setImageDrawable(RoundedBitmapDrawableFactory.create(v.getResources(), iconToSet));
 //        }
         RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(v.getResources(), mBgIcon);
@@ -207,12 +207,12 @@ public class GridAdapter extends BaseAdapter{
             public void onClick(View v) {
                 try {
                     Intent i;
-                    if (mApps.get(position).getLabel().toString().equalsIgnoreCase("Phone")) {
+                    if (mApps.get(position).getmLabel().toString().equalsIgnoreCase("Phone")) {
                         i = new Intent(Intent.ACTION_DIAL);
                     } else {
-                        i = mPackageManager.getLaunchIntentForPackage(mApps.get(position).getName().toString());
+                        i = mPackageManager.getLaunchIntentForPackage(mApps.get(position).getmName().toString());
                     }
-                    SharedPrefs.increaseNumberOfActivityStarts(mApps.get(position).getLabel().toString(), mContext);
+                    SharedPrefs.increaseNumberOfActivityStarts(mApps.get(position).getmLabel().toString(), mContext);
                     SharedPrefs.setHomeReloadRequired(true, mContext);
                     mContext.startActivity(i);
                 } catch (Exception e) {

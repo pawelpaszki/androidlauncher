@@ -1,33 +1,25 @@
 package com.example.pawelpaszki.launcher;
 
-import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
-import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.DragEvent;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -40,7 +32,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -49,7 +40,6 @@ import android.widget.Toast;
 import com.example.pawelpaszki.launcher.utils.AppsSorter;
 import com.example.pawelpaszki.launcher.utils.IconLoader;
 import com.example.pawelpaszki.launcher.utils.NetworkConnectivityChecker;
-import com.example.pawelpaszki.launcher.utils.RoundBitmapGenerator;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
 import java.io.IOException;
@@ -58,47 +48,44 @@ import java.util.List;
 
 public class ChangeIconsActivity extends AppCompatActivity {
 
-    private PackageManager manager;
-    private List<AppDetail> apps;
+    private List<AppDetail> mApps;
     private static int RESULT_LOAD_IMAGE = 1;
-    private String appName;
-    private int actionBarHeight;
-    private int minX;
-    private int minY;
-    private int maxX;
-    private int maxY;
-    private int startX;
-    private int startY;
-    private int buttonSide;
-    private String tag;
-    private Button topLeft;
-    private Button topRight;
-    private Button bottomLeft;
-    private Button bottomRight;
-    private int x;
-    private int y;
-    private FrameLayout.LayoutParams topLeftButtonParams;
-    private FrameLayout.LayoutParams topRightButtonParams;
-    private FrameLayout.LayoutParams bottomLeftButtonParams;
-    private FrameLayout.LayoutParams bottomRightButtonParams;
+    private String mAppName;
+    private int mActionBarHeight;
+    private int mMinX;
+    private int mMinY;
+    private int mMaxX;
+    private int mMaxY;
+    private int mStartX;
+    private int mStartY;
+    private int mButtonSide;
+    private String mTag;
+    private Button mTopLeft;
+    private Button mTopRight;
+    private Button mBottomLeft;
+    private Button mBottomRight;
+    private FrameLayout.LayoutParams mTopLeftButtonParams;
+    private FrameLayout.LayoutParams mTopRightButtonParams;
+    private FrameLayout.LayoutParams mBottomLeftButtonParams;
+    private FrameLayout.LayoutParams mBottomRightButtonParams;
 
-    private int height;
-    private int width;
-    private int previousTopLeftX;
-    private int previousTopRightX;
-    private int previousTopLeftY;
-    private int previousTopRightY;
-    private int previousBottomLeftX;
-    private int previousBottomLeftY;
-    private int previousBottomRightX;
-    private int previousBottomRightY;
-    private ImageView imageView;
-    private int iconSide;
-    private String option;
+    private int mHeight;
+    private int mWidth;
+    private int mPreviousTopLeftX;
+    private int mPreviousTopRightX;
+    private int mPreviousTopLeftY;
+    private int mPreviousTopRightY;
+    private int mPreviousBottomLeftX;
+    private int mPreviousBottomLeftY;
+    private int mPreviousBottomRightX;
+    private int mPreviousBottomRightY;
+    private ImageView mImageView;
+    private int mIconSide;
+    private String mOption;
 
     private void loadApps(){
-        manager = getPackageManager();
-        apps = new ArrayList<AppDetail>();
+        PackageManager manager = getPackageManager();
+        mApps = new ArrayList<>();
 
         Intent i = new Intent(Intent.ACTION_MAIN, null);
         i.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -106,61 +93,60 @@ public class ChangeIconsActivity extends AppCompatActivity {
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
         for(ResolveInfo ri:availableActivities){
             AppDetail app = new AppDetail();
-            app.setLabel(ri.loadLabel(manager));
-            app.setName(ri.activityInfo.packageName);
-            app.setIcon(ri.activityInfo.loadIcon(manager));
-            app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
+            app.setmLabel(ri.loadLabel(manager));
+            app.setmName(ri.activityInfo.packageName);
+            app.setmIcon(ri.activityInfo.loadIcon(manager));
+            app.setmNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getmLabel().toString(), this));
             if(ri.loadLabel(manager).toString().equalsIgnoreCase("Settings")) {
-                iconSide = ri.activityInfo.loadIcon(manager).getIntrinsicWidth();
-                Log.i("icon side", String.valueOf(iconSide));
+                mIconSide = ri.activityInfo.loadIcon(manager).getIntrinsicWidth();
+                Log.i("icon side", String.valueOf(mIconSide));
             }
             if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(manager))) {
-                apps.add(app);
+                mApps.add(app);
             }
         }
-        apps = AppsSorter.sortApps(this,apps, "most used", false);
+        mApps = AppsSorter.sortApps(this,mApps, "most used", false);
     }
 
-    private ListView list;
     private void loadListView(){
-        list = (ListView)findViewById(R.id.set_icons_list);
+        ListView list = (ListView) findViewById(R.id.set_icons_list);
 
         ArrayAdapter<AppDetail> adapter = new ArrayAdapter<AppDetail>(this,
                 R.layout.visible_app_item,
-                apps) {
+                mApps) {
+            @NonNull
             @Override
-            public View getView(final int position, View convertView, ViewGroup parent) {
+            public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
                 if(convertView == null){
                     convertView = getLayoutInflater().inflate(R.layout.visible_app_item, null);
                 }
 
                 String path = this.getContext().getFilesDir().getAbsolutePath();
-                final int index = position;
-                //Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
-                Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getLabel());
+                //Bitmap icon = IconLoader.loadImageFromStorage(path, (String) apps.get(position).getmLabel());
+                Bitmap icon = IconLoader.loadImageFromStorage(path, (String) mApps.get(position).getmLabel());
                 if(icon == null) {
-                    icon  = ((BitmapDrawable) apps.get(position).getIcon()).getBitmap();
+                    icon  = ((BitmapDrawable) mApps.get(position).getmIcon()).getBitmap();
                 } else {
                     // rounded ??
                     //icon = RoundBitmapGenerator.getCircleBitmap(icon);
                 }
 
                 ImageView appIcon = (ImageView)convertView.findViewById(R.id.visible_app_icon);
-                if(icon.getWidth() != iconSide || icon.getHeight() != iconSide) {
-                    icon = Bitmap.createScaledBitmap(icon, iconSide, iconSide, false);
+                if(icon.getWidth() != mIconSide || icon.getHeight() != mIconSide) {
+                    icon = Bitmap.createScaledBitmap(icon, mIconSide, mIconSide, false);
                 }
                 appIcon.setImageDrawable(new BitmapDrawable(ChangeIconsActivity.this.getResources(), icon));
 
                 TextView appLabel = (TextView)convertView.findViewById(R.id.visible_app_label);
-                appLabel.setText(apps.get(position).getLabel());
+                appLabel.setText(mApps.get(position).getmLabel());
 
                 CheckBox visible = (CheckBox)convertView.findViewById(R.id.toggle_visible);
                 visible.setVisibility(View.GONE);
                 convertView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        appName = apps.get(index).getLabel().toString();
-                        if(option.equalsIgnoreCase("gallery")) {
+                        mAppName = mApps.get(position).getmLabel().toString();
+                        if(mOption.equalsIgnoreCase("gallery")) {
                             Intent i = new Intent(
                                     Intent.ACTION_PICK,
                                     android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -168,7 +154,7 @@ public class ChangeIconsActivity extends AppCompatActivity {
                         } else {
                             if(NetworkConnectivityChecker.isNetworkAvailable(ChangeIconsActivity.this)) {
                                 Intent i = new Intent(ChangeIconsActivity.this, LoadWebIconActivity.class);
-                                i.putExtra("label",apps.get(position).getLabel());
+                                i.putExtra("label",mApps.get(position).getmLabel());
                                 i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                                 startActivity(i);
                                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
@@ -205,14 +191,14 @@ public class ChangeIconsActivity extends AppCompatActivity {
             cursor.close();
             ListView listView = (ListView) findViewById(R.id.set_icons_list);
             FrameLayout imageViewFrame = (FrameLayout) findViewById(R.id.image_frame);
-            imageView = (ImageView) findViewById(R.id.image_view);
+            mImageView = (ImageView) findViewById(R.id.image_view);
             int orientation = 1;
             Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
             try {
                 ExifInterface exif = new ExifInterface(picturePath);
                 orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
                 Log.i("orientation", String.valueOf(exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1)));
-            } catch (IOException e) {
+            } catch (IOException ignored) {
 
             }
             switch(orientation) {
@@ -264,16 +250,16 @@ public class ChangeIconsActivity extends AppCompatActivity {
                 } else {
                     resizeFactor = 1;
                 }
-                imageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, bitmapWidth / resizeFactor, bitmapHeight / resizeFactor, false) );
+                mImageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, bitmapWidth / resizeFactor, bitmapHeight / resizeFactor, false) );
 
             }
         }
     }
 
     public void saveIconToLocalStorage(View view) {
-        BitmapDrawable bitmapDrawable = (BitmapDrawable) imageView.getDrawable();
-        Bitmap bitmap = Bitmap.createBitmap(bitmapDrawable.getBitmap(),minX,minY,maxX-minX,maxY-minY);
-        IconLoader.saveIcon(this,bitmap,appName);
+        BitmapDrawable bitmapDrawable = (BitmapDrawable) mImageView.getDrawable();
+        Bitmap bitmap = Bitmap.createBitmap(bitmapDrawable.getBitmap(), mMinX, mMinY, mMaxX - mMinX, mMaxY - mMinY);
+        IconLoader.saveIcon(this,bitmap, mAppName);
         SharedPrefs.setHomeReloadRequired(true,this);
         SharedPrefs.setNonDefaultIconsCount(SharedPrefs.getNonDefaultIconsCount(this) + 1, this);
         recreate();
@@ -281,67 +267,72 @@ public class ChangeIconsActivity extends AppCompatActivity {
 
     private final class MyTouchListener implements View.OnTouchListener {
         public boolean onTouch(View view, MotionEvent motionEvent) {
-            topLeftButtonParams = new FrameLayout.LayoutParams(topLeft.getLayoutParams());
-            topRightButtonParams = new FrameLayout.LayoutParams(topRight.getLayoutParams());
-            bottomLeftButtonParams = new FrameLayout.LayoutParams(bottomLeft.getLayoutParams());
-            bottomRightButtonParams = new FrameLayout.LayoutParams(bottomRight.getLayoutParams());
+            mTopLeftButtonParams = new FrameLayout.LayoutParams(mTopLeft.getLayoutParams());
+            mTopRightButtonParams = new FrameLayout.LayoutParams(mTopRight.getLayoutParams());
+            mBottomLeftButtonParams = new FrameLayout.LayoutParams(mBottomLeft.getLayoutParams());
+            mBottomRightButtonParams = new FrameLayout.LayoutParams(mBottomRight.getLayoutParams());
 
             switch (motionEvent.getAction()) {
 
                 case MotionEvent.ACTION_DOWN:
-                    tag = view.getTag().toString();
-                    startX = (int) (view.getX() - motionEvent.getRawX());
-                    startY = (int) (view.getY() - motionEvent.getRawY());
+                    mTag = view.getTag().toString();
+                    mStartX = (int) (view.getX() - motionEvent.getRawX());
+                    mStartY = (int) (view.getY() - motionEvent.getRawY());
                     break;
 
                 case MotionEvent.ACTION_MOVE:
-                    Log.i("x, y", motionEvent.getRawX() + startX + ", " + motionEvent.getRawY() + startY);
-                    if(tag.equals("top_left")) {
-                        if(motionEvent.getRawX() + startX > 0 && motionEvent.getRawX() + startX < maxX - buttonSide * 2 -1
-                                && motionEvent.getRawY() + startY > 0 && motionEvent.getRawY() + startY < maxY - buttonSide * 2 -1) {
-                            minY = (int)motionEvent.getRawY() + startY;
-                            minX = (int)motionEvent.getRawX() + startX;
+                    Log.i("x, y", motionEvent.getRawX() + mStartX + ", " + motionEvent.getRawY() + mStartY);
+                    switch (mTag) {
+                        case "top_left":
+                            if (motionEvent.getRawX() + mStartX > 0 && motionEvent.getRawX() + mStartX < mMaxX - mButtonSide * 2 - 1
+                                    && motionEvent.getRawY() + mStartY > 0 && motionEvent.getRawY() + mStartY < mMaxY - mButtonSide * 2 - 1) {
+                                mMinY = (int) motionEvent.getRawY() + mStartY;
+                                mMinX = (int) motionEvent.getRawX() + mStartX;
 
-                            previousTopLeftX = (int)motionEvent.getRawX() + startX;
-                            previousBottomLeftX = (int)motionEvent.getRawX() + startX;
-                            previousTopLeftY = (int)motionEvent.getRawY() + startY;
-                            previousTopRightY = (int)motionEvent.getRawY() + startY;
-                        }
+                                mPreviousTopLeftX = (int) motionEvent.getRawX() + mStartX;
+                                mPreviousBottomLeftX = (int) motionEvent.getRawX() + mStartX;
+                                mPreviousTopLeftY = (int) motionEvent.getRawY() + mStartY;
+                                mPreviousTopRightY = (int) motionEvent.getRawY() + mStartY;
+                            }
 
-                    } else if (tag.equals("top_right")) {
-                        if(motionEvent.getRawX() + startX > minX + buttonSide && motionEvent.getRawX() + startX < width - buttonSide  -1
-                                && motionEvent.getRawY() + startY > 0 && motionEvent.getRawY() + startY < maxY - buttonSide) {
-                            minY = (int)motionEvent.getRawY() + startY;
-                            maxX = (int)motionEvent.getRawX() + startX + buttonSide;
+                            break;
+                        case "top_right":
+                            if (motionEvent.getRawX() + mStartX > mMinX + mButtonSide && motionEvent.getRawX() + mStartX < mWidth - mButtonSide - 1
+                                    && motionEvent.getRawY() + mStartY > 0 && motionEvent.getRawY() + mStartY < mMaxY - mButtonSide) {
+                                mMinY = (int) motionEvent.getRawY() + mStartY;
+                                mMaxX = (int) motionEvent.getRawX() + mStartX + mButtonSide;
 
-                            previousTopRightX = (int)motionEvent.getRawX() + startX;
-                            previousTopLeftY = (int)motionEvent.getRawY() + startY;
-                            previousTopRightY = (int)motionEvent.getRawY() + startY;
-                            previousBottomRightX = (int)motionEvent.getRawX() + startX;
-                        }
+                                mPreviousTopRightX = (int) motionEvent.getRawX() + mStartX;
+                                mPreviousTopLeftY = (int) motionEvent.getRawY() + mStartY;
+                                mPreviousTopRightY = (int) motionEvent.getRawY() + mStartY;
+                                mPreviousBottomRightX = (int) motionEvent.getRawX() + mStartX;
+                            }
 
-                    } else if (tag.equals("bottom_left")) {
-                        if(motionEvent.getRawX() + startX > 0 && motionEvent.getRawX() + startX < maxX - buttonSide *2 -1
-                                && motionEvent.getRawY() + startY > minY + buttonSide && motionEvent.getRawY() + startY < height - buttonSide -1) {
-                            minX = (int)motionEvent.getRawX() + startX;
-                            maxY = (int)motionEvent.getRawY() + startY + buttonSide;
+                            break;
+                        case "bottom_left":
+                            if (motionEvent.getRawX() + mStartX > 0 && motionEvent.getRawX() + mStartX < mMaxX - mButtonSide * 2 - 1
+                                    && motionEvent.getRawY() + mStartY > mMinY + mButtonSide && motionEvent.getRawY() + mStartY < mHeight - mButtonSide - 1) {
+                                mMinX = (int) motionEvent.getRawX() + mStartX;
+                                mMaxY = (int) motionEvent.getRawY() + mStartY + mButtonSide;
 
-                            previousTopLeftX = (int)motionEvent.getRawX() + startX;
-                            previousBottomLeftX = (int)motionEvent.getRawX() + startX;
-                            previousBottomLeftY = (int)motionEvent.getRawY() + startY;
-                            previousBottomRightY = (int)motionEvent.getRawY() + startY;
-                        }
-                    } else if (tag.equals("bottom_right")) {
-                        if(motionEvent.getRawX() + startX > minX + buttonSide && motionEvent.getRawX() + startX < width - buttonSide  -1
-                                && motionEvent.getRawY() + startY > minY + buttonSide && motionEvent.getRawY() + startY < height - buttonSide -1) {
-                            maxX = (int)motionEvent.getRawX() + startX + buttonSide;
-                            maxY = (int)motionEvent.getRawY() + startY + buttonSide;
+                                mPreviousTopLeftX = (int) motionEvent.getRawX() + mStartX;
+                                mPreviousBottomLeftX = (int) motionEvent.getRawX() + mStartX;
+                                mPreviousBottomLeftY = (int) motionEvent.getRawY() + mStartY;
+                                mPreviousBottomRightY = (int) motionEvent.getRawY() + mStartY;
+                            }
+                            break;
+                        case "bottom_right":
+                            if (motionEvent.getRawX() + mStartX > mMinX + mButtonSide && motionEvent.getRawX() + mStartX < mWidth - mButtonSide - 1
+                                    && motionEvent.getRawY() + mStartY > mMinY + mButtonSide && motionEvent.getRawY() + mStartY < mHeight - mButtonSide - 1) {
+                                mMaxX = (int) motionEvent.getRawX() + mStartX + mButtonSide;
+                                mMaxY = (int) motionEvent.getRawY() + mStartY + mButtonSide;
 
-                            previousTopRightX = (int)motionEvent.getRawX() + startX;
-                            previousBottomLeftY = (int)motionEvent.getRawY() + startY;
-                            previousBottomRightY = (int)motionEvent.getRawY() + startY;
-                            previousBottomRightX = (int)motionEvent.getRawX() + startX;
-                        }
+                                mPreviousTopRightX = (int) motionEvent.getRawX() + mStartX;
+                                mPreviousBottomLeftY = (int) motionEvent.getRawY() + mStartY;
+                                mPreviousBottomRightY = (int) motionEvent.getRawY() + mStartY;
+                                mPreviousBottomRightX = (int) motionEvent.getRawX() + mStartX;
+                            }
+                            break;
                     }
                     repaintCropButtons();
                     break;
@@ -353,46 +344,46 @@ public class ChangeIconsActivity extends AppCompatActivity {
     }
 
     private void repaintCropButtons() {
-        topLeftButtonParams.setMargins(previousTopLeftX, previousTopLeftY,0,0);
-        topLeft.setLayoutParams(topLeftButtonParams);
-        topLeft.setVisibility(View.GONE);
-        topLeft.setVisibility(View.VISIBLE);
+        mTopLeftButtonParams.setMargins(mPreviousTopLeftX, mPreviousTopLeftY,0,0);
+        mTopLeft.setLayoutParams(mTopLeftButtonParams);
+        mTopLeft.setVisibility(View.GONE);
+        mTopLeft.setVisibility(View.VISIBLE);
 
-        topRightButtonParams.setMargins(previousTopRightX,previousTopRightY,0,0);
-        topRight.setLayoutParams(topRightButtonParams);
-        topRight.setVisibility(View.GONE);
-        topRight.setVisibility(View.VISIBLE);
+        mTopRightButtonParams.setMargins(mPreviousTopRightX, mPreviousTopRightY,0,0);
+        mTopRight.setLayoutParams(mTopRightButtonParams);
+        mTopRight.setVisibility(View.GONE);
+        mTopRight.setVisibility(View.VISIBLE);
 
-        bottomRightButtonParams.setMargins(previousBottomRightX,previousBottomRightY,0,0);
-        bottomRight.setLayoutParams(bottomRightButtonParams);
-        bottomRight.setVisibility(View.GONE);
-        bottomRight.setVisibility(View.VISIBLE);
+        mBottomRightButtonParams.setMargins(mPreviousBottomRightX, mPreviousBottomRightY,0,0);
+        mBottomRight.setLayoutParams(mBottomRightButtonParams);
+        mBottomRight.setVisibility(View.GONE);
+        mBottomRight.setVisibility(View.VISIBLE);
 
-        bottomLeftButtonParams.setMargins(previousBottomLeftX,previousBottomLeftY,0,0);
-        bottomLeft.setLayoutParams(bottomLeftButtonParams);
-        bottomLeft.setVisibility(View.GONE);
-        bottomLeft.setVisibility(View.VISIBLE);
+        mBottomLeftButtonParams.setMargins(mPreviousBottomLeftX, mPreviousBottomLeftY,0,0);
+        mBottomLeft.setLayoutParams(mBottomLeftButtonParams);
+        mBottomLeft.setVisibility(View.GONE);
+        mBottomLeft.setVisibility(View.VISIBLE);
 
 
         Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.crop_background);
         ImageView croppedBackground = (ImageView) findViewById(R.id.cropped_background);
-        croppedBackground.setBackground(new BitmapDrawable(this.getResources(), Bitmap.createScaledBitmap(image, maxX - minX, maxY - minY, true)));
+        croppedBackground.setBackground(new BitmapDrawable(this.getResources(), Bitmap.createScaledBitmap(image, mMaxX - mMinX, mMaxY - mMinY, true)));
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(croppedBackground.getLayoutParams());
-        params.leftMargin = minX;
-        params.topMargin = minY;
-        params.width = maxX - minX;
-        params.height = maxY - minY;
+        params.leftMargin = mMinX;
+        params.topMargin = mMinY;
+        params.width = mMaxX - mMinX;
+        params.height = mMaxY - mMinY;
         croppedBackground.setLayoutParams(params);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        option = getIntent().getExtras().getString("option");
-        Log.i("option", option);
+        mOption = getIntent().getExtras().getString("option");
+        Log.i("option", mOption);
         setContentView(R.layout.activity_change_icons);
-        minX = 0;
-        minY = 0;
+        mMinX = 0;
+        mMinY = 0;
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(Color.TRANSPARENT);
@@ -404,17 +395,17 @@ public class ChangeIconsActivity extends AppCompatActivity {
         toolbar.setTitle("Set Icons");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        actionBarHeight = 0;
+        mActionBarHeight = 0;
         TypedValue tv = new TypedValue();
         if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
         {
-            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
+            mActionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
         }
         final FrameLayout imageView = (FrameLayout) findViewById(R.id.image_frame);
         final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) imageView
                 .getLayoutParams();
 
-        layoutParams.setMargins(0, actionBarHeight, 0, 0);
+        layoutParams.setMargins(0, mActionBarHeight, 0, 0);
 
         imageView.setLayoutParams(layoutParams);
         final ImageView parent = (ImageView) findViewById(R.id.image_view);
@@ -424,100 +415,100 @@ public class ChangeIconsActivity extends AppCompatActivity {
                 DisplayMetrics displayMetrics = new DisplayMetrics();
                 getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
                 int screenWidth = displayMetrics.widthPixels;
-                buttonSide = 0;
+                mButtonSide = 0;
                 if(screenWidth <= 240) {
-                    buttonSide = 20;
+                    mButtonSide = 20;
                 } else if(screenWidth <= 320) {
-                    buttonSide = 24;
+                    mButtonSide = 24;
                 } else if(screenWidth <= 480) {
-                    buttonSide = 36;
+                    mButtonSide = 36;
                 } else if(screenWidth <= 768) {
-                    buttonSide = 48;
+                    mButtonSide = 48;
                 } else if(screenWidth <= 1080) {
-                    buttonSide = 72;
+                    mButtonSide = 72;
                 } else {
-                    buttonSide = 96;
+                    mButtonSide = 96;
                 }
-                height = parent.getMeasuredHeight();
-                width = parent.getMeasuredWidth();
+                mHeight = parent.getMeasuredHeight();
+                mWidth = parent.getMeasuredWidth();
 
-                maxY = height;
-                maxX = width;
+                mMaxY = mHeight;
+                mMaxX = mWidth;
 
-                if(height>0) {
+                if(mHeight>0) {
                     parent.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    Log.i("height", String.valueOf(height));
-                    Log.i("width", String.valueOf(width));
+                    Log.i("height", String.valueOf(mHeight));
+                    Log.i("width", String.valueOf(mWidth));
 
-                    layoutParams.setMargins((screenWidth - width)/2, actionBarHeight, (screenWidth - width)/2, 0);
+                    layoutParams.setMargins((screenWidth - mWidth)/2, mActionBarHeight, (screenWidth - mWidth)/2, 0);
 
                     imageView.setLayoutParams(layoutParams);
                     ImageView cropped_background = (ImageView) findViewById(R.id.cropped_background);
-                    cropped_background.setLayoutParams(new FrameLayout.LayoutParams(width, height));
+                    cropped_background.setLayoutParams(new FrameLayout.LayoutParams(mWidth, mHeight));
 
-                    topLeft = (Button) findViewById(R.id.top_left_crop);
-                    topLeft.setVisibility(View.VISIBLE);
-                    topLeft.getLayoutParams().height = buttonSide;
-                    topLeft.getLayoutParams().width = buttonSide;
-                    topLeft.setOnTouchListener(new MyTouchListener());
-                    previousTopLeftX = 0;
-                    previousTopLeftY = 0;
+                    mTopLeft = (Button) findViewById(R.id.top_left_crop);
+                    mTopLeft.setVisibility(View.VISIBLE);
+                    mTopLeft.getLayoutParams().height = mButtonSide;
+                    mTopLeft.getLayoutParams().width = mButtonSide;
+                    mTopLeft.setOnTouchListener(new MyTouchListener());
+                    mPreviousTopLeftX = 0;
+                    mPreviousTopLeftY = 0;
 
                     Drawable dr = getResources().getDrawable(R.mipmap.crop_top_left, null);
                     Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
-                    Drawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, buttonSide, buttonSide, true));
-                    topLeft.setBackground(d);
+                    Drawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, mButtonSide, mButtonSide, true));
+                    mTopLeft.setBackground(d);
 
-                    topRight = (Button) findViewById(R.id.top_right_crop);
-                    topRight.setVisibility(View.VISIBLE);
-                    topRight.getLayoutParams().height = buttonSide;
-                    topRight.getLayoutParams().width = buttonSide;
-                    previousTopRightX = width-buttonSide-1;
-                    previousTopRightY = 0;
-                    FrameLayout.LayoutParams buttonParams = new FrameLayout.LayoutParams(topRight.getLayoutParams());
-                    buttonParams.setMargins(width-buttonSide-1,0,0,0);
-                    topRight.setLayoutParams(buttonParams);
-                    topRight.setOnTouchListener(new MyTouchListener());
+                    mTopRight = (Button) findViewById(R.id.top_right_crop);
+                    mTopRight.setVisibility(View.VISIBLE);
+                    mTopRight.getLayoutParams().height = mButtonSide;
+                    mTopRight.getLayoutParams().width = mButtonSide;
+                    mPreviousTopRightX = mWidth- mButtonSide -1;
+                    mPreviousTopRightY = 0;
+                    FrameLayout.LayoutParams buttonParams = new FrameLayout.LayoutParams(mTopRight.getLayoutParams());
+                    buttonParams.setMargins(mWidth- mButtonSide -1,0,0,0);
+                    mTopRight.setLayoutParams(buttonParams);
+                    mTopRight.setOnTouchListener(new MyTouchListener());
 
                     dr = getResources().getDrawable(R.mipmap.crop_top_right, null);
                     bitmap = ((BitmapDrawable) dr).getBitmap();
-                    d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, buttonSide, buttonSide, true));
-                    topRight.setBackground(d);
+                    d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, mButtonSide, mButtonSide, true));
+                    mTopRight.setBackground(d);
 
-                    bottomLeft = (Button) findViewById(R.id.left_bottom_crop);
-                    bottomLeft.setVisibility(View.VISIBLE);
-                    bottomLeft.getLayoutParams().height = buttonSide;
-                    bottomLeft.getLayoutParams().width = buttonSide;
-                    buttonParams = new FrameLayout.LayoutParams(bottomLeft.getLayoutParams());
-                    buttonParams.setMargins(0,height-buttonSide,0,0);
-                    bottomLeft.setLayoutParams(buttonParams);
-                    bottomLeft.setOnTouchListener(new MyTouchListener());
-                    previousBottomLeftX = 0;
-                    previousBottomLeftY = height-buttonSide -1;
+                    mBottomLeft = (Button) findViewById(R.id.left_bottom_crop);
+                    mBottomLeft.setVisibility(View.VISIBLE);
+                    mBottomLeft.getLayoutParams().height = mButtonSide;
+                    mBottomLeft.getLayoutParams().width = mButtonSide;
+                    buttonParams = new FrameLayout.LayoutParams(mBottomLeft.getLayoutParams());
+                    buttonParams.setMargins(0,mHeight- mButtonSide,0,0);
+                    mBottomLeft.setLayoutParams(buttonParams);
+                    mBottomLeft.setOnTouchListener(new MyTouchListener());
+                    mPreviousBottomLeftX = 0;
+                    mPreviousBottomLeftY = mHeight- mButtonSide -1;
 
 
                     dr = getResources().getDrawable(R.mipmap.crop_bottom_left, null);
                     bitmap = ((BitmapDrawable) dr).getBitmap();
-                    d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, buttonSide, buttonSide, true));
-                    bottomLeft.setBackground(d);
+                    d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, mButtonSide, mButtonSide, true));
+                    mBottomLeft.setBackground(d);
 
 
-                    bottomRight = (Button) findViewById(R.id.bottom_right_crop);
-                    bottomRight.setVisibility(View.VISIBLE);
-                    bottomRight.getLayoutParams().height = buttonSide;
-                    bottomRight.getLayoutParams().width = buttonSide;
-                    buttonParams = new FrameLayout.LayoutParams(bottomRight.getLayoutParams());
-                    buttonParams.setMargins(width -buttonSide,height-buttonSide,0,0);
-                    bottomRight.setLayoutParams(buttonParams);
-                    bottomRight.setOnTouchListener(new MyTouchListener());
-                    previousBottomRightX = width -buttonSide - 1;
-                    previousBottomRightY = height - buttonSide - 1;
+                    mBottomRight = (Button) findViewById(R.id.bottom_right_crop);
+                    mBottomRight.setVisibility(View.VISIBLE);
+                    mBottomRight.getLayoutParams().height = mButtonSide;
+                    mBottomRight.getLayoutParams().width = mButtonSide;
+                    buttonParams = new FrameLayout.LayoutParams(mBottomRight.getLayoutParams());
+                    buttonParams.setMargins(mWidth - mButtonSide,mHeight- mButtonSide,0,0);
+                    mBottomRight.setLayoutParams(buttonParams);
+                    mBottomRight.setOnTouchListener(new MyTouchListener());
+                    mPreviousBottomRightX = mWidth - mButtonSide - 1;
+                    mPreviousBottomRightY = mHeight - mButtonSide - 1;
 
 
                     dr = getResources().getDrawable(R.mipmap.crop_bottom_right, null);
                     bitmap = ((BitmapDrawable) dr).getBitmap();
-                    d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, buttonSide, buttonSide, true));
-                    bottomRight.setBackground(d);
+                    d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, mButtonSide, mButtonSide, true));
+                    mBottomRight.setBackground(d);
 
                 }
             }
