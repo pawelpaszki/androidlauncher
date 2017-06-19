@@ -4,6 +4,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 /**
  * Created by PawelPaszki on 10/05/2017.
  */
@@ -144,5 +151,52 @@ public class SharedPrefs {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("messaging", name);
         editor.commit();
+    }
+
+    public static void saveWidgetsIds(Context context, ArrayList<Integer> widgetsIds){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (prefs != null){
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < widgetsIds.size(); i++) {
+                if(i + 1 < widgetsIds.size()) {
+                    sb.append(widgetsIds.get(i) + ",");
+                } else {
+                    sb.append(widgetsIds.get(i));
+                }
+            }
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("widgetsids", sb.toString());
+            editor.commit();
+        }
+    }
+
+    public static void clearWidgetsIds(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (prefs != null){
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.remove("widgetsids").commit();
+        }
+    }
+
+    public static ArrayList<Integer> getWidgetsIds(Context context){
+        ArrayList<Integer> widgetsIds = new ArrayList<Integer>();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (prefs != null) {
+            String concatenatedString = prefs.getString("widgetsids", "");
+            if (concatenatedString.length() == 0) {
+                return widgetsIds;
+            } else {
+                String[] ids = concatenatedString.split(",");
+                for(int i = 0; i < ids.length; i++) {
+                    try {
+                        widgetsIds.add(Integer.parseInt(ids[i]));
+                    } catch (Exception e) {
+                        return new ArrayList<Integer>();
+                    }
+
+                }
+            }
+        }
+        return widgetsIds;
     }
 }
