@@ -18,7 +18,6 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.ResultReceiver;
 import android.provider.CallLog;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -35,7 +34,6 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -43,7 +41,6 @@ import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.layouts.WidgetFrame;
 import com.example.pawelpaszki.launcher.layouts.WidgetInfo;
-import com.example.pawelpaszki.launcher.services.MyIntentService;
 import com.example.pawelpaszki.launcher.utils.AppsSorter;
 import com.example.pawelpaszki.launcher.utils.IconLoader;
 import com.example.pawelpaszki.launcher.utils.MissedCallsCountRetriever;
@@ -51,42 +48,32 @@ import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.TreeMap;
 
 public class HomeActivity extends Activity {
 
-    private Handler handler = new Handler();
-    private List<AppDetail> dockerApps;
-    private ProgressBar pb;
-    private TextView textView;
-    private MyResultReceiver myResultReceiver;
-    private GestureDetectorCompat detector;
-    private PackageManager manager;
-    private Context context;
-    private int j;
-    private TextView homeNotifications;
-    private LinearLayout dock;
-    private RelativeLayout topContainer;
-    private boolean topContainerEnabled = true;
-    private int i = 0;
-    private FloatingActionButton addPage;
-    private FloatingActionButton removePage;
-    private FloatingActionButton pinPage;
-    private boolean isWidgetPinned;
-    private int topContainerWidth;
-    private int topContainerHeight;
-    private ScrollView scrollView;
-    private LinearLayout widgetContainer;
-    private int singleScrollHeight;
-    private int startScrollY;
-    private int endScrollY;
-    private Handler pinPageHandler;
-    private int currentWidgetPage;
-    private boolean widgetControlsInvisible = true;
+//    private ProgressBar mProgressBar;
+//    private TextView mProgressTextView;
+    private GestureDetectorCompat mGestureDetector;
+    private PackageManager mPackageManager;
+    private Context mContext;
+    private LinearLayout mDockLayout;
+    private RelativeLayout mTopContainer;
+    private boolean mTopContainerEnabled = true;
+    private FloatingActionButton mAddPage;
+    private FloatingActionButton mRemovePage;
+    private FloatingActionButton mPinPage;
+    private boolean mIsWidgetPinned;
+    private int mTopContainerWidth;
+    private int mTopContainerHeight;
+    private ScrollView mWidgetScrollView;
+    private LinearLayout mWidgetContainer;
+    private int mSingleScrollHeight;
+    private int mStartScrollY;
+    private int mEndScrollY;
+    private int mCurrentWidgetPage;
+    private boolean mWidgetControlsInvisible = true;
 
     ///////////
     private AppWidgetManager mAppWidgetManager;
@@ -102,7 +89,7 @@ public class HomeActivity extends Activity {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    dock.removeAllViews();
+                    mDockLayout.removeAllViews();
                     loadCarousel();
                 }
             }, 500);
@@ -116,14 +103,14 @@ public class HomeActivity extends Activity {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    dock.removeAllViews();
+                    mDockLayout.removeAllViews();
                     loadCarousel();
                 }
             }, 500);
         }
     };
     private WidgetFrame newWidgetPage;
-    private ArrayList<Integer> widgetIds = new ArrayList<Integer>();
+    private ArrayList<Integer> widgetIds = new ArrayList<>();
     private int startScrollX;
     private int endScrollX;
 
@@ -138,7 +125,7 @@ public class HomeActivity extends Activity {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        dock.removeAllViews();
+                        mDockLayout.removeAllViews();
                         loadCarousel();
                     }
                 }, 500);
@@ -149,17 +136,17 @@ public class HomeActivity extends Activity {
                 "android.provider.Telephony.SMS_RECEIVED"));
         getApplicationContext().getContentResolver().registerContentObserver(CallLog.Calls.CONTENT_URI, true, missedCallObserver);
         Log.i("on start", "on start");
-        int unreadMessages = MissedCallsCountRetriever.getUnreadMessagesCount(context);
-        if(dock != null) {
-            for(int i = 0; i < dock.getChildCount(); i++) {
-                if(dock.getChildAt(i).getTag().toString().equals("Messaging")) {
-                    if(! ((TextView)((FrameLayout)((LinearLayout)(dock.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText().equals("") && ! (((TextView)((FrameLayout)((LinearLayout)(dock.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText()== null)) {
-                        if( Integer.parseInt(((TextView)((FrameLayout)((LinearLayout)(dock.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText().toString()) != unreadMessages) {
+        int unreadMessages = MissedCallsCountRetriever.getUnreadMessagesCount(mContext);
+        if(mDockLayout != null) {
+            for(int i = 0; i < mDockLayout.getChildCount(); i++) {
+                if(mDockLayout.getChildAt(i).getTag().toString().equals("Messaging")) {
+                    if(! ((TextView)((FrameLayout)((LinearLayout)(mDockLayout.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText().equals("") && ! (((TextView)((FrameLayout)((LinearLayout)(mDockLayout.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText()== null)) {
+                        if( Integer.parseInt(((TextView)((FrameLayout)((LinearLayout)(mDockLayout.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText().toString()) != unreadMessages) {
                             final Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    dock.removeAllViews();
+                                    mDockLayout.removeAllViews();
                                     loadCarousel();
                                 }
                             }, 500);
@@ -168,8 +155,8 @@ public class HomeActivity extends Activity {
                 }
             }
         }
-        if(((LinearLayout) scrollView.getChildAt(0)).getChildCount() > 0) {
-            ((WidgetFrame) widgetContainer.getChildAt(currentWidgetPage)).getAppWidgetHost().startListening();
+        if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() > 0) {
+            ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
         }
         super.onStart();
     }
@@ -183,8 +170,8 @@ public class HomeActivity extends Activity {
         if(missedCallObserver != null) {
             getApplicationContext().getContentResolver().unregisterContentObserver(missedCallObserver);
         }
-        if(((LinearLayout) scrollView.getChildAt(0)).getChildCount() > 0) {
-            ((WidgetFrame) widgetContainer.getChildAt(currentWidgetPage)).getAppWidgetHost().stopListening();
+        if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() > 0) {
+            ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().stopListening();
         }
         super.onStop();
 
@@ -196,7 +183,6 @@ public class HomeActivity extends Activity {
         Log.i("oncreate", "home activity created");
         setContentView(R.layout.activity_home);
         mAppWidgetManager = AppWidgetManager.getInstance(this);
-        pinPageHandler = new Handler();
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(Color.TRANSPARENT);
@@ -212,7 +198,7 @@ public class HomeActivity extends Activity {
             }
             SharedPrefs.setIsFirstLaunch(false,this);
         }
-        context = this;
+        mContext = this;
 
 
         /////////////// load/ process icons //////////////
@@ -221,28 +207,28 @@ public class HomeActivity extends Activity {
         // comment out if loading icons from local storage
         loadCarousel();
 
-        scrollView = (ScrollView) findViewById(R.id.widgets_scroll);
+        mWidgetScrollView = (ScrollView) findViewById(R.id.widgets_scroll);
 
-        scrollView.setOnTouchListener(new View.OnTouchListener() {
+        mWidgetScrollView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-            if(((LinearLayout) scrollView.getChildAt(0)).getChildCount() > 1) {
+            if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() > 1) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    startScrollY = scrollView.getScrollY();
+                    mStartScrollY = mWidgetScrollView.getScrollY();
                     startScrollX = (int) event.getX();
                     Log.i("start scroll x: ", String.valueOf(startScrollX));
-                    Log.i("start scroll: ", String.valueOf(startScrollY));
+                    Log.i("start scroll: ", String.valueOf(mStartScrollY));
                     return false;
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    int childCount = ((LinearLayout) scrollView.getChildAt(0)).getChildCount();
-                    singleScrollHeight = scrollView.getChildAt(0).getHeight() / childCount;
-                    endScrollY = scrollView.getScrollY();
+                    int childCount = ((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount();
+                    mSingleScrollHeight = mWidgetScrollView.getChildAt(0).getHeight() / childCount;
+                    mEndScrollY = mWidgetScrollView.getScrollY();
                     endScrollX = (int) event.getX();
                     Log.i("end scroll x: ", String.valueOf(endScrollX));
-                    Log.i("end scroll: ", String.valueOf(endScrollY));
-                    Log.i("y", String.valueOf(Math.abs(startScrollY-endScrollY)));
+                    Log.i("end scroll: ", String.valueOf(mEndScrollY));
+                    Log.i("y", String.valueOf(Math.abs(mStartScrollY - mEndScrollY)));
                     Log.i("x", String.valueOf(endScrollX - startScrollX));
-                    if(Math.abs(startScrollY-endScrollY) < 20) {
+                    if(Math.abs(mStartScrollY - mEndScrollY) < 20) {
                         if(endScrollX - startScrollX > 100) {
                             showWidgetControlButtonsOnSwipeRight();
                         } else if (startScrollX - endScrollX > 100){
@@ -250,89 +236,74 @@ public class HomeActivity extends Activity {
                         }
                         return true;
                     }
-//                    Log.i("scrollview height", String.valueOf(scrollView.getChildAt(0).getHeight()));
-//                    Log.i("single scroll height y", String.valueOf(singleScrollHeight));
-//                    Log.i("linear layout height", String.valueOf(topContainer.getHeight()));
+//                    Log.i("scrollview height", String.valueOf(mWidgetScrollView.getChildAt(0).getHeight()));
+//                    Log.i("single scroll height y", String.valueOf(mSingleScrollHeight));
+//                    Log.i("linear layout height", String.valueOf(mTopContainer.getHeight()));
 //                    Log.i("child count", String.valueOf(childCount));
-//                    Log.i("single page height", String.valueOf(topContainer.getChildAt(0).getHeight()));
-                    ((WidgetFrame) widgetContainer.getChildAt(currentWidgetPage)).getAppWidgetHost().stopListening();
-                    if(startScrollY < endScrollY) {
-                        if(startScrollY < singleScrollHeight) {
+//                    Log.i("single page height", String.valueOf(mTopContainer.getChildAt(0).getHeight()));
+                    ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().stopListening();
+                    if(mStartScrollY < mEndScrollY) {
+                        if(mStartScrollY < mSingleScrollHeight) {
 
-                            startScrollY = 1;
-                            currentWidgetPage = startScrollY;
+                            mStartScrollY = 1;
+                            mCurrentWidgetPage = mStartScrollY;
                         } else {
-                            startScrollY = scrollView.getScrollY() / singleScrollHeight + 1;
-                            if(startScrollY > childCount) {
-                                startScrollY = scrollView.getScrollY() / singleScrollHeight;
-                                startScrollY--;
-                                currentWidgetPage = startScrollY;
+                            mStartScrollY = mWidgetScrollView.getScrollY() / mSingleScrollHeight + 1;
+                            if(mStartScrollY > childCount) {
+                                mStartScrollY = mWidgetScrollView.getScrollY() / mSingleScrollHeight;
+                                mStartScrollY--;
+                                mCurrentWidgetPage = mStartScrollY;
 
                             }
                         }
                     } else {
-                        startScrollY = scrollView.getScrollY() / singleScrollHeight;
-                        currentWidgetPage = startScrollY;
+                        mStartScrollY = mWidgetScrollView.getScrollY() / mSingleScrollHeight;
+                        mCurrentWidgetPage = mStartScrollY;
                     }
-                    Log.i("start scroll: ", String.valueOf(startScrollY));
-                    if(!isWidgetPinned) {
-                        scrollView.postDelayed(new Runnable() {
+                    Log.i("start scroll: ", String.valueOf(mStartScrollY));
+                    if(!mIsWidgetPinned) {
+                        mWidgetScrollView.postDelayed(new Runnable() {
                             public void run() {
-                                scrollView.smoothScrollTo(0, startScrollY * singleScrollHeight);
+                                mWidgetScrollView.smoothScrollTo(0, mStartScrollY * mSingleScrollHeight);
                             }
                         },100);
-                        ((WidgetFrame) widgetContainer.getChildAt(currentWidgetPage)).getAppWidgetHost().startListening();
+                        ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
                     }
 
-                    if(!isWidgetPinned) {
+                    if(!mIsWidgetPinned) {
                         return false;
                     }
                 }
-                if(isWidgetPinned) {
-//                    pinPage.setVisibility(View.VISIBLE);
-//                    if(pinPageHandler != null) {
-//                        pinPageHandler.removeCallbacksAndMessages(null);
-//                    }
-//                    pinPageHandler.postDelayed(new Runnable()
-//                    {
-//                        @Override
-//                        public void run()
-//                        {
-//                            if(isWidgetPinned) {
-//                                pinPage.setVisibility(View.GONE);
-//                            }
-//                        }
-//                    }, 3000);
-                    detector.onTouchEvent(event);
+                if(mIsWidgetPinned) {
+                    mGestureDetector.onTouchEvent(event);
                 }
             } else {
-                detector.onTouchEvent(event);
+                mGestureDetector.onTouchEvent(event);
             }
 
-            return isWidgetPinned;
+            return mIsWidgetPinned;
             }
         });
 
-        LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        widgetContainer = (LinearLayout) findViewById (R.id.widget_container);
+        mWidgetContainer = (LinearLayout) findViewById (R.id.widget_container);
 
         ///// add saved widgets later //////////
 
-        addPage = (FloatingActionButton) findViewById(R.id.add_page_button);
-        addPage.setOnClickListener(new View.OnClickListener() {
+        mAddPage = (FloatingActionButton) findViewById(R.id.add_page_button);
+        mAddPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(widgetContainer.getChildCount() <= 10) {
-                    Log.i("addPage dimensions", addPage.getHeight() + ":" + addPage.getWidth());
-                    LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    newWidgetPage = (WidgetFrame) inflater.inflate(R.layout.widget_layout, widgetContainer, false);
-                    newWidgetPage.getLayoutParams().height = topContainerHeight;
-                    newWidgetPage.getLayoutParams().width = topContainerWidth;
+                if(mWidgetContainer.getChildCount() <= 10) {
+                    Log.i("addPage dimensions", mAddPage.getHeight() + ":" + mAddPage.getWidth());
+                    LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    newWidgetPage = (WidgetFrame) inflater.inflate(R.layout.widget_layout, mWidgetContainer, false);
+                    newWidgetPage.getLayoutParams().height = mTopContainerHeight;
+                    newWidgetPage.getLayoutParams().width = mTopContainerWidth;
                     newWidgetPage.setTag(new Random().nextInt(Integer.MAX_VALUE));
-                    newWidgetPage.setAppWidgetHost(new AppWidgetHost(context, Integer.parseInt(newWidgetPage.getTag().toString())));
+                    newWidgetPage.setAppWidgetHost(new AppWidgetHost(mContext, Integer.parseInt(newWidgetPage.getTag().toString())));
                     onClickSelectWidget();
-                    if(((LinearLayout) scrollView.getChildAt(0)).getChildCount() == 0)  {
-                        currentWidgetPage = 0;
+                    if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() == 0)  {
+                        mCurrentWidgetPage = 0;
                     }
 
                     newWidgetPage.getAppWidgetHost().startListening();
@@ -344,87 +315,88 @@ public class HomeActivity extends Activity {
             }
         });
 
-        removePage = (FloatingActionButton) findViewById(R.id.remove_page_button);
-        removePage.setOnClickListener(new View.OnClickListener() {
+        mRemovePage = (FloatingActionButton) findViewById(R.id.remove_page_button);
+        mRemovePage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(widgetContainer.getChildCount() > 0) {
+                if(mWidgetContainer.getChildCount() > 0) {
                     int viewToRemoveIndex;
-                    if (scrollView.getScrollY() == 0) {
+                    if (mWidgetScrollView.getScrollY() == 0) {
                         viewToRemoveIndex = 0;
                     } else {
-                        viewToRemoveIndex = scrollView.getScrollY() / singleScrollHeight;
+                        viewToRemoveIndex = mWidgetScrollView.getScrollY() / mSingleScrollHeight;
                     }
-                    ((WidgetFrame) widgetContainer.getChildAt(viewToRemoveIndex)).getAppWidgetHost().stopListening();
-                    widgetContainer.removeViewAt(viewToRemoveIndex);
+                    ((WidgetFrame) mWidgetContainer.getChildAt(viewToRemoveIndex)).getAppWidgetHost().stopListening();
+                    ((WidgetFrame) mWidgetContainer.getChildAt(viewToRemoveIndex)).getAppWidgetHost().deleteAppWidgetId(widgetIds.get(viewToRemoveIndex));
+                    mWidgetContainer.removeViewAt(viewToRemoveIndex);
                     widgetIds.remove(viewToRemoveIndex);
 
-                    if(widgetContainer.getChildCount() == 0) {
-                        removePage.setVisibility(View.GONE);
-                        SharedPrefs.clearWidgetsIds(context);
+                    if(mWidgetContainer.getChildCount() == 0) {
+                        mRemovePage.setVisibility(View.GONE);
+                        SharedPrefs.clearWidgetsIds(mContext);
                     } else {
                         final int scrollTo = viewToRemoveIndex;
 
-                        if(widgetContainer.getChildCount() == viewToRemoveIndex) {
-                            scrollView.postDelayed(new Runnable() {
+                        if(mWidgetContainer.getChildCount() == viewToRemoveIndex) {
+                            mWidgetScrollView.postDelayed(new Runnable() {
                                 public void run() {
-                                    scrollView.smoothScrollTo(0, (scrollTo-1) * singleScrollHeight);
+                                    mWidgetScrollView.smoothScrollTo(0, (scrollTo-1) * mSingleScrollHeight);
                                 }
                             },20);
-                            ((WidgetFrame) widgetContainer.getChildAt(scrollTo-1)).getAppWidgetHost().startListening();
-                            currentWidgetPage = scrollTo - 1;
+                            ((WidgetFrame) mWidgetContainer.getChildAt(scrollTo-1)).getAppWidgetHost().startListening();
+                            mCurrentWidgetPage = scrollTo - 1;
                         } else {
-                            currentWidgetPage = scrollTo;
-                            scrollView.postDelayed(new Runnable() {
+                            mCurrentWidgetPage = scrollTo;
+                            mWidgetScrollView.postDelayed(new Runnable() {
                                 public void run() {
-                                    scrollView.smoothScrollTo(0, (scrollTo) * singleScrollHeight);
+                                    mWidgetScrollView.smoothScrollTo(0, (scrollTo) * mSingleScrollHeight);
                                 }
                             },20);
-                            ((WidgetFrame) widgetContainer.getChildAt(currentWidgetPage)).getAppWidgetHost().startListening();
+                            ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
                         }
-                        SharedPrefs.saveWidgetsIds(context,widgetIds);
+                        SharedPrefs.saveWidgetsIds(mContext,widgetIds);
                     }
-                    if (widgetContainer.getChildCount() == 1) {
-                        pinPage.setVisibility(View.GONE);
+                    if (mWidgetContainer.getChildCount() == 1) {
+                        mPinPage.setVisibility(View.GONE);
                     }
-                    if(widgetContainer.getChildCount() == 9) {
-                        addPage.setVisibility(View.VISIBLE);
+                    if(mWidgetContainer.getChildCount() == 9) {
+                        mAddPage.setVisibility(View.VISIBLE);
                     }
                 }
             }
         });
 
-        pinPage = (FloatingActionButton) findViewById(R.id.pin_page);
-        pinPage.setOnClickListener(new View.OnClickListener() {
+        mPinPage = (FloatingActionButton) findViewById(R.id.pin_page);
+        mPinPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isWidgetPinned = !isWidgetPinned;
-                if(isWidgetPinned) {
-                    scrollView.setVerticalScrollBarEnabled(false);
-                    addPage.setVisibility(View.GONE);
-                    removePage.setVisibility(View.GONE);
-                    pinPage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.unlock));
-                    pinPage.setVisibility(View.GONE);
+                mIsWidgetPinned = !mIsWidgetPinned;
+                if(mIsWidgetPinned) {
+                    mWidgetScrollView.setVerticalScrollBarEnabled(false);
+                    mAddPage.setVisibility(View.GONE);
+                    mRemovePage.setVisibility(View.GONE);
+                    mPinPage.setImageDrawable(ContextCompat.getDrawable(getmContext(), R.drawable.unlock));
+                    mPinPage.setVisibility(View.GONE);
                 } else {
-                    scrollView.setVerticalScrollBarEnabled(true);
-                    if( widgetContainer.getChildCount() < 10) {
-                        addPage.setVisibility(View.VISIBLE);
+                    mWidgetScrollView.setVerticalScrollBarEnabled(true);
+                    if( mWidgetContainer.getChildCount() < 10) {
+                        mAddPage.setVisibility(View.VISIBLE);
                     }
-                    if(widgetContainer.getChildCount() > 0) {
-                        removePage.setVisibility(View.VISIBLE);
-                        pinPage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.lock));
-                        pinPage.setVisibility(View.VISIBLE);
+                    if(mWidgetContainer.getChildCount() > 0) {
+                        mRemovePage.setVisibility(View.VISIBLE);
+                        mPinPage.setImageDrawable(ContextCompat.getDrawable(getmContext(), R.drawable.lock));
+                        mPinPage.setVisibility(View.VISIBLE);
                     }
                 }
             }
         });
 
-        detector = new GestureDetectorCompat(this, new MyGestureListener());
+        mGestureDetector = new GestureDetectorCompat(this, new MyGestureListener());
         RelativeLayout home = (RelativeLayout) findViewById(R.id.home_container);
         home.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                detector.onTouchEvent(event);
+                mGestureDetector.onTouchEvent(event);
                 return false;
             }
         });
@@ -432,23 +404,23 @@ public class HomeActivity extends Activity {
         home.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-            if(topContainerEnabled) {
-                topContainer.setVisibility(View.INVISIBLE);
-                topContainer.setEnabled(false);
+            if(mTopContainerEnabled) {
+                mTopContainer.setVisibility(View.INVISIBLE);
+                mTopContainer.setEnabled(false);
             } else {
-                topContainer.setVisibility(View.VISIBLE);
-                topContainer.setEnabled(true);
+                mTopContainer.setVisibility(View.VISIBLE);
+                mTopContainer.setEnabled(true);
             }
-            topContainerEnabled =!topContainerEnabled;
+            mTopContainerEnabled =!mTopContainerEnabled;
             return false;
             }
         });
-        ArrayList<Integer> widgetDetails = SharedPrefs.getWidgetsIds(context);
-        if(widgetContainer.getChildCount() != widgetDetails.size()) {
+        ArrayList<Integer> widgetDetails = SharedPrefs.getWidgetsIds(mContext);
+        if(mWidgetContainer.getChildCount() != widgetDetails.size()) {
             loadSavedWidgets(widgetDetails);
         }
-        if(widgetContainer.getChildCount() == 0) {
-            removePage.setVisibility(View.GONE);
+        if(mWidgetContainer.getChildCount() == 0) {
+            mRemovePage.setVisibility(View.GONE);
         }
     }
 
@@ -463,10 +435,6 @@ public class HomeActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_CANCELED) {
-            //TODO do nothing??
-        }
-
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case REQUEST_PICK_APPWIDGET:
@@ -482,12 +450,12 @@ public class HomeActivity extends Activity {
     private void loadSavedWidgets(ArrayList<Integer> ids) {
         widgetIds = ids;
         for(int i = 0; i < ids.size(); i++) {
-            LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            newWidgetPage = (WidgetFrame) inflater.inflate(R.layout.widget_layout, widgetContainer, false);
-            newWidgetPage.getLayoutParams().height = topContainerHeight;
-            newWidgetPage.getLayoutParams().width = topContainerWidth;
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            newWidgetPage = (WidgetFrame) inflater.inflate(R.layout.widget_layout, mWidgetContainer, false);
+            newWidgetPage.getLayoutParams().height = mTopContainerHeight;
+            newWidgetPage.getLayoutParams().width = mTopContainerWidth;
             newWidgetPage.setTag(new Random().nextInt(Integer.MAX_VALUE));
-            newWidgetPage.setAppWidgetHost(new AppWidgetHost(context, Integer.parseInt(newWidgetPage.getTag().toString())));
+            newWidgetPage.setAppWidgetHost(new AppWidgetHost(mContext, Integer.parseInt(newWidgetPage.getTag().toString())));
 
             newWidgetPage.getAppWidgetHost().startListening();
             int appWidgetId = ids.get(i);
@@ -497,9 +465,9 @@ public class HomeActivity extends Activity {
             launcherInfo.hostView.setAppWidget(appWidgetId, appWidgetInfo);
             launcherInfo.hostView.setTag(launcherInfo);
             newWidgetPage.setWidgetView(launcherInfo);
-            widgetContainer.addView(newWidgetPage);
+            mWidgetContainer.addView(newWidgetPage);
         }
-        currentWidgetPage = 0;
+        mCurrentWidgetPage = 0;
     }
 
     private void completeAddAppWidget(Intent data) {
@@ -515,16 +483,16 @@ public class HomeActivity extends Activity {
         launcherInfo.hostView.setTag(launcherInfo);
         newWidgetPage.setWidgetView(launcherInfo);
         widgetIds.add(appWidgetId);
-        SharedPrefs.saveWidgetsIds(context, widgetIds);
-        widgetContainer.addView(newWidgetPage);
-        if(widgetContainer.getChildCount() == 10) {
-            addPage.setVisibility(View.GONE);
+        SharedPrefs.saveWidgetsIds(mContext, widgetIds);
+        mWidgetContainer.addView(newWidgetPage);
+        if(mWidgetContainer.getChildCount() == 10) {
+            mAddPage.setVisibility(View.GONE);
         }
-        if (widgetContainer.getChildCount() == 1) {
-            removePage.setVisibility(View.VISIBLE);
+        if (mWidgetContainer.getChildCount() == 1) {
+            mRemovePage.setVisibility(View.VISIBLE);
         }
-        if (widgetContainer.getChildCount() > 1) {
-            pinPage.setVisibility(View.VISIBLE);
+        if (mWidgetContainer.getChildCount() > 1) {
+            mPinPage.setVisibility(View.VISIBLE);
         }
     }
 
@@ -548,15 +516,15 @@ public class HomeActivity extends Activity {
     }
 
 
-    public Context getContext() {
-        return context;
+    public Context getmContext() {
+        return mContext;
     }
 
     private void loadCarousel() {
         Log.i("carousel loaded", "true");
-        dock = (LinearLayout) findViewById(R.id.dock_list);
-        manager = getPackageManager();
-        dockerApps = new ArrayList<AppDetail>();
+        mDockLayout = (LinearLayout) findViewById(R.id.dock_list);
+        mPackageManager = getPackageManager();
+        List<AppDetail> dockerApps = new ArrayList<>();
 
         Intent i = new Intent(Intent.ACTION_MAIN, null);
         i.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -566,30 +534,31 @@ public class HomeActivity extends Activity {
         int height = displayMetrics.heightPixels;
 
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(width/5, width/5);
-        topContainer = (RelativeLayout) findViewById(R.id.top_container);
-        final RelativeLayout.LayoutParams topContainerParams = new RelativeLayout.LayoutParams(topContainer.getLayoutParams());
-        topContainerWidth = width;
-        topContainerHeight = height - width/5 - getSoftButtonsBarHeight() * 2;
-        topContainerParams.height = topContainerHeight;
+        mTopContainer = (RelativeLayout) findViewById(R.id.top_container);
+        final RelativeLayout.LayoutParams topContainerParams = new RelativeLayout.LayoutParams(mTopContainer.getLayoutParams());
+        mTopContainerWidth = width;
+        mTopContainerHeight = height - width/5 - getSoftButtonsBarHeight() * 2;
+        topContainerParams.height = mTopContainerHeight;
         topContainerParams.topMargin = getSoftButtonsBarHeight();
-        topContainer.setLayoutParams(topContainerParams);
+        mTopContainer.setLayoutParams(topContainerParams);
 
-        List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
+        List<ResolveInfo> availableActivities = mPackageManager.queryIntentActivities(i, 0);
         for(ResolveInfo ri:availableActivities){
             AppDetail app = new AppDetail();
-            app.setLabel(ri.loadLabel(manager));
+            app.setLabel(ri.loadLabel(mPackageManager));
             app.setName(ri.activityInfo.packageName);
-            app.setIcon(ri.activityInfo.loadIcon(manager));
+            app.setIcon(ri.activityInfo.loadIcon(mPackageManager));
             app.setNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getLabel().toString(), this));
-            if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(manager))) {
+            if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(mPackageManager))) {
                 dockerApps.add(app);
                 //Log.i("no of runs", "label: " + app.getLabel() + ": " + " package name: " + String.valueOf(ri.activityInfo.packageName) + String.valueOf(app.getNumberOfStarts()));
             }
         }
         AppsSorter.sortApps(this, dockerApps, "most used", true);
+        int j;
         for(j = 0; j < dockerApps.size(); j++) {
             View view = LayoutInflater.from(this).inflate(R.layout.dock_item,null);
-            homeNotifications = (TextView) view.findViewById(R.id.home_notifications);
+            TextView homeNotifications = (TextView) view.findViewById(R.id.home_notifications);
             if(dockerApps.get(j).getLabel().toString().equalsIgnoreCase("Messaging")) {
                 SharedPrefs.setMessagingPackageName(this, (String) dockerApps.get(j).getName());
                 view.setTag("Messaging");
@@ -612,7 +581,7 @@ public class HomeActivity extends Activity {
                     homeNotifications.setVisibility(View.GONE);
                 }
             } else {
-                view.setTag((String) dockerApps.get(j).getName());
+                view.setTag(dockerApps.get(j).getName());
             }
 
             ImageView iv = (ImageView) view.findViewById(R.id.dock_app_icon);
@@ -624,11 +593,12 @@ public class HomeActivity extends Activity {
             //Bitmap icon = IconLoader.loadImageFromStorage(path, (String) dockerApps.get(j).getLabel());
             Bitmap icon = IconLoader.loadImageFromStorage(path, (String) dockerApps.get(j).getLabel());
             if(icon == null) {
-                icon  = ((BitmapDrawable) dockerApps.get(j).getIcon()).getBitmap();
-            } else {
-                // rounded??
-                //icon = RoundBitmapGenerator.getCircleBitmap(icon);
+                icon = ((BitmapDrawable) dockerApps.get(j).getIcon()).getBitmap();
             }
+//            else {
+//                // rounded??
+//                //icon = RoundBitmapGenerator.getCircleBitmap(icon);
+//            }
             iv.setImageDrawable(new BitmapDrawable(this.getResources(), icon));
             iv.setLayoutParams(layoutParams);
             tv.setText(dockerApps.get(j).getLabel());
@@ -641,19 +611,19 @@ public class HomeActivity extends Activity {
                             intent = new Intent(Intent.ACTION_DIAL);
                         } else {
                             if(v.getTag().toString().equals("Messaging")) {
-                                intent = manager.getLaunchIntentForPackage(SharedPrefs.getMessagingPackageName(HomeActivity.this));
+                                intent = mPackageManager.getLaunchIntentForPackage(SharedPrefs.getMessagingPackageName(HomeActivity.this));
                             } else {
-                                intent = manager.getLaunchIntentForPackage(v.getTag().toString());
+                                intent = mPackageManager.getLaunchIntentForPackage(v.getTag().toString());
                             }
                         }
                         // Log.i("name", v.getTag().toString());
-                        SharedPrefs.increaseNumberOfActivityStarts(((TextView)v.findViewById(R.id.dock_app_name)).getText().toString(), context);
+                        SharedPrefs.increaseNumberOfActivityStarts(((TextView)v.findViewById(R.id.dock_app_name)).getText().toString(), mContext);
                         SharedPrefs.setHomeReloadRequired(true, HomeActivity.this);
 
                         if(intent != null) {
-                            context.startActivity(intent);
+                            mContext.startActivity(intent);
                         } else {
-                            context.startActivity(new Intent(v.getTag().toString()));
+                            mContext.startActivity(new Intent(v.getTag().toString()));
                         }
                     } catch (Exception e) {
                         Toast.makeText(HomeActivity.this,"This application cannot be opened" ,
@@ -662,7 +632,7 @@ public class HomeActivity extends Activity {
                     }
                 }
             });
-            dock.addView(view);
+            mDockLayout.addView(view);
 
         }
     }
@@ -682,11 +652,11 @@ public class HomeActivity extends Activity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        detector.onTouchEvent(event);
+        mGestureDetector.onTouchEvent(event);
         return super.onTouchEvent(event);
     }
 
-    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+    private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         private static final int SWIPE_THRESHOLD = 100;
         private static final int SWIPE_VELOCITY_THRESHOLD = 100;
@@ -710,14 +680,6 @@ public class HomeActivity extends Activity {
                             onSwipeLeft();
                         }
                     }
-                } else {
-                    if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                        if (diffY > 0) {
-
-                        } else {
-
-                        }
-                    }
                 }
                 return true;
             }
@@ -726,24 +688,24 @@ public class HomeActivity extends Activity {
     }
 
     private void showWidgetControlButtonsOnSwipeRight() {
-        Log.i("widgetcontrolsinvisible", String.valueOf(widgetControlsInvisible));
-        if(widgetControlsInvisible) {
-            Log.i("widgetContainer", String.valueOf(widgetContainer.getChildCount()));
-            if(widgetContainer.getChildCount() > 0 &&  !isWidgetPinned) {
-                removePage.setVisibility(View.VISIBLE);
+        Log.i("widgetcontrolsinvisible", String.valueOf(mWidgetControlsInvisible));
+        if(mWidgetControlsInvisible) {
+            Log.i("mWidgetContainer", String.valueOf(mWidgetContainer.getChildCount()));
+            if(mWidgetContainer.getChildCount() > 0 &&  !mIsWidgetPinned) {
+                mRemovePage.setVisibility(View.VISIBLE);
             }
-            if(widgetContainer.getChildCount() > 1) {
-                pinPage.setVisibility(View.VISIBLE);
+            if(mWidgetContainer.getChildCount() > 1) {
+                mPinPage.setVisibility(View.VISIBLE);
             }
-            if(widgetContainer.getChildCount() < 10 && !isWidgetPinned) {
-                addPage.setVisibility(View.VISIBLE);
+            if(mWidgetContainer.getChildCount() < 10 && !mIsWidgetPinned) {
+                mAddPage.setVisibility(View.VISIBLE);
             }
         } else {
-            pinPage.setVisibility(View.GONE);
-            addPage.setVisibility(View.GONE);
-            removePage.setVisibility(View.GONE);
+            mPinPage.setVisibility(View.GONE);
+            mAddPage.setVisibility(View.GONE);
+            mRemovePage.setVisibility(View.GONE);
         }
-        widgetControlsInvisible = !widgetControlsInvisible;
+        mWidgetControlsInvisible = !mWidgetControlsInvisible;
     }
 
     private void onSwipeLeft() {
@@ -755,21 +717,21 @@ public class HomeActivity extends Activity {
     @Override
     protected void onResume() {
         Log.i("onResume","home activity");
-        dock = (LinearLayout) findViewById(R.id.dock_list);
-        int dockCount = dock.getChildCount();
+        mDockLayout = (LinearLayout) findViewById(R.id.dock_list);
+        int dockCount = mDockLayout.getChildCount();
         if(dockCount > 0) {
-            ((HorizontalScrollView) dock.getParent()).scrollTo(0,0);
+            ((HorizontalScrollView) mDockLayout.getParent()).scrollTo(0,0);
         }
-        if(SharedPrefs.getHomeReloadRequired(this) || (SharedPrefs.getVisibleCount(this) > 0 && dock.getChildCount() != SharedPrefs.getVisibleCount(this))) {
+        if(SharedPrefs.getHomeReloadRequired(this) || (SharedPrefs.getVisibleCount(this) > 0 && mDockLayout.getChildCount() != SharedPrefs.getVisibleCount(this))) {
             SharedPrefs.setHomeReloadRequired(false, this);
-            SharedPrefs.setVisibleCount(dock.getChildCount(), this);
+            SharedPrefs.setVisibleCount(mDockLayout.getChildCount(), this);
             Handler handler = new Handler();
             handler.postDelayed(new Runnable()
             {
                 @Override
                 public void run()
                 {
-                    dock.removeAllViews();
+                    mDockLayout.removeAllViews();
                     loadCarousel();
                 }
             }, 1);
@@ -782,53 +744,53 @@ public class HomeActivity extends Activity {
         super.onPause();
     }
 
-    public void startIntentService() {
-
-        myResultReceiver = new MyResultReceiver(null);
-        Intent intent = new Intent(this, MyIntentService.class);
-        intent.putExtra("receiver", myResultReceiver);
-        startService(intent);
-    }
+    //not used currently
+//    public void startIntentService() {
+//        MyResultReceiver myResultReceiver = new MyResultReceiver(null);
+//        Intent intent = new Intent(this, MyIntentService.class);
+//        intent.putExtra("receiver", myResultReceiver);
+//        startService(intent);
+//    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
-
-    private class MyResultReceiver extends ResultReceiver {
-
-        public MyResultReceiver(Handler handler) {
-            super(handler);
-        }
-        @Override
-        protected void onReceiveResult(int resultCode, Bundle resultData) {
-            super.onReceiveResult(resultCode, resultData);
-            if (resultCode == 1 && resultData != null) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        pb = (ProgressBar) findViewById(R.id.progress);
-                        pb.setVisibility(View.VISIBLE);
-                        textView = (TextView) findViewById(R.id.progress_text);
-                        textView.setVisibility(View.VISIBLE);
-                    }
-                });
-
-            }
-            if (resultCode == 18 && resultData != null) {
-
-                final ArrayList<String> apps = resultData.getStringArrayList("apps");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        pb.setVisibility(View.GONE);
-                        textView.setVisibility(View.GONE);
-                        loadCarousel();
-                    }
-                });
-            }
-        }
-    }
+//currently not used
+//    private class MyResultReceiver extends ResultReceiver {
+//
+//        public MyResultReceiver(Handler handler) {
+//            super(handler);
+//        }
+//        @Override
+//        protected void onReceiveResult(int resultCode, Bundle resultData) {
+//            super.onReceiveResult(resultCode, resultData);
+//            if (resultCode == 1 && resultData != null) {
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mProgressBar = (ProgressBar) findViewById(R.id.progress);
+//                        mProgressBar.setVisibility(View.VISIBLE);
+//                        mProgressTextView = (TextView) findViewById(R.id.progress_text);
+//                        mProgressTextView.setVisibility(View.VISIBLE);
+//                    }
+//                });
+//
+//            }
+//            if (resultCode == 18 && resultData != null) {
+//
+//                final ArrayList<String> apps = resultData.getStringArrayList("apps");
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mProgressBar.setVisibility(View.GONE);
+//                        mProgressTextView.setVisibility(View.GONE);
+//                        loadCarousel();
+//                    }
+//                });
+//            }
+//        }
+//    }
 
     @Override
     public void onBackPressed() {
