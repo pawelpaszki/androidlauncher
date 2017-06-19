@@ -86,6 +86,7 @@ public class HomeActivity extends Activity {
     private int endScrollY;
     private Handler pinPageHandler;
     private int currentWidgetPage;
+    private boolean widgetControlsInvisible = true;
 
     ///////////
     private AppWidgetManager mAppWidgetManager;
@@ -123,6 +124,8 @@ public class HomeActivity extends Activity {
     };
     private WidgetFrame newWidgetPage;
     private ArrayList<Integer> widgetIds = new ArrayList<Integer>();
+    private int startScrollX;
+    private int endScrollX;
 
 
     @Override
@@ -226,15 +229,29 @@ public class HomeActivity extends Activity {
             if(((LinearLayout) scrollView.getChildAt(0)).getChildCount() > 1) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     startScrollY = scrollView.getScrollY();
-//                    Log.i("start scroll: ", String.valueOf(startScrollY));
+                    startScrollX = (int) event.getX();
+                    Log.i("start scroll x: ", String.valueOf(startScrollX));
+                    Log.i("start scroll: ", String.valueOf(startScrollY));
+                    return false;
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     int childCount = ((LinearLayout) scrollView.getChildAt(0)).getChildCount();
                     singleScrollHeight = scrollView.getChildAt(0).getHeight() / childCount;
                     endScrollY = scrollView.getScrollY();
-
-//                    Log.i("end scroll: ", String.valueOf(endScrollY));
-                    //Log.i("scrollview height", String.valueOf(scrollView.getChildAt(0).getHeight()));
-                    //Log.i("single scroll height y", String.valueOf(singleScrollHeight));
+                    endScrollX = (int) event.getX();
+                    Log.i("end scroll x: ", String.valueOf(endScrollX));
+                    Log.i("end scroll: ", String.valueOf(endScrollY));
+                    Log.i("y", String.valueOf(Math.abs(startScrollY-endScrollY)));
+                    Log.i("x", String.valueOf(endScrollX - startScrollX));
+                    if(Math.abs(startScrollY-endScrollY) < 20) {
+                        if(endScrollX - startScrollX > 100) {
+                            showWidgetControlButtonsOnSwipeRight();
+                        } else if (startScrollX - endScrollX > 100){
+                            onSwipeLeft();
+                        }
+                        return true;
+                    }
+//                    Log.i("scrollview height", String.valueOf(scrollView.getChildAt(0).getHeight()));
+//                    Log.i("single scroll height y", String.valueOf(singleScrollHeight));
 //                    Log.i("linear layout height", String.valueOf(topContainer.getHeight()));
 //                    Log.i("child count", String.valueOf(childCount));
 //                    Log.i("single page height", String.valueOf(topContainer.getChildAt(0).getHeight()));
@@ -272,20 +289,20 @@ public class HomeActivity extends Activity {
                     }
                 }
                 if(isWidgetPinned) {
-                    pinPage.setVisibility(View.VISIBLE);
-                    if(pinPageHandler != null) {
-                        pinPageHandler.removeCallbacksAndMessages(null);
-                    }
-                    pinPageHandler.postDelayed(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            if(isWidgetPinned) {
-                                pinPage.setVisibility(View.GONE);
-                            }
-                        }
-                    }, 3000);
+//                    pinPage.setVisibility(View.VISIBLE);
+//                    if(pinPageHandler != null) {
+//                        pinPageHandler.removeCallbacksAndMessages(null);
+//                    }
+//                    pinPageHandler.postDelayed(new Runnable()
+//                    {
+//                        @Override
+//                        public void run()
+//                        {
+//                            if(isWidgetPinned) {
+//                                pinPage.setVisibility(View.GONE);
+//                            }
+//                        }
+//                    }, 3000);
                     detector.onTouchEvent(event);
                 }
             } else {
@@ -353,7 +370,7 @@ public class HomeActivity extends Activity {
                                 public void run() {
                                     scrollView.smoothScrollTo(0, (scrollTo-1) * singleScrollHeight);
                                 }
-                            },100);
+                            },20);
                             ((WidgetFrame) widgetContainer.getChildAt(scrollTo-1)).getAppWidgetHost().startListening();
                             currentWidgetPage = scrollTo - 1;
                         } else {
@@ -362,9 +379,10 @@ public class HomeActivity extends Activity {
                                 public void run() {
                                     scrollView.smoothScrollTo(0, (scrollTo) * singleScrollHeight);
                                 }
-                            },100);
+                            },20);
                             ((WidgetFrame) widgetContainer.getChildAt(currentWidgetPage)).getAppWidgetHost().startListening();
                         }
+                        SharedPrefs.saveWidgetsIds(context,widgetIds);
                     }
                     if (widgetContainer.getChildCount() == 1) {
                         pinPage.setVisibility(View.GONE);
@@ -383,14 +401,12 @@ public class HomeActivity extends Activity {
                 isWidgetPinned = !isWidgetPinned;
                 if(isWidgetPinned) {
                     scrollView.setVerticalScrollBarEnabled(false);
-                    //scrollView.setHorizontalScrollBarEnabled(false);
                     addPage.setVisibility(View.GONE);
                     removePage.setVisibility(View.GONE);
                     pinPage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.unlock));
                     pinPage.setVisibility(View.GONE);
                 } else {
                     scrollView.setVerticalScrollBarEnabled(true);
-                    //scrollView.setHorizontalScrollBarEnabled(false);
                     if( widgetContainer.getChildCount() < 10) {
                         addPage.setVisibility(View.VISIBLE);
                     }
@@ -689,7 +705,7 @@ public class HomeActivity extends Activity {
                 if (Math.abs(diffX) > Math.abs(diffY)) {
                     if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                         if (diffX > 0) {
-
+                            showWidgetControlButtonsOnSwipeRight();
                         } else {
                             onSwipeLeft();
                         }
@@ -707,6 +723,27 @@ public class HomeActivity extends Activity {
             }
             return false;
         }
+    }
+
+    private void showWidgetControlButtonsOnSwipeRight() {
+        Log.i("widgetcontrolsinvisible", String.valueOf(widgetControlsInvisible));
+        if(widgetControlsInvisible) {
+            Log.i("widgetContainer", String.valueOf(widgetContainer.getChildCount()));
+            if(widgetContainer.getChildCount() > 0 &&  !isWidgetPinned) {
+                removePage.setVisibility(View.VISIBLE);
+            }
+            if(widgetContainer.getChildCount() > 1) {
+                pinPage.setVisibility(View.VISIBLE);
+            }
+            if(widgetContainer.getChildCount() < 10 && !isWidgetPinned) {
+                addPage.setVisibility(View.VISIBLE);
+            }
+        } else {
+            pinPage.setVisibility(View.GONE);
+            addPage.setVisibility(View.GONE);
+            removePage.setVisibility(View.GONE);
+        }
+        widgetControlsInvisible = !widgetControlsInvisible;
     }
 
     private void onSwipeLeft() {
