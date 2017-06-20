@@ -8,7 +8,7 @@
     android:background="#FFFFFFFF"
     android:theme="@style/Theme.AppCompat"
     android:id="@+id/set_web_icon_container"
-    tools:context=".LoadWebIconActivity"
+    tools:context=".GetWebImageActivity"
     android:weightSum="1"
     >
 

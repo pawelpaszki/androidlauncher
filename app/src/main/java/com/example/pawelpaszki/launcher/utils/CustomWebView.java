@@ -36,5 +36,4 @@ public class CustomWebView extends WebViewClient {
         return false;
     }
 
-
 }

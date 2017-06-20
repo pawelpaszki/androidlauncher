@@ -23,6 +23,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.pawelpaszki.launcher.utils.NetworkConnectivityChecker;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
 /**
@@ -260,5 +261,14 @@ public class SettingsActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(intent, "Select Wallpaper"));
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
     }
+
+    public void setWallpaperColor(View view) {
+        Intent i = new Intent(this, ColorPickActivity.class);
+        i.putExtra("option", "wallpaper");
+        startActivity(i);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+    }
+
+
 
 }

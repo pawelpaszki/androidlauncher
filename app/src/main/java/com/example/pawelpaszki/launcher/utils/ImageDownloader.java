@@ -1,11 +1,15 @@
 package com.example.pawelpaszki.launcher.utils;
 
+import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.pawelpaszki.launcher.R;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -17,11 +21,11 @@ import java.net.URL;
 
 public class ImageDownloader extends AsyncTask<String,Void,Bitmap>{
 
-    private Context context;
-    private String appLabel;
-    public ImageDownloader(Context context, String appLabel) {
-        this.context = context;
-        this.appLabel = appLabel;
+    private Context mContext;
+    private String mAppLabel;
+    public ImageDownloader(Context mContext, String mAppLabel) {
+        this.mContext = mContext;
+        this.mAppLabel = mAppLabel;
     }
 
     @Override
@@ -42,10 +46,20 @@ public class ImageDownloader extends AsyncTask<String,Void,Bitmap>{
 
     protected void onPostExecute(Bitmap result) {
         Log.i("result size", String.valueOf(result.getHeight()));
-        Log.i("result name", appLabel);
-        IconLoader.saveIcon(context, result, appLabel);
-        SharedPrefs.setHomeReloadRequired(true, context);
-        SharedPrefs.setNonDefaultIconsCount(SharedPrefs.getNonDefaultIconsCount(context) + 1,context);
+        Log.i("result name", mAppLabel);
+        if(mAppLabel.equals("")) {
+            WallpaperManager myWallpaperManager
+                    = WallpaperManager.getInstance(mContext);
+            try {
+                myWallpaperManager.setBitmap(result);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            IconLoader.saveIcon(mContext, result, mAppLabel);
+            SharedPrefs.setHomeReloadRequired(true, mContext);
+            SharedPrefs.setNonDefaultIconsCount(SharedPrefs.getNonDefaultIconsCount(mContext) + 1,mContext);
+        }
     }
 
 }

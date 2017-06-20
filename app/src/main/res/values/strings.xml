@@ -36,11 +36,17 @@
     <string name="set_icons">Set Icons using Gallery</string>
     <string name="set_icons_desc">Change icons of applications by using your own images</string>
     <string name="set_icons_web">Set Icons using Online Web</string>
-    <string name="set_icons_desc_web">Change icons of applications by using images found in the browser</string>
+    <string name="set_icons_desc_web">Change icons of applications using online icons</string>
     <string name="toolbar_select_apps">Select Visible Apps</string>
     <string name="toolbar_set_icons">Set Apps Icons</string>
+    <string name="set_solid_color_wallpaper">Set Wallpaper as a solid color</string>
+    <string name="set_solid_color_wallpaper_desc">Pick a color to be used as your wallpaper</string>
     <string name="uninstall">Uninstall</string>
     <string name="cancel">Cancel</string>
+    <string name="rgb_red">RED:</string>
+    <string name="rgb_green">GREEN:</string>
+    <string name="rgb_blue">BLUE:</string>
+    <string name="rgb_alpha">ALPHA:</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>
         <item>When possible</item>

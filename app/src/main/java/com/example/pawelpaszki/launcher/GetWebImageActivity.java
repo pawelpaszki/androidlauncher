@@ -21,7 +21,7 @@ import android.widget.Toast;
 import com.example.pawelpaszki.launcher.utils.CustomWebView;
 import com.example.pawelpaszki.launcher.utils.ImageDownloader;
 
-public class LoadWebIconActivity extends AppCompatActivity {
+public class GetWebImageActivity extends AppCompatActivity {
 
     private WebView mWebView;
     private String mAppLabel;
@@ -39,7 +39,12 @@ public class LoadWebIconActivity extends AppCompatActivity {
         View root = someView.getRootView();
         root.setBackgroundColor(0xC5CAE9);
         Toolbar toolbar = (Toolbar) findViewById(R.id.select_web_icon_toolbar);
-        toolbar.setTitle("Set Web Icon");
+        if(!mAppLabel.equals("")) {
+            toolbar.setTitle("Set Web Icon");
+        } else {
+            toolbar.setTitle("Set Web Wallpaper");
+        }
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mWebView = (WebView) findViewById(R.id.load_icon_web_view);
@@ -55,6 +60,8 @@ public class LoadWebIconActivity extends AppCompatActivity {
         layoutParams.setMargins(0, actionBarHeight, 0, 0);
 
         mWebView.setLayoutParams(layoutParams);
+        mWebView.getSettings().setLoadsImagesAutomatically(true);
+        mWebView.getSettings().setDomStorageEnabled(true);
         mWebView.setWebViewClient(new CustomWebView());
         mWebView.loadUrl("https://images.google.com/");
         mWebView.setOnKeyListener(new View.OnKeyListener()
@@ -86,7 +93,7 @@ public class LoadWebIconActivity extends AppCompatActivity {
                 if(mWebView.getHitTestResult().getType() == 5) {
                     Log.i("extra", mWebView.getHitTestResult().getExtra());
                         try {
-                            new ImageDownloader(LoadWebIconActivity.this, mAppLabel).execute(mWebView.getHitTestResult().getExtra());
+                            new ImageDownloader(GetWebImageActivity.this, mAppLabel).execute(mWebView.getHitTestResult().getExtra());
                             final Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {
                                 @Override
@@ -94,14 +101,11 @@ public class LoadWebIconActivity extends AppCompatActivity {
                                     goBack();
                                 }
                             }, 500);
-
-
-
                         } catch (Exception e) {
                             e.getStackTrace();
                         }
                 } else if (mWebView.getHitTestResult().getType() == 8) {
-                    Toast.makeText(LoadWebIconActivity.this, "Can't select this image. Please try different one",
+                    Toast.makeText(GetWebImageActivity.this, "Can't select this image. Please try different one",
                             Toast.LENGTH_LONG).show();
                 }
                 return false;
@@ -120,13 +124,17 @@ public class LoadWebIconActivity extends AppCompatActivity {
         if (menuItem.getItemId() == android.R.id.home) {
             goBack();
         }
-        return super.onOptionsItemSelected(menuItem);
+        return true;//super.onOptionsItemSelected(menuItem);
     }
 
     private void goBack() {
-        Intent intent = new Intent(LoadWebIconActivity.this,ChangeIconsActivity.class);
-
-        intent.putExtra("option", "web");
+        Intent intent;
+        if(!mAppLabel.equals("")) {
+            intent = new Intent(GetWebImageActivity.this,ChangeIconsActivity.class);
+            intent.putExtra("option", "web");
+        } else {
+            intent = new Intent(GetWebImageActivity.this,SettingsActivity.class);
+        }
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);

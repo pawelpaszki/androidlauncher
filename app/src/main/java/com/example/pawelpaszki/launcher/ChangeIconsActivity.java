@@ -153,7 +153,7 @@ public class ChangeIconsActivity extends AppCompatActivity {
                             startActivityForResult(i, RESULT_LOAD_IMAGE);
                         } else {
                             if(NetworkConnectivityChecker.isNetworkAvailable(ChangeIconsActivity.this)) {
-                                Intent i = new Intent(ChangeIconsActivity.this, LoadWebIconActivity.class);
+                                Intent i = new Intent(ChangeIconsActivity.this, GetWebImageActivity.class);
                                 i.putExtra("label",mApps.get(position).getmLabel());
                                 i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                                 startActivity(i);
