@@ -100,13 +100,6 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 SharedPrefs.setNumberOfColumns(Integer.parseInt(parent.getItemAtPosition(position).toString()), SettingsActivity.this);
-                if(Integer.parseInt(parent.getItemAtPosition(position).toString()) >=5) {
-                    mShowAppNamesCheckBox.setChecked(false);
-                    SharedPrefs.setShowAppNames(false, SettingsActivity.this);
-                    mShowAppNamesCheckBox.setEnabled(false);
-                } else {
-                    mShowAppNamesCheckBox.setEnabled(true);
-                }
             }
 
             @Override

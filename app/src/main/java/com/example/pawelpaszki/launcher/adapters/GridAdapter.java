@@ -32,6 +32,8 @@ import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
 import java.util.List;
 
+import static com.example.pawelpaszki.launcher.utils.SharedPrefs.getShowAppNames;
+
 /**
  * Created by PawelPaszki on 03/05/2017.
  * Last edited on 19/06/2017
@@ -98,17 +100,19 @@ public class GridAdapter extends BaseAdapter{
         margins.leftMargin = noOfCols;
         margins.rightMargin = noOfCols;
         String text = (String) mApps.get(position).getmLabel();
-        if(noOfCols >= 5 || !SharedPrefs.getShowAppNames(mContext)) {
-            textView.setVisibility(View.GONE);
-            imageView.setLayoutParams(margins);
-            textView.setLayoutParams(margins);
-        } else {
-            if(noOfCols <= 3) {
+//        if(noOfCols >= 5 || !SharedPrefs.getShowAppNames(mContext)) {
+//            textView.setVisibility(View.GONE);
+//            imageView.setLayoutParams(margins);
+//        } else {
+//            if(noOfCols <= 3) {
+//                imageView.setLayoutParams(margins);
+//            }
+//
+//            textView.setText(text);
+//        }
                 imageView.setLayoutParams(margins);
-            }
 
             textView.setText(text);
-        }
         TextView messagesCount = (TextView) v.findViewById(R.id.notifications);
         if(text.equalsIgnoreCase("Messaging")) {
             v.setTag("Messaging");
@@ -160,28 +164,38 @@ public class GridAdapter extends BaseAdapter{
 //        Bitmap bitmap = BitmapFactory.decodeResource(v.getResources(), R.mipmap.imageviewbg);
         //imageView.setImageDrawable(mApps.get(position).getmIcon());
         float fontSize = 11f;
+        float ratio = 0f;
+        switch(noOfCols) {
+            case 1:
+                ratio = 3f;
+                fontSize = 24f;
+                break;
+            case 2:
+                ratio = 1.6f;
+                fontSize = 18f;
+                break;
+            case 3:
+                ratio = 1.3f;
+                fontSize = 14f;
+                break;
+            case 4:
+                break;
+            default:
+                fontSize = 16f - (float)noOfCols * 1.2f;
+                break;
+        }
         if(noOfCols <=3) {
-            float ratio = 0f;
-            switch(noOfCols) {
-                case 1:
-                    ratio = 3f;
-                    fontSize = 24f;
-                    break;
-                case 2:
-                    ratio = 1.6f;
-                    fontSize = 18f;
-                    break;
-                case 3:
-                    ratio = 1.3f;
-                    fontSize = 14f;
-                    break;
-            }
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,fontSize);
-            messagesCount.setTextSize(TypedValue.COMPLEX_UNIT_SP,fontSize);
             imageView.setImageDrawable(new BitmapDrawable(v.getResources(), Bitmap.createScaledBitmap(icon, (int) (icon.getWidth() * ratio), (int) (icon.getHeight() * ratio), true)));
         } else {
             imageView.setImageDrawable(new BitmapDrawable(v.getResources(), icon));
         }
+        if(!getShowAppNames(mContext)) {
+            textView.setVisibility(View.GONE);
+        } else {
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,fontSize);
+        }
+        messagesCount.setTextSize(TypedValue.COMPLEX_UNIT_SP,fontSize);
+
 
 
 
