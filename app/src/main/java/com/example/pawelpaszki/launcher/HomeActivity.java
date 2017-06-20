@@ -224,6 +224,7 @@ public class HomeActivity extends Activity {
         }
         mContext = this;
 
+        mIsWidgetPinned = SharedPrefs.getWidgetPinned(mContext);
 
         /////////////// load/ process icons //////////////
         //startIntentService();
@@ -398,6 +399,7 @@ public class HomeActivity extends Activity {
             @Override
             public void onClick(View v) {
                 mIsWidgetPinned = !mIsWidgetPinned;
+                SharedPrefs.setWidgetPinned(mIsWidgetPinned, mContext);
                 if(mIsWidgetPinned) {
                     mWidgetScrollView.setVerticalScrollBarEnabled(false);
                     mAddPage.setVisibility(View.GONE);

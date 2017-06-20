@@ -209,4 +209,18 @@ public class SharedPrefs {
         String key = "currentWidgetPage";
         return prefs.getInt(key, 0);
     }
+
+    public static void setWidgetPinned(boolean isWidgetPinned, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "widgetPinned";
+        editor.putBoolean(key, isWidgetPinned);
+        editor.apply();
+    }
+
+    public static boolean getWidgetPinned(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "widgetPinned";
+        return prefs.getBoolean(key, false);
+    }
 }
