@@ -14,7 +14,14 @@ public class MissedCallsCountRetriever {
         if (c != null) {
             c.moveToFirst();
         }
-        return c != null ? c.getCount() : 0;
+        int missedCallsCount = 0;
+        if (c != null) {
+            missedCallsCount = c.getCount();
+        }
+        if (c != null) {
+            c.close();
+        }
+        return missedCallsCount;
     }
 
     public static int getUnreadMessagesCount(Context context) {

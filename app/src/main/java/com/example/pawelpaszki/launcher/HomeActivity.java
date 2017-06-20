@@ -195,7 +195,9 @@ public class HomeActivity extends Activity {
             getApplicationContext().getContentResolver().unregisterContentObserver(missedCallObserver);
         }
         if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() > 0) {
-            ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().stopListening();
+            for(int i = 0; i < ((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount(); i++) {
+                ((WidgetFrame) mWidgetContainer.getChildAt(i)).getAppWidgetHost().stopListening();
+            }
         }
         super.onStop();
 
@@ -486,7 +488,6 @@ public class HomeActivity extends Activity {
             newWidgetPage.setTag(new Random().nextInt(Integer.MAX_VALUE));
             newWidgetPage.setAppWidgetHost(new AppWidgetHost(mContext, Integer.parseInt(newWidgetPage.getTag().toString())));
 
-            //newWidgetPage.getAppWidgetHost().startListening();
             int appWidgetId = ids.get(i);
             AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
             WidgetInfo launcherInfo = new WidgetInfo(appWidgetId);
