@@ -1,6 +1,7 @@
 package com.example.pawelpaszki.launcher.layouts;
 
 import android.appwidget.AppWidgetHostView;
+import android.widget.FrameLayout;
 
 /**
  * Created by PawelPaszki on 16/06/2017.

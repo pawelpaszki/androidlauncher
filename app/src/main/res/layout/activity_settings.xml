@@ -230,7 +230,7 @@
                 android:textSize="16sp"
                 android:textColor="#1A237E"
                 android:text="@string/set_icons_web"
-                android:onClick="set_icons"/>
+                android:onClick="set_icons_web"/>
             <TextView
                 android:id="@+id/set_icons_desc_web"
                 android:layout_width="wrap_content"

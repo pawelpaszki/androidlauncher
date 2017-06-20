@@ -270,7 +270,7 @@ public class HomeActivity extends Activity {
                             public void run() {
                                 mWidgetScrollView.smoothScrollTo(0, mStartScrollY * mSingleScrollHeight);
                             }
-                        },100);
+                        },10);
                         ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
                         return true;
                     }

@@ -5,7 +5,7 @@
     android:id="@+id/widget_page"
     android:background="#00ffffff"
     android:padding="5dp"
-    layout_gravity = "center"
+    android:layout_gravity="center"
     >
 
 </com.example.pawelpaszki.launcher.layouts.WidgetFrame>

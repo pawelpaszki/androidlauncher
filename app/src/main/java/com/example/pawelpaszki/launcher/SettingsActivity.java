@@ -60,8 +60,6 @@ public class SettingsActivity extends AppCompatActivity {
         layoutParams.setMargins(0, actionBarHeight, 0, 0);
 
         settings_scroll.setLayoutParams(layoutParams);
-
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Settings");
         setSupportActionBar(toolbar);

@@ -96,7 +96,6 @@ public class AppsListActivity extends Activity {
             mSmsReceiver = null;
         }
         super.onStop();
-
     }
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,10 +154,7 @@ public class AppsListActivity extends Activity {
             intent.setData(Uri.parse("package:" + mHighlightedViewTag));
             intent.putExtra(Intent.EXTRA_RETURN_RESULT, true);
             startActivityForResult(intent, UNINSTALL_REQUEST_CODE);
-
-
         }
-
     }
 
         @Override
@@ -178,7 +174,8 @@ public class AppsListActivity extends Activity {
                     unHighlightView();
                 }
             } catch (Exception e) {
-
+                Toast.makeText(this,"This application cannot be uninstalled" ,
+                        Toast.LENGTH_LONG).show();
             }
         }
 
