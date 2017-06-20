@@ -196,5 +196,17 @@ public class SharedPrefs {
         return widgetsIds;
     }
 
+    public static void setCurrentWidgetPage(Context context, int pageNumber) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "currentWidgetPage";
+        editor.putInt(key, pageNumber);
+        editor.apply();
+    }
 
+    public static int getCurrentWidgetPage(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "currentWidgetPage";
+        return prefs.getInt(key, 0);
+    }
 }

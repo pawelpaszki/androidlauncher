@@ -28,6 +28,7 @@ import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -50,6 +51,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static com.example.pawelpaszki.launcher.utils.SharedPrefs.getCurrentWidgetPage;
 
 /**
  * Last Edited by PawelPaszki on 19/06/2017.
@@ -160,10 +163,27 @@ public class HomeActivity extends Activity {
             }
         }
         if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() > 0) {
-            ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
+            mCurrentWidgetPage = SharedPrefs.getCurrentWidgetPage(mContext);
+            mWidgetScrollView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    mSingleScrollHeight = mWidgetScrollView.getHeight();
+                    mWidgetScrollView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    Log.i("mSingleScrollHeight", String.valueOf(mSingleScrollHeight));
+                    mWidgetScrollView.postDelayed(new Runnable() {
+                        public void run() {
+                            mWidgetScrollView.smoothScrollTo(0, mCurrentWidgetPage * mSingleScrollHeight);
+                        }
+                    },10);
+                    ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
+                }
+            });
+
         }
         super.onStart();
     }
+
+
 
     @Override
     protected void onStop() {
@@ -272,6 +292,7 @@ public class HomeActivity extends Activity {
                             }
                         },10);
                         ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
+                        SharedPrefs.setCurrentWidgetPage(mContext,mCurrentWidgetPage);
                         return true;
                     }
 
@@ -347,18 +368,19 @@ public class HomeActivity extends Activity {
                                 public void run() {
                                     mWidgetScrollView.smoothScrollTo(0, (scrollTo-1) * mSingleScrollHeight);
                                 }
-                            },20);
+                            },10);
                             ((WidgetFrame) mWidgetContainer.getChildAt(scrollTo-1)).getAppWidgetHost().startListening();
                             mCurrentWidgetPage = scrollTo - 1;
                         } else {
                             mCurrentWidgetPage = scrollTo;
                             mWidgetScrollView.postDelayed(new Runnable() {
                                 public void run() {
-                                    mWidgetScrollView.smoothScrollTo(0, (scrollTo) * mSingleScrollHeight);
+                                    mWidgetScrollView.smoothScrollTo(0, scrollTo * mSingleScrollHeight);
                                 }
-                            },20);
+                            },10);
                             ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
                         }
+                        SharedPrefs.setCurrentWidgetPage(mContext,mCurrentWidgetPage);
                         SharedPrefs.saveWidgetsIds(mContext,widgetIds);
                     }
                     if (mWidgetContainer.getChildCount() == 1) {
@@ -462,7 +484,7 @@ public class HomeActivity extends Activity {
             newWidgetPage.setTag(new Random().nextInt(Integer.MAX_VALUE));
             newWidgetPage.setAppWidgetHost(new AppWidgetHost(mContext, Integer.parseInt(newWidgetPage.getTag().toString())));
 
-            newWidgetPage.getAppWidgetHost().startListening();
+            //newWidgetPage.getAppWidgetHost().startListening();
             int appWidgetId = ids.get(i);
             AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
             WidgetInfo launcherInfo = new WidgetInfo(appWidgetId);
@@ -472,7 +494,16 @@ public class HomeActivity extends Activity {
             newWidgetPage.setWidgetView(launcherInfo);
             mWidgetContainer.addView(newWidgetPage);
         }
-        mCurrentWidgetPage = 0;
+        mCurrentWidgetPage = getCurrentWidgetPage(mContext);
+        if(mCurrentWidgetPage != 0) {
+            mSingleScrollHeight = mWidgetScrollView.getChildAt(0).getHeight();
+            mWidgetScrollView.postDelayed(new Runnable() {
+                public void run() {
+                    mWidgetScrollView.smoothScrollTo(0, mCurrentWidgetPage * mSingleScrollHeight);
+                }
+            },10);
+        }
+        ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
     }
 
     private void completeAddAppWidget(Intent data) {
