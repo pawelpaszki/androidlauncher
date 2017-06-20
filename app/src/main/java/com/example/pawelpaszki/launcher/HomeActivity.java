@@ -490,10 +490,22 @@ public class HomeActivity extends Activity {
 
             int appWidgetId = ids.get(i);
             AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
+
             WidgetInfo launcherInfo = new WidgetInfo(appWidgetId);
             launcherInfo.hostView = newWidgetPage.getAppWidgetHost().createView(this, appWidgetId, appWidgetInfo);
             launcherInfo.hostView.setAppWidget(appWidgetId, appWidgetInfo);
             launcherInfo.hostView.setTag(launcherInfo);
+//
+//            int height = appWidgetInfo.minHeight;
+//            int width = appWidgetInfo.minWidth;
+//            final float scale = mContext.getResources().getDisplayMetrics().density;
+//            int dpHeight = (int) (height * scale + 0.5f);
+//            int dpWidth = (int) (width * scale + 0.5f);
+//            Log.i("height", height + ":" + dpHeight);
+//            Log.i("width", width + ":" + dpWidth);
+//            launcherInfo.hostView.setLayoutParams(new FrameLayout.LayoutParams(dpWidth,dpHeight));
+
+
             newWidgetPage.setWidgetView(launcherInfo);
             mWidgetContainer.addView(newWidgetPage);
         }
@@ -524,6 +536,15 @@ public class HomeActivity extends Activity {
         widgetIds.add(appWidgetId);
         SharedPrefs.saveWidgetsIds(mContext, widgetIds);
         mWidgetContainer.addView(newWidgetPage);
+        mWidgetScrollView.post(new Runnable() {
+            public void run() {
+                mWidgetScrollView.smoothScrollTo(0, mWidgetContainer.getChildCount()  * mSingleScrollHeight);
+            }
+        });
+
+        mCurrentWidgetPage = mWidgetContainer.getChildCount() - 1;
+
+        SharedPrefs.setCurrentWidgetPage(mContext, mCurrentWidgetPage);
         if(mWidgetContainer.getChildCount() == 10) {
             mAddPage.setVisibility(View.GONE);
         }
