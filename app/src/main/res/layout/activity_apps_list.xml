@@ -25,7 +25,7 @@
             android:textStyle="bold"
             android:padding="6dp"
             android:layout_margin="3dp"
-            android:onClick="mUninstallPackage">
+            android:onClick="uninstallPackage">
         </Button>
         <Button
             android:layout_height="wrap_content"

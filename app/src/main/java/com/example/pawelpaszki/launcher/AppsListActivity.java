@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.GestureDetectorCompat;
@@ -22,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.pawelpaszki.launcher.adapters.GridAdapter;
 import com.example.pawelpaszki.launcher.utils.AppsSorter;
@@ -141,22 +143,43 @@ public class AppsListActivity extends Activity {
         unHighlightView();
     }
 
+    public void uninstallPackage(View view) {
+        if(mHighlightedViewTag.equals("Messaging") || mHighlightedViewTag.equals("Phone")) {
+            Toast.makeText(this,"This application cannot be uninstalled" ,
+                    Toast.LENGTH_LONG).show();
+            hideUninstallView(view);
+        } else {
+            int UNINSTALL_REQUEST_CODE = 1;
+            Log.i("package name", mHighlightedViewTag);
+            Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
+            intent.setData(Uri.parse("package:" + mHighlightedViewTag));
+            intent.putExtra(Intent.EXTRA_RETURN_RESULT, true);
+            startActivityForResult(intent, UNINSTALL_REQUEST_CODE);
+
+
+        }
+
+    }
+
         @Override
         protected void onActivityResult(int requestCode, int resultCode, Intent data) {
             super.onActivityResult(requestCode, resultCode, data);
-            if (requestCode == 1) {
-                if (resultCode == RESULT_OK) {
-                    mUninstalled = true;
-                    hideUninstallView(null);
-                } else if (resultCode == RESULT_CANCELED) {
-                    hideUninstallView(null);
-                } else if (resultCode == RESULT_FIRST_USER) {
-                    Log.d("TAG", "onActivityResult: failed to (un)install");
+            try {
+                if (requestCode == 1) {
+                    if (resultCode == RESULT_OK) {
+                        mUninstalled = true;
+                        hideUninstallView(null);
+                    } else if (resultCode == RESULT_CANCELED) {
+                        hideUninstallView(null);
+                    } else if (resultCode == RESULT_FIRST_USER) {
+                        Log.d("TAG", "onActivityResult: failed to (un)install");
+                    }
+                } else {
+                    unHighlightView();
                 }
-            } else {
-                unHighlightView();
-            }
+            } catch (Exception e) {
 
+            }
         }
 
     private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -270,44 +293,6 @@ public class AppsListActivity extends Activity {
             recreate();
         }
     }
-
-//    public void toggleMenu(View view) {
-//        Toast.makeText(this,String.valueOf(SharedPrefs.getNumberOfColumns(this)) ,
-//                Toast.LENGTH_LONG).show();
-//        this.menuVisible = !menuVisible;
-//        menu_options = (RelativeLayout) findViewById(R.id.options);
-//        Button toggle_menu = (Button) findViewById(R.id.arrow);
-//        sort_az = (Button) findViewById(R.id.sort_az);
-//        sort_most_used = (Button) findViewById(R.id.sort_most_used);
-//        settings = (Button) findViewById(R.id.settings);
-//        if(!this.menuVisible) {
-//
-//            slideOutToRight(this, settings);
-//
-//            slideOutToRight(this, sort_az);
-//
-//            slideOutToRight(this, sort_most_used);
-//            handler.postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    menu_options.setBackgroundColor(android.graphics.Color.argb(0, 255, 255, 255));
-//                    settings.setVisibility(View.GONE);
-//                    sort_az.setVisibility(View.GONE);
-//                    sort_most_used.setVisibility(View.GONE);
-//                }
-//            }, 300);
-//            toggle_menu.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.left_arrow, 0, 0, 0);
-//        } else {
-//            menu_options.setBackgroundColor(android.graphics.Color.argb(102, 255, 255, 255));
-//            settings.setVisibility(View.VISIBLE);
-//            slideInFromRight(this, settings);
-//            sort_az.setVisibility(View.VISIBLE);
-//            slideInFromRight(this, sort_az);
-//            sort_most_used.setVisibility(View.VISIBLE);
-//            slideInFromRight(this, sort_most_used);
-//            toggle_menu.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.right_arrow, 0, 0, 0);
-//        }
-//    }
 
     @Override
     public void onBackPressed() {
