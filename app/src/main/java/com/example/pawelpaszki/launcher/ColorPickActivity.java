@@ -111,6 +111,9 @@ public class ColorPickActivity extends AppCompatActivity {
         });
 
         SeekBar mAlphaSeekBar = (SeekBar) findViewById(R.id.aSeekBar);
+        mAlphaSeekBar.setProgress(mAlphaSeekBar.getMax());
+        mAlphaValue = mAlphaSeekBar.getMax();
+        setImageViewColor();
         mAlphaSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
         {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)

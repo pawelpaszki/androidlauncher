@@ -147,17 +147,22 @@ public class HomeActivity extends Activity {
         if(mDockLayout != null) {
             for(int i = 0; i < mDockLayout.getChildCount(); i++) {
                 if(mDockLayout.getChildAt(i).getTag().toString().equals("Messaging")) {
-                    if(! ((TextView)((FrameLayout)((LinearLayout)(mDockLayout.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText().equals("") && ! (((TextView)((FrameLayout)((LinearLayout)(mDockLayout.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText()== null)) {
-                        if( Integer.parseInt(((TextView)((FrameLayout)((LinearLayout)(mDockLayout.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText().toString()) != unreadMessages) {
-                            final Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mDockLayout.removeAllViews();
-                                    loadCarousel();
-                                }
-                            }, 500);
-                        }
+                    int unreadMsgCount = 0;
+                    String unreadMessagesCount = ((TextView)((FrameLayout)((LinearLayout)(mDockLayout.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText().toString();
+                    try {
+                        unreadMsgCount = Integer.parseInt(unreadMessagesCount);
+                    } catch (Exception e) {
+
+                    }
+                    if( unreadMsgCount != unreadMessages) {
+                        final Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mDockLayout.removeAllViews();
+                                loadCarousel();
+                            }
+                        }, 50);
                     }
                 }
             }
