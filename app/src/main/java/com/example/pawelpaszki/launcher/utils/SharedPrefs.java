@@ -223,4 +223,18 @@ public class SharedPrefs {
         String key = "widgetPinned";
         return prefs.getBoolean(key, false);
     }
+
+    public static void setNumberOfApps(int value, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "noOfApps";
+        editor.putInt(key, value);
+        editor.apply();
+    }
+
+    public static int getNumberOfApps(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "noOfApps";
+        return prefs.getInt(key, 0);
+    }
 }

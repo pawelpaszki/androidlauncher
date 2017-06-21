@@ -61,6 +61,20 @@ public class AppsListActivity extends Activity {
             }
         }
     };
+
+    private BroadcastReceiver mPackageUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i("message received", "msg");
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    recreate();
+                }
+            }, 50);
+        }
+    };
     private boolean mUninstalled;
 
     @Override
@@ -85,16 +99,42 @@ public class AppsListActivity extends Activity {
         };
         registerReceiver(mSmsReceiver, new IntentFilter(
                 "android.provider.Telephony.SMS_RECEIVED"));
+
+        mPackageUpdateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i("message received", "msg");
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        recreate();
+                    }
+                }, 50);
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        registerReceiver(mPackageUpdateReceiver, intentFilter);
         SharedPrefs.setHomeReloadRequired(true,this);
+        for(int i = 0; i < mGridView.getChildCount(); i++) {
+            if(mGridView.getChildAt(i).getTag().equals("Messaging")) {
+                mAppLabelTextView = (TextView) ((FrameLayout) ((LinearLayout) mGridView.getChildAt(i)).getChildAt(0)).getChildAt(1);
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAppLabelTextView.setText(String.valueOf(MissedCallsCountRetriever.getUnreadMessagesCount(AppsListActivity.this)));
+                    }
+                }, 500);
+            }
+        }
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        if(mSmsReceiver != null) {
-            unregisterReceiver(mSmsReceiver);
-            mSmsReceiver = null;
-        }
         super.onStop();
     }
 
@@ -135,6 +175,25 @@ public class AppsListActivity extends Activity {
     public boolean onTouchEvent(MotionEvent event) {
         detector.onTouchEvent(event);
         return super.onTouchEvent(event);
+    }
+
+    @Override
+    protected void onResume() {
+        if(!sameNoOfAllApps()) {
+            recreate();
+        }
+        super.onResume();
+    }
+
+    private boolean sameNoOfAllApps() {
+        Intent i = new Intent(Intent.ACTION_MAIN, null);
+        i.addCategory(Intent.CATEGORY_LAUNCHER);
+        List<ResolveInfo> availableActivities = mPackageManager.queryIntentActivities(i, 0);
+        int numberOfApps = 0;
+        for(ResolveInfo ignored :availableActivities){
+            numberOfApps++;
+        }
+        return SharedPrefs.getNumberOfApps(this) == numberOfApps;
     }
 
     public void hideUninstallView(View view) {
@@ -227,6 +286,14 @@ public class AppsListActivity extends Activity {
 
     @Override
     protected void onPause() {
+        if(mPackageUpdateReceiver != null) {
+            unregisterReceiver(mPackageUpdateReceiver);
+            mPackageUpdateReceiver = null;
+        }
+        if(mSmsReceiver != null) {
+            unregisterReceiver(mSmsReceiver);
+            mSmsReceiver = null;
+        }
         super.onPause();
     }
 
@@ -236,7 +303,7 @@ public class AppsListActivity extends Activity {
 
         Intent i = new Intent(Intent.ACTION_MAIN, null);
         i.addCategory(Intent.CATEGORY_LAUNCHER);
-
+        int numberOfApps = 0;
         List<ResolveInfo> availableActivities = mPackageManager.queryIntentActivities(i, 0);
         for(ResolveInfo ri:availableActivities){
             AppDetail app = new AppDetail();
@@ -253,9 +320,10 @@ public class AppsListActivity extends Activity {
                 mVisibleCount++;
                 Log.i("app starts", String.valueOf(ri.loadLabel(mPackageManager)) + " " + String.valueOf(ri.activityInfo.packageName) + " "+ SharedPrefs.getNumberOfActivityStarts(app.getmLabel().toString(), this));
             }
-
+            numberOfApps++;
             //Log.i("name", String.valueOf(ri.loadLabel(mPackageManager)) + " " + SharedPrefs.getNumberOfActivityStarts(app.getmLabel().toString(), this));
         }
+        SharedPrefs.setNumberOfApps(numberOfApps, this);
         //Log.i("sorting method", SharedPrefs.getSortingMethod(this));
         mApps = AppsSorter.sortApps(this, mApps, SharedPrefs.getSortingMethod(this), false);
     }

@@ -88,7 +88,22 @@ public class HomeActivity extends Activity {
     private static final int REQUEST_PICK_APPWIDGET   = 9;
     ///////////
 
-    private BroadcastReceiver smsReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mPackageUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i("message received", "msg");
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mDockLayout.removeAllViews();
+                    loadCarousel();
+                }
+            }, 50);
+        }
+    };
+
+    private BroadcastReceiver mSmsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i("message received", "msg");
@@ -100,9 +115,10 @@ public class HomeActivity extends Activity {
                     loadCarousel();
                 }
             }, 500);
-
         }
     };
+
+
     private ContentObserver missedCallObserver = new ContentObserver(null) {
         @Override
         public void onChange(boolean selfChange) {
@@ -124,7 +140,7 @@ public class HomeActivity extends Activity {
 
     @Override
     protected void onStart() {
-        smsReceiver = new BroadcastReceiver() {
+        mSmsReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.i("message received", "msg");
@@ -139,10 +155,30 @@ public class HomeActivity extends Activity {
 
             }
         };
-        registerReceiver(smsReceiver, new IntentFilter(
+        registerReceiver(mSmsReceiver, new IntentFilter(
                 "android.provider.Telephony.SMS_RECEIVED"));
         getApplicationContext().getContentResolver().registerContentObserver(CallLog.Calls.CONTENT_URI, true, missedCallObserver);
         Log.i("on start", "on start");
+
+        mPackageUpdateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i("message received", "msg");
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mDockLayout.removeAllViews();
+                        loadCarousel();
+                    }
+                }, 50);
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        registerReceiver(mPackageUpdateReceiver, intentFilter);
+
         int unreadMessages = MissedCallsCountRetriever.getUnreadMessagesCount(mContext);
         if(mDockLayout != null) {
             for(int i = 0; i < mDockLayout.getChildCount(); i++) {
@@ -151,7 +187,7 @@ public class HomeActivity extends Activity {
                     String unreadMessagesCount = ((TextView)((FrameLayout)((LinearLayout)(mDockLayout.getChildAt(i))).getChildAt(0)).getChildAt(1)).getText().toString();
                     try {
                         unreadMsgCount = Integer.parseInt(unreadMessagesCount);
-                    } catch (Exception e) {
+                    } catch (Exception ignored) {
 
                     }
                     if( unreadMsgCount != unreadMessages) {
@@ -186,26 +222,6 @@ public class HomeActivity extends Activity {
 
         }
         super.onStart();
-    }
-
-
-
-    @Override
-    protected void onStop() {
-        if(smsReceiver != null) {
-            unregisterReceiver(smsReceiver);
-            smsReceiver = null;
-        }
-        if(missedCallObserver != null) {
-            getApplicationContext().getContentResolver().unregisterContentObserver(missedCallObserver);
-        }
-        if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() > 0) {
-            for(int i = 0; i < ((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount(); i++) {
-                ((WidgetFrame) mWidgetContainer.getChildAt(i)).getAppWidgetHost().stopListening();
-            }
-        }
-        super.onStop();
-
     }
 
     @Override
@@ -608,6 +624,7 @@ public class HomeActivity extends Activity {
         mTopContainer.setLayoutParams(topContainerParams);
 
         List<ResolveInfo> availableActivities = mPackageManager.queryIntentActivities(i, 0);
+        int numberOfApps = 0;
         for(ResolveInfo ri:availableActivities){
             AppDetail app = new AppDetail();
             app.setmLabel(ri.loadLabel(mPackageManager));
@@ -618,7 +635,9 @@ public class HomeActivity extends Activity {
                 dockerApps.add(app);
                 //Log.i("no of runs", "label: " + app.getmLabel() + ": " + " package name: " + String.valueOf(ri.activityInfo.packageName) + String.valueOf(app.getmNumberOfStarts()));
             }
+            numberOfApps++;
         }
+        SharedPrefs.setNumberOfApps(numberOfApps, mContext);
         AppsSorter.sortApps(this, dockerApps, "most used", true);
         int j;
         for(j = 0; j < dockerApps.size(); j++) {
@@ -779,6 +798,18 @@ public class HomeActivity extends Activity {
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
     }
 
+
+    private boolean sameNoOfAllApps() {
+        Intent i = new Intent(Intent.ACTION_MAIN, null);
+        i.addCategory(Intent.CATEGORY_LAUNCHER);
+        List<ResolveInfo> availableActivities = mPackageManager.queryIntentActivities(i, 0);
+        int numberOfApps = 0;
+        for(ResolveInfo ignored :availableActivities){
+            numberOfApps++;
+        }
+        return SharedPrefs.getNumberOfApps(mContext) == numberOfApps;
+    }
+
     @Override
     protected void onResume() {
         Log.i("onResume","home activity");
@@ -787,7 +818,7 @@ public class HomeActivity extends Activity {
         if(dockCount > 0) {
             ((HorizontalScrollView) mDockLayout.getParent()).scrollTo(0,0);
         }
-        if(SharedPrefs.getHomeReloadRequired(this) || (SharedPrefs.getVisibleCount(this) > 0 && mDockLayout.getChildCount() != SharedPrefs.getVisibleCount(this))) {
+        if(SharedPrefs.getHomeReloadRequired(this) || (SharedPrefs.getVisibleCount(this) > 0 && mDockLayout.getChildCount() != SharedPrefs.getVisibleCount(this)) || !sameNoOfAllApps()) {
             SharedPrefs.setHomeReloadRequired(false, this);
             SharedPrefs.setVisibleCount(mDockLayout.getChildCount(), this);
             Handler handler = new Handler();
@@ -806,56 +837,36 @@ public class HomeActivity extends Activity {
 
     @Override
     protected void onPause() {
+        if(mSmsReceiver != null) {
+            unregisterReceiver(mSmsReceiver);
+            mSmsReceiver = null;
+        }
+        if(missedCallObserver != null) {
+            getApplicationContext().getContentResolver().unregisterContentObserver(missedCallObserver);
+        }
+        if(mPackageUpdateReceiver != null) {
+            unregisterReceiver(mPackageUpdateReceiver);
+            mPackageUpdateReceiver = null;
+        }
+        if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() > 0) {
+            for(int i = 0; i < ((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount(); i++) {
+                ((WidgetFrame) mWidgetContainer.getChildAt(i)).getAppWidgetHost().stopListening();
+            }
+        }
         super.onPause();
     }
 
-    //not used currently
-//    public void startIntentService() {
-//        MyResultReceiver myResultReceiver = new MyResultReceiver(null);
-//        Intent intent = new Intent(this, MyIntentService.class);
-//        intent.putExtra("receiver", myResultReceiver);
-//        startService(intent);
-//    }
+    @Override
+    protected void onStop() {
+
+        super.onStop();
+    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
-//currently not used
-//    private class MyResultReceiver extends ResultReceiver {
-//
-//        public MyResultReceiver(Handler handler) {
-//            super(handler);
-//        }
-//        @Override
-//        protected void onReceiveResult(int resultCode, Bundle resultData) {
-//            super.onReceiveResult(resultCode, resultData);
-//            if (resultCode == 1 && resultData != null) {
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        mProgressBar = (ProgressBar) findViewById(R.id.progress);
-//                        mProgressBar.setVisibility(View.VISIBLE);
-//                        mProgressTextView = (TextView) findViewById(R.id.progress_text);
-//                        mProgressTextView.setVisibility(View.VISIBLE);
-//                    }
-//                });
-//
-//            }
-//            if (resultCode == 18 && resultData != null) {
-//
-//                final ArrayList<String> apps = resultData.getStringArrayList("apps");
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        mProgressBar.setVisibility(View.GONE);
-//                        mProgressTextView.setVisibility(View.GONE);
-//                        loadCarousel();
-//                    }
-//                });
-//            }
-//        }
-//    }
+
 
     @Override
     public void onBackPressed() {
