@@ -29,13 +29,15 @@ public class WidgetFrame extends FrameLayout {
         if (launcherInfo.hostView == null) {
             return;
         }
-        removeAllViews();
         addView(launcherInfo.hostView);
-
     }
 
     public AppWidgetHost getAppWidgetHost() {
         return appWidgetHost;
+    }
+
+    public void removeWidgetHost() {
+        removeAllViews();
     }
 
     public void setAppWidgetHost(AppWidgetHost appWidgetHost) {

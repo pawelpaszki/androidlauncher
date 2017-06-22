@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -81,6 +82,7 @@ public class HomeActivity extends Activity {
     private int mEndScrollY;
     private int mCurrentWidgetPage;
     private boolean mWidgetControlsInvisible = true;
+    private boolean mAllScrollsDisabled = false;
 
     ///////////
     private AppWidgetManager mAppWidgetManager;
@@ -136,6 +138,22 @@ public class HomeActivity extends Activity {
     private ArrayList<Integer> widgetIds = new ArrayList<>();
     private int startScrollX;
     private int endScrollX;
+    private RelativeLayout.LayoutParams mResizeRightLayoutParams;
+    private RelativeLayout.LayoutParams mResizeDownLayoutParams;
+    private String mResizeButtonTag;
+    private int mResizeStartX;
+    private int mResizeStartY;
+    private int mCurrentWidgetMinHeight;
+    private int mCurrentWidgetMinWidth;
+    private Button mResizeDown;
+    private Button mResizeRight;
+    private int mCurrentResizeDownLeftMargin;
+    private int mCurrentResizeDownTopMargin;
+    private int mCurrentResizeRightLeftMargin;
+    private int mCurrentResizeRightTopMargin;
+    private WidgetInfo launcherInfo;
+    private int mCurrentWidgetWidth;
+    private int mCurrentWidgetHeight;
 
 
     @Override
@@ -260,77 +278,78 @@ public class HomeActivity extends Activity {
         mWidgetScrollView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-            if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() > 1) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    mStartScrollY = mWidgetScrollView.getScrollY();
-                    startScrollX = (int) event.getX();
-                    Log.i("start scroll x: ", String.valueOf(startScrollX));
-                    Log.i("start scroll: ", String.valueOf(mStartScrollY));
-                    return false;
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    int childCount = ((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount();
-                    mSingleScrollHeight = mWidgetScrollView.getChildAt(0).getHeight() / childCount;
-                    mEndScrollY = mWidgetScrollView.getScrollY();
-                    endScrollX = (int) event.getX();
-                    Log.i("end scroll x: ", String.valueOf(endScrollX));
-                    Log.i("end scroll: ", String.valueOf(mEndScrollY));
-                    Log.i("y", String.valueOf(Math.abs(mStartScrollY - mEndScrollY)));
-                    Log.i("x", String.valueOf(endScrollX - startScrollX));
-                    if(Math.abs(mStartScrollY - mEndScrollY) < 50) {
-                        if(endScrollX - startScrollX > 200) {
-                            showWidgetControlButtonsOnSwipeRight();
-                        } else if (startScrollX - endScrollX > 400 || (mIsWidgetPinned && startScrollX - endScrollX > 100)){
-                            onSwipeLeft();
-                        }
-                        return true;
-                    }
+                if(!mAllScrollsDisabled) {
+                    if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() > 1) {
+                        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                            mStartScrollY = mWidgetScrollView.getScrollY();
+                            startScrollX = (int) event.getX();
+                            Log.i("start scroll x: ", String.valueOf(startScrollX));
+                            Log.i("start scroll: ", String.valueOf(mStartScrollY));
+                            return false;
+                        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                            int childCount = ((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount();
+                            mSingleScrollHeight = mWidgetScrollView.getChildAt(0).getHeight() / childCount;
+                            mEndScrollY = mWidgetScrollView.getScrollY();
+                            endScrollX = (int) event.getX();
+                            Log.i("end scroll x: ", String.valueOf(endScrollX));
+                            Log.i("end scroll: ", String.valueOf(mEndScrollY));
+                            Log.i("y", String.valueOf(Math.abs(mStartScrollY - mEndScrollY)));
+                            Log.i("x", String.valueOf(endScrollX - startScrollX));
+                            if(Math.abs(mStartScrollY - mEndScrollY) < 50) {
+                                if(endScrollX - startScrollX > 200) {
+                                    showWidgetControlButtonsOnSwipeRight();
+                                } else if (startScrollX - endScrollX > 400 || (mIsWidgetPinned && startScrollX - endScrollX > 100)){
+                                    onSwipeLeft();
+                                }
+                                return true;
+                            }
 //                    Log.i("scrollview height", String.valueOf(mWidgetScrollView.getChildAt(0).getHeight()));
 //                    Log.i("single scroll height y", String.valueOf(mSingleScrollHeight));
 //                    Log.i("linear layout height", String.valueOf(mTopContainer.getHeight()));
 //                    Log.i("child count", String.valueOf(childCount));
 //                    Log.i("single page height", String.valueOf(mTopContainer.getChildAt(0).getHeight()));
-                    ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().stopListening();
-                    if(mStartScrollY < mEndScrollY) {
-                        if(mStartScrollY < mSingleScrollHeight) {
+                            ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().stopListening();
+                            if(mStartScrollY < mEndScrollY) {
+                                if(mStartScrollY < mSingleScrollHeight) {
 
-                            mStartScrollY = 1;
-                            mCurrentWidgetPage = mStartScrollY;
-                        } else {
-                            mStartScrollY = mWidgetScrollView.getScrollY() / mSingleScrollHeight + 1;
-                            if(mStartScrollY > childCount) {
+                                    mStartScrollY = 1;
+                                    mCurrentWidgetPage = mStartScrollY;
+                                } else {
+                                    mStartScrollY = mWidgetScrollView.getScrollY() / mSingleScrollHeight + 1;
+                                    if(mStartScrollY > childCount) {
+                                        mStartScrollY = mWidgetScrollView.getScrollY() / mSingleScrollHeight;
+                                        //mStartScrollY--;
+                                        mCurrentWidgetPage = mStartScrollY;
+
+                                    }
+                                }
+                            } else {
                                 mStartScrollY = mWidgetScrollView.getScrollY() / mSingleScrollHeight;
-                                mStartScrollY--;
                                 mCurrentWidgetPage = mStartScrollY;
+                            }
+                            Log.i("start scroll: ", String.valueOf(mStartScrollY));
+                            if(!mIsWidgetPinned) {
+                                mWidgetScrollView.postDelayed(new Runnable() {
+                                    public void run() {
+                                        mWidgetScrollView.smoothScrollTo(0, mStartScrollY * mSingleScrollHeight);
+                                    }
+                                },10);
+                                ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
+                                SharedPrefs.setCurrentWidgetPage(mContext,mCurrentWidgetPage);
+                                return true;
+                            }
 
+                            if(!mIsWidgetPinned) {
+                                return false;
                             }
                         }
+                        if(mIsWidgetPinned) {
+                            mGestureDetector.onTouchEvent(event);
+                        }
                     } else {
-                        mStartScrollY = mWidgetScrollView.getScrollY() / mSingleScrollHeight;
-                        mCurrentWidgetPage = mStartScrollY;
-                    }
-                    Log.i("start scroll: ", String.valueOf(mStartScrollY));
-                    if(!mIsWidgetPinned) {
-                        mWidgetScrollView.postDelayed(new Runnable() {
-                            public void run() {
-                                mWidgetScrollView.smoothScrollTo(0, mStartScrollY * mSingleScrollHeight);
-                            }
-                        },10);
-                        ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
-                        SharedPrefs.setCurrentWidgetPage(mContext,mCurrentWidgetPage);
-                        return true;
-                    }
-
-                    if(!mIsWidgetPinned) {
-                        return false;
+                        mGestureDetector.onTouchEvent(event);
                     }
                 }
-                if(mIsWidgetPinned) {
-                    mGestureDetector.onTouchEvent(event);
-                }
-            } else {
-                mGestureDetector.onTouchEvent(event);
-            }
-
             return mIsWidgetPinned;
             }
         });
@@ -344,19 +363,26 @@ public class HomeActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if(mWidgetContainer.getChildCount() <= 10) {
+//            int height = appWidgetInfo.minHeight;
+//            int width = appWidgetInfo.minWidth;
+//            final float scale = mContext.getResources().getDisplayMetrics().density;
+//            int dpHeight = (int) (height * scale + 0.5f);
+//            int dpWidth = (int) (width * scale + 0.5f);
+//            Log.i("height", height + ":" + dpHeight);
+//            Log.i("width", width + ":" + dpWidth);
+//            launcherInfo.hostView.setLayoutParams(new FrameLayout.LayoutParams(dpWidth,dpHeight));
                     Log.i("addPage dimensions", mAddPage.getHeight() + ":" + mAddPage.getWidth());
+                    Log.i("container width", String.valueOf(mWidgetContainer.getWidth()));
                     LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                     newWidgetPage = (WidgetFrame) inflater.inflate(R.layout.widget_layout, mWidgetContainer, false);
-                    newWidgetPage.getLayoutParams().height = mTopContainerHeight;
-                    newWidgetPage.getLayoutParams().width = mTopContainerWidth;
+//                    newWidgetPage.getLayoutParams().height = mTopContainerHeight;
+//                    newWidgetPage.getLayoutParams().width = mTopContainerWidth;
                     newWidgetPage.setTag(new Random().nextInt(Integer.MAX_VALUE));
                     newWidgetPage.setAppWidgetHost(new AppWidgetHost(mContext, Integer.parseInt(newWidgetPage.getTag().toString())));
                     onClickSelectWidget();
                     if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() == 0)  {
                         mCurrentWidgetPage = 0;
                     }
-
-                    newWidgetPage.getAppWidgetHost().startListening();
 
                 } else {
                     Toast.makeText(HomeActivity.this,"Only 10 widget pages allowed" ,
@@ -504,8 +530,6 @@ public class HomeActivity extends Activity {
         for(int i = 0; i < ids.size(); i++) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             newWidgetPage = (WidgetFrame) inflater.inflate(R.layout.widget_layout, mWidgetContainer, false);
-            newWidgetPage.getLayoutParams().height = mTopContainerHeight;
-            newWidgetPage.getLayoutParams().width = mTopContainerWidth;
             newWidgetPage.setTag(new Random().nextInt(Integer.MAX_VALUE));
             newWidgetPage.setAppWidgetHost(new AppWidgetHost(mContext, Integer.parseInt(newWidgetPage.getTag().toString())));
 
@@ -516,19 +540,17 @@ public class HomeActivity extends Activity {
             launcherInfo.hostView = newWidgetPage.getAppWidgetHost().createView(this, appWidgetId, appWidgetInfo);
             launcherInfo.hostView.setAppWidget(appWidgetId, appWidgetInfo);
             launcherInfo.hostView.setTag(launcherInfo);
-//
-//            int height = appWidgetInfo.minHeight;
-//            int width = appWidgetInfo.minWidth;
-//            final float scale = mContext.getResources().getDisplayMetrics().density;
-//            int dpHeight = (int) (height * scale + 0.5f);
-//            int dpWidth = (int) (width * scale + 0.5f);
-//            Log.i("height", height + ":" + dpHeight);
-//            Log.i("width", width + ":" + dpWidth);
-//            launcherInfo.hostView.setLayoutParams(new FrameLayout.LayoutParams(dpWidth,dpHeight));
-
-
+            mCurrentWidgetWidth = SharedPrefs.getWidgetWidth(mContext, appWidgetId);
+            mCurrentWidgetHeight = SharedPrefs.getWidgetHeight(mContext, appWidgetId);
+            launcherInfo.hostView.setLayoutParams(new FrameLayout.LayoutParams(mCurrentWidgetWidth,mCurrentWidgetHeight));
+            FrameLayout.LayoutParams widgetParams = (FrameLayout.LayoutParams) launcherInfo.hostView.getLayoutParams();
+            widgetParams.setMargins((mTopContainerWidth - mCurrentWidgetWidth) / 2, (mTopContainerHeight - mCurrentWidgetHeight) / 2, (mTopContainerWidth - mCurrentWidgetWidth) / 2, (mTopContainerHeight - mCurrentWidgetHeight) / 2);
+            launcherInfo.hostView.setLayoutParams(widgetParams);
             newWidgetPage.setWidgetView(launcherInfo);
+
             mWidgetContainer.addView(newWidgetPage);
+            Log.i("top container height", String.valueOf(mTopContainerHeight));
+            Log.i("widget dimensions", launcherInfo.hostView.getWidth() + ":" + launcherInfo.hostView.getHeight());
         }
         mCurrentWidgetPage = getCurrentWidgetPage(mContext);
         if(mCurrentWidgetPage != 0) {
@@ -544,15 +566,17 @@ public class HomeActivity extends Activity {
 
     private void completeAddAppWidget(Intent data) {
         Bundle extras = data.getExtras();
-        int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+        final int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
         Log.i("widget id", String.valueOf(appWidgetId));
 
         AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
 
-        WidgetInfo launcherInfo = new WidgetInfo(appWidgetId);
+        launcherInfo = new WidgetInfo(appWidgetId);
         launcherInfo.hostView = newWidgetPage.getAppWidgetHost().createView(this, appWidgetId, appWidgetInfo);
         launcherInfo.hostView.setAppWidget(appWidgetId, appWidgetInfo);
         launcherInfo.hostView.setTag(launcherInfo);
+        launcherInfo.hostView.setLayoutParams(new FrameLayout.LayoutParams(appWidgetInfo.minWidth, appWidgetInfo.minHeight));
+
         newWidgetPage.setWidgetView(launcherInfo);
         widgetIds.add(appWidgetId);
         SharedPrefs.saveWidgetsIds(mContext, widgetIds);
@@ -566,15 +590,123 @@ public class HomeActivity extends Activity {
         mCurrentWidgetPage = mWidgetContainer.getChildCount() - 1;
 
         SharedPrefs.setCurrentWidgetPage(mContext, mCurrentWidgetPage);
-        if(mWidgetContainer.getChildCount() == 10) {
-            mAddPage.setVisibility(View.GONE);
+        newWidgetPage.getAppWidgetHost().startListening();
+
+        mResizeDown = (Button) findViewById(R.id.resize_widget_down);
+        mResizeDown.setVisibility(View.VISIBLE);
+
+        mResizeRight = (Button) findViewById(R.id.resize_widget_right);
+        mResizeRight.setVisibility(View.VISIBLE);
+
+        mCurrentWidgetMinHeight = appWidgetInfo.minHeight;
+        mCurrentWidgetMinWidth = appWidgetInfo.minWidth;
+
+        mResizeDownLayoutParams = new RelativeLayout.LayoutParams(mResizeDown.getLayoutParams());
+        mResizeDownLayoutParams.height = 60;
+        mResizeDownLayoutParams.width = 60;
+        mCurrentResizeDownTopMargin = mCurrentWidgetMinHeight - 30;
+        mResizeDownLayoutParams.topMargin = mCurrentResizeDownTopMargin;
+        mCurrentResizeDownLeftMargin = mCurrentWidgetMinWidth / 2 - 30;
+        mResizeDownLayoutParams.leftMargin = mCurrentResizeDownLeftMargin;
+        mResizeDown.setLayoutParams(mResizeDownLayoutParams);
+        mResizeDown.setOnTouchListener(new MyTouchListener());
+
+        mResizeRightLayoutParams = new RelativeLayout.LayoutParams(mResizeRight.getLayoutParams());
+        mResizeRightLayoutParams.height = 60;
+        mResizeRightLayoutParams.width = 60;
+        mCurrentResizeRightLeftMargin = mCurrentWidgetMinWidth - 30;
+        mCurrentResizeRightTopMargin = mCurrentWidgetMinHeight / 2 - 30;
+        mResizeRightLayoutParams.topMargin = mCurrentResizeRightTopMargin;
+        mResizeRightLayoutParams.leftMargin = mCurrentResizeRightLeftMargin;
+        mResizeRight.setLayoutParams(mResizeRightLayoutParams);
+        mResizeRight.setOnTouchListener(new MyTouchListener());
+        mAddPage.setVisibility(View.GONE);
+        mRemovePage.setVisibility(View.GONE);
+        mPinPage.setVisibility(View.GONE);
+        mAllScrollsDisabled = true;
+        final FloatingActionButton addWidget = (FloatingActionButton) findViewById(R.id.complete_add_widget);
+        if(mWidgetContainer.getChildCount() > 0) {
+            FrameLayout.LayoutParams widgetParams = (FrameLayout.LayoutParams) launcherInfo.hostView.getLayoutParams();
+            widgetParams.setMargins(0, 0, 0, mTopContainerHeight - mCurrentWidgetMinHeight);
+            launcherInfo.hostView.setLayoutParams(widgetParams);
+            mWidgetScrollView.post(new Runnable() {
+                public void run() {
+                    mWidgetScrollView.smoothScrollTo(0, mWidgetContainer.getChildCount() * mTopContainerHeight);
+                }
+            });
         }
-        if (mWidgetContainer.getChildCount() == 1) {
-            mRemovePage.setVisibility(View.VISIBLE);
+        addWidget.setVisibility(View.VISIBLE);
+        addWidget.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FrameLayout.LayoutParams widgetParams = (FrameLayout.LayoutParams) launcherInfo.hostView.getLayoutParams();
+                widgetParams.setMargins((mTopContainerWidth - mCurrentWidgetWidth) / 2, (mTopContainerHeight - mCurrentWidgetHeight) / 2, (mTopContainerWidth - mCurrentWidgetWidth) / 2, (mTopContainerHeight - mCurrentWidgetHeight) / 2);
+                launcherInfo.hostView.setLayoutParams(widgetParams);
+                addWidget.setVisibility(View.GONE);
+                mResizeDown.setVisibility(View.GONE);
+                mResizeRight.setVisibility(View.GONE);
+                if(mWidgetContainer.getChildCount() < 10) {
+                    mAddPage.setVisibility(View.VISIBLE);
+                }
+                mRemovePage.setVisibility(View.VISIBLE);
+                if (mWidgetContainer.getChildCount() > 1) {
+                    mPinPage.setVisibility(View.VISIBLE);
+                }
+                SharedPrefs.setWidgetHeight(mContext, mCurrentWidgetHeight, appWidgetId);
+                SharedPrefs.setWidgetWidth(mContext, mCurrentWidgetWidth, appWidgetId);
+                mAllScrollsDisabled = false;
+            }
+        });
+    }
+
+    private final class MyTouchListener implements View.OnTouchListener {
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+
+            switch (motionEvent.getAction()) {
+
+                case MotionEvent.ACTION_DOWN:
+                    mResizeButtonTag = view.getTag().toString();
+                    mResizeStartX = (int) (view.getX() - motionEvent.getRawX());
+                    mResizeStartY = (int) (view.getY() - motionEvent.getRawY());
+                    break;
+
+                case MotionEvent.ACTION_MOVE:
+                    switch (mResizeButtonTag) {
+                        case "resize_down":
+                            if (motionEvent.getRawY() + mResizeStartY > mCurrentWidgetMinHeight - 30 && motionEvent.getRawY() + mResizeStartY + 30 < mTopContainerHeight ) {
+                                mCurrentResizeDownTopMargin = (int) motionEvent.getRawY() + mResizeStartY - 30;
+                                mCurrentResizeRightTopMargin = mCurrentResizeDownTopMargin / 2 - 15;
+                            }
+                            break;
+                        case "resize_right":
+                            if (motionEvent.getRawX() + mResizeStartX > mCurrentWidgetMinWidth - 30 && motionEvent.getRawX() + mResizeStartX + 30 < mTopContainerWidth ) {
+                                mCurrentResizeRightLeftMargin = (int) motionEvent.getRawX() + mResizeStartX;
+                                mCurrentResizeDownLeftMargin = mCurrentResizeRightLeftMargin / 2 -15;
+
+                            }
+                            break;
+                    }
+                resizeWidget();
+                    break;
+            }
+            return true;
         }
-        if (mWidgetContainer.getChildCount() > 1) {
-            mPinPage.setVisibility(View.VISIBLE);
+    }
+
+    private void resizeWidget() {
+        mCurrentWidgetWidth = mCurrentResizeRightLeftMargin + 30;
+        mCurrentWidgetHeight = mCurrentResizeDownTopMargin + 30;
+        launcherInfo.hostView.setLayoutParams(new FrameLayout.LayoutParams(mCurrentWidgetWidth, mCurrentWidgetHeight));
+        if(mWidgetContainer.getChildCount() != 0) {
+            FrameLayout.LayoutParams widgetParams = (FrameLayout.LayoutParams) launcherInfo.hostView.getLayoutParams();
+            widgetParams.setMargins(0, 0, 0, mTopContainerHeight - mCurrentWidgetHeight);
+            launcherInfo.hostView.setLayoutParams(widgetParams);
         }
+
+        mResizeRightLayoutParams.setMargins(mCurrentResizeRightLeftMargin, mCurrentResizeRightTopMargin,0,0);
+        mResizeDownLayoutParams.setMargins(mCurrentResizeDownLeftMargin, mCurrentResizeDownTopMargin, 0, 0);
+        mResizeDown.setLayoutParams(mResizeDownLayoutParams);
+        mResizeRight.setLayoutParams(mResizeRightLayoutParams);
     }
 
     private void addAppWidget(Intent data) {
@@ -758,10 +890,12 @@ public class HomeActivity extends Activity {
                 float diffX = event2.getX() - event1.getX();
                 if (Math.abs(diffX) > Math.abs(diffY)) {
                     if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                        if (diffX > 0) {
-                            showWidgetControlButtonsOnSwipeRight();
-                        } else {
-                            onSwipeLeft();
+                        if(!mAllScrollsDisabled) {
+                            if (diffX > 0) {
+                                showWidgetControlButtonsOnSwipeRight();
+                            } else {
+                                onSwipeLeft();
+                            }
                         }
                     }
                 }
@@ -772,7 +906,6 @@ public class HomeActivity extends Activity {
     }
 
     private void showWidgetControlButtonsOnSwipeRight() {
-        Log.i("widgetcontrolsinvisible", String.valueOf(mWidgetControlsInvisible));
         if(mWidgetControlsInvisible) {
             Log.i("mWidgetContainer", String.valueOf(mWidgetContainer.getChildCount()));
             if(mWidgetContainer.getChildCount() > 0 &&  !mIsWidgetPinned) {

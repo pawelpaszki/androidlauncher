@@ -237,4 +237,32 @@ public class SharedPrefs {
         String key = "noOfApps";
         return prefs.getInt(key, 0);
     }
+
+    public static void setWidgetHeight(Context context, int height, int widgetId) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "widgetheight" + widgetId;
+        editor.putInt(key, height);
+        editor.apply();
+    }
+
+    public static int getWidgetHeight(Context context, int widgetId) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "widgetheight" + widgetId;
+        return prefs.getInt(key, 400);
+    }
+
+    public static void setWidgetWidth(Context context, int width, int widgetId) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "widgetwidth" + widgetId;
+        editor.putInt(key, width);
+        editor.apply();
+    }
+
+    public static int getWidgetWidth(Context context, int widgetId) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "widgetwidth" + widgetId;
+        return prefs.getInt(key, 600);
+    }
 }

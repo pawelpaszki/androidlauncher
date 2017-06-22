@@ -19,7 +19,6 @@
                 android:layout_height="match_parent"
                 android:id="@+id/widget_container"
                 android:orientation="vertical">
-
             </LinearLayout>
         </ScrollView>
 
@@ -68,9 +67,34 @@
             app:elevation="0dp"
             app:fabSize="normal"
             app:rippleColor="@color/semiTransparent" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/complete_add_widget"
+            android:src="@drawable/add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"/>
 
+        <Button
+            android:id="@+id/resize_widget_down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/resize_down"
+            android:visibility="gone"
+            android:tag="resize_down">
+        </Button>
+
+        <Button
+            android:id="@+id/resize_widget_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/resize_right"
+            android:visibility="gone"
+            android:tag="resize_right">
+
+        </Button>
     </RelativeLayout>
-
     <ProgressBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
