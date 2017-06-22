@@ -232,6 +232,7 @@ public class HomeActivity extends Activity {
                     mWidgetScrollView.postDelayed(new Runnable() {
                         public void run() {
                             mWidgetScrollView.smoothScrollTo(0, mCurrentWidgetPage * mSingleScrollHeight);
+                            Log.i("current page 235", String.valueOf(mCurrentWidgetPage));
                         }
                     },10);
                     ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
@@ -303,11 +304,6 @@ public class HomeActivity extends Activity {
                                 }
                                 return true;
                             }
-//                    Log.i("scrollview height", String.valueOf(mWidgetScrollView.getChildAt(0).getHeight()));
-//                    Log.i("single scroll height y", String.valueOf(mSingleScrollHeight));
-//                    Log.i("linear layout height", String.valueOf(mTopContainer.getHeight()));
-//                    Log.i("child count", String.valueOf(childCount));
-//                    Log.i("single page height", String.valueOf(mTopContainer.getChildAt(0).getHeight()));
                             ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().stopListening();
                             if(mStartScrollY < mEndScrollY) {
                                 if(mStartScrollY < mSingleScrollHeight) {
@@ -332,6 +328,7 @@ public class HomeActivity extends Activity {
                                 mWidgetScrollView.postDelayed(new Runnable() {
                                     public void run() {
                                         mWidgetScrollView.smoothScrollTo(0, mStartScrollY * mSingleScrollHeight);
+                                        Log.i("current page 331", String.valueOf(mStartScrollY));
                                     }
                                 },10);
                                 ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
@@ -350,7 +347,7 @@ public class HomeActivity extends Activity {
                         mGestureDetector.onTouchEvent(event);
                     }
                 }
-            return mIsWidgetPinned;
+            return mIsWidgetPinned || mAllScrollsDisabled;
             }
         });
 
@@ -417,6 +414,7 @@ public class HomeActivity extends Activity {
                             mWidgetScrollView.postDelayed(new Runnable() {
                                 public void run() {
                                     mWidgetScrollView.smoothScrollTo(0, (scrollTo-1) * mSingleScrollHeight);
+                                    Log.i("current page 415", String.valueOf(scrollTo-1));
                                 }
                             },10);
                             ((WidgetFrame) mWidgetContainer.getChildAt(scrollTo-1)).getAppWidgetHost().startListening();
@@ -426,6 +424,7 @@ public class HomeActivity extends Activity {
                             mWidgetScrollView.postDelayed(new Runnable() {
                                 public void run() {
                                     mWidgetScrollView.smoothScrollTo(0, scrollTo * mSingleScrollHeight);
+                                    Log.i("current page 426", String.valueOf(scrollTo));
                                 }
                             },10);
                             ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
@@ -558,6 +557,7 @@ public class HomeActivity extends Activity {
             mWidgetScrollView.postDelayed(new Runnable() {
                 public void run() {
                     mWidgetScrollView.smoothScrollTo(0, mCurrentWidgetPage * mSingleScrollHeight);
+                    Log.i("current widget 559", String.valueOf(mCurrentWidgetPage));
                 }
             },10);
         }
@@ -583,7 +583,8 @@ public class HomeActivity extends Activity {
         mWidgetContainer.addView(newWidgetPage);
         mWidgetScrollView.post(new Runnable() {
             public void run() {
-                mWidgetScrollView.smoothScrollTo(0, mWidgetContainer.getChildCount()  * mSingleScrollHeight);
+                mWidgetScrollView.smoothScrollTo(0, (mWidgetContainer.getChildCount() -1) * mSingleScrollHeight);
+                Log.i("current page 586", String.valueOf((mWidgetContainer.getChildCount() -1)));
             }
         });
 
@@ -600,6 +601,8 @@ public class HomeActivity extends Activity {
 
         mCurrentWidgetMinHeight = appWidgetInfo.minHeight;
         mCurrentWidgetMinWidth = appWidgetInfo.minWidth;
+        mCurrentWidgetHeight = appWidgetInfo.minHeight;
+        mCurrentWidgetWidth = appWidgetInfo.minWidth;
 
         mResizeDownLayoutParams = new RelativeLayout.LayoutParams(mResizeDown.getLayoutParams());
         mResizeDownLayoutParams.height = 60;
@@ -631,7 +634,8 @@ public class HomeActivity extends Activity {
             launcherInfo.hostView.setLayoutParams(widgetParams);
             mWidgetScrollView.post(new Runnable() {
                 public void run() {
-                    mWidgetScrollView.smoothScrollTo(0, mWidgetContainer.getChildCount() * mTopContainerHeight);
+                    mWidgetScrollView.smoothScrollTo(0, (mWidgetContainer.getChildCount() -1)* mTopContainerHeight);
+                    Log.i("current page 635", String.valueOf(mWidgetContainer.getChildCount() - 1));
                 }
             });
         }
@@ -640,6 +644,12 @@ public class HomeActivity extends Activity {
             @Override
             public void onClick(View v) {
                 FrameLayout.LayoutParams widgetParams = (FrameLayout.LayoutParams) launcherInfo.hostView.getLayoutParams();
+                if(mCurrentWidgetHeight % 2 == 1) {
+                    mCurrentWidgetHeight++;
+                }
+                if(mCurrentWidgetWidth % 2 == 1) {
+                    mCurrentWidgetWidth++;
+                }
                 widgetParams.setMargins((mTopContainerWidth - mCurrentWidgetWidth) / 2, (mTopContainerHeight - mCurrentWidgetHeight) / 2, (mTopContainerWidth - mCurrentWidgetWidth) / 2, (mTopContainerHeight - mCurrentWidgetHeight) / 2);
                 launcherInfo.hostView.setLayoutParams(widgetParams);
                 addWidget.setVisibility(View.GONE);
