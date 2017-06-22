@@ -400,7 +400,7 @@ public class HomeActivity extends Activity {
                     if (mWidgetScrollView.getScrollY() == 0) {
                         viewToRemoveIndex = 0;
                     } else {
-                        viewToRemoveIndex = mWidgetScrollView.getScrollY() / mSingleScrollHeight;
+                        viewToRemoveIndex = (mWidgetScrollView.getScrollY() + 2) / mSingleScrollHeight;
                     }
                     ((WidgetFrame) mWidgetContainer.getChildAt(viewToRemoveIndex)).getAppWidgetHost().stopListening();
                     ((WidgetFrame) mWidgetContainer.getChildAt(viewToRemoveIndex)).getAppWidgetHost().deleteAppWidgetId(widgetIds.get(viewToRemoveIndex));
@@ -682,7 +682,6 @@ public class HomeActivity extends Activity {
                             if (motionEvent.getRawX() + mResizeStartX > mCurrentWidgetMinWidth - 30 && motionEvent.getRawX() + mResizeStartX + 30 < mTopContainerWidth ) {
                                 mCurrentResizeRightLeftMargin = (int) motionEvent.getRawX() + mResizeStartX;
                                 mCurrentResizeDownLeftMargin = mCurrentResizeRightLeftMargin / 2 -15;
-
                             }
                             break;
                     }

@@ -346,24 +346,15 @@ public class ChangeIconsActivity extends AppCompatActivity {
     private void repaintCropButtons() {
         mTopLeftButtonParams.setMargins(mPreviousTopLeftX, mPreviousTopLeftY,0,0);
         mTopLeft.setLayoutParams(mTopLeftButtonParams);
-        mTopLeft.setVisibility(View.GONE);
-        mTopLeft.setVisibility(View.VISIBLE);
 
         mTopRightButtonParams.setMargins(mPreviousTopRightX, mPreviousTopRightY,0,0);
         mTopRight.setLayoutParams(mTopRightButtonParams);
-        mTopRight.setVisibility(View.GONE);
-        mTopRight.setVisibility(View.VISIBLE);
 
         mBottomRightButtonParams.setMargins(mPreviousBottomRightX, mPreviousBottomRightY,0,0);
         mBottomRight.setLayoutParams(mBottomRightButtonParams);
-        mBottomRight.setVisibility(View.GONE);
-        mBottomRight.setVisibility(View.VISIBLE);
 
         mBottomLeftButtonParams.setMargins(mPreviousBottomLeftX, mPreviousBottomLeftY,0,0);
         mBottomLeft.setLayoutParams(mBottomLeftButtonParams);
-        mBottomLeft.setVisibility(View.GONE);
-        mBottomLeft.setVisibility(View.VISIBLE);
-
 
         Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.crop_background);
         ImageView croppedBackground = (ImageView) findViewById(R.id.cropped_background);
