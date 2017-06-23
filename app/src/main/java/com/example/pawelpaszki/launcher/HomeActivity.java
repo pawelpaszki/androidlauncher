@@ -368,7 +368,9 @@ public class HomeActivity extends Activity {
         mGoToSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent i = new Intent(mContext, SettingsActivity.class);
+                startActivity(i);
+                //overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
             }
         });
 
@@ -978,77 +980,6 @@ public class HomeActivity extends Activity {
                 fadeIn.setDuration(i);
                 mControls.get(j).setAnimation(fadeIn);
             }
-
-//            Handler handler = new Handler();
-//            handler.postDelayed(new Runnable(){
-//                @Override
-//                public void run()
-//                {
-//                    mAddPage.setVisibility(View.VISIBLE);
-//                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mAddPage.getLayoutParams());
-//                    params.leftMargin = -200;
-//                    mAddPage.setLayoutParams(params);
-//                    ObjectAnimator animation = ObjectAnimator.ofFloat(mAddPage, "translationX", 250f);
-//                    animation.setDuration(200);
-//                    animation.start();
-//                }
-//            }, 100);
-//            handler = new Handler();
-//            handler.postDelayed(new Runnable(){
-//                @Override
-//                public void run()
-//                {
-//                    mRemovePage.setVisibility(View.VISIBLE);
-//                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mRemovePage.getLayoutParams());
-//                    params.leftMargin = -200;
-//                    mRemovePage.setLayoutParams(params);
-//                    ObjectAnimator animation = ObjectAnimator.ofFloat(mRemovePage, "translationX", 250f);
-//                    animation.setDuration(200);
-//                    animation.start();
-//                }
-//            }, 200);
-//            handler = new Handler();
-//            handler.postDelayed(new Runnable(){
-//                @Override
-//                public void run()
-//                {
-//                    mPinPage.setVisibility(View.VISIBLE);
-//                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mPinPage.getLayoutParams());
-//                    params.leftMargin = -200;
-//                    mPinPage.setLayoutParams(params);
-//                    ObjectAnimator animation = ObjectAnimator.ofFloat(mPinPage, "translationX", 250f);
-//                    animation.setDuration(200);
-//                    animation.start();
-//                }
-//            }, 300);
-//            handler = new Handler();
-//            handler.postDelayed(new Runnable(){
-//                @Override
-//                public void run()
-//                {
-//                    mGoToSettings.setVisibility(View.VISIBLE);
-//                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mGoToSettings.getLayoutParams());
-//                    params.leftMargin = -200;
-//                    mGoToSettings.setLayoutParams(params);
-//                    ObjectAnimator animation = ObjectAnimator.ofFloat(mGoToSettings, "translationX", 250f);
-//                    animation.setDuration(200);
-//                    animation.start();
-//                }
-//            }, 400);
-//            handler = new Handler();
-//            handler.postDelayed(new Runnable(){
-//                @Override
-//                public void run()
-//                {
-//                    mHideControls.setVisibility(View.VISIBLE);
-//                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mHideControls.getLayoutParams());
-//                    params.leftMargin = -200;
-//                    mHideControls.setLayoutParams(params);
-//                    ObjectAnimator animation = ObjectAnimator.ofFloat(mHideControls, "translationX", 250f);
-//                    animation.setDuration(200);
-//                    animation.start();
-//                }
-//            }, 500);
 
             if(mWidgetContainer.getChildCount() > 0 &&  !mIsWidgetPinned) {
                 mRemovePage.setEnabled(true);

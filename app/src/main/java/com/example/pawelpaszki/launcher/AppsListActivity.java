@@ -258,8 +258,6 @@ public class AppsListActivity extends Activity {
                     if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                         if (diffX > 0) {
                             onSwipeRight();
-                        } else {
-                            onSwipeLeft();
                         }
                     }
                 }
@@ -267,12 +265,6 @@ public class AppsListActivity extends Activity {
             }
             return false;
         }
-    }
-
-    private void onSwipeLeft() {
-        Intent i = new Intent(this, SettingsActivity.class);
-        startActivity(i);
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
     }
 
     private void onSwipeRight() {

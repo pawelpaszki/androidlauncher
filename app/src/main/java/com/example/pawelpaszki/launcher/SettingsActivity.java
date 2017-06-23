@@ -123,7 +123,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
         mShowAppNamesCheckBox.setChecked(SharedPrefs.getShowAppNames(this));
-        mDetector = new GestureDetectorCompat(this, new MyGestureListener());
         RelativeLayout container = (RelativeLayout) findViewById(R.id.settings_container);
         container.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -182,45 +181,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
-
-        private static final int SWIPE_THRESHOLD = 100;
-        private static final int SWIPE_VELOCITY_THRESHOLD = 100;
-
-        @Override
-        public boolean onDown(MotionEvent event) {
-            return true;
-        }
-
-        @Override
-        public boolean onFling(MotionEvent event1, MotionEvent event2,
-                               float velocityX, float velocityY) {
-            if(event1 != null && event2 != null) {
-                float diffY = event2.getY() - event1.getY();
-                float diffX = event2.getX() - event1.getX();
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                        if (diffX > 0) {
-                            onSwipeRight();
-                        } else {
-
-                        }
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-    }
-
-    private void onSwipeRight() {
-        Intent intent = new Intent(this, AppsListActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-        finish();
-    }
-
     public void sortByName() {
         SharedPrefs.setSortingMethod(this,"name");
     }
@@ -243,10 +203,10 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(this, AppsListActivity.class);
+        Intent intent = new Intent(this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+        //overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
         finish();
     }
 
@@ -268,7 +228,5 @@ public class SettingsActivity extends AppCompatActivity {
         startActivity(i);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
     }
-
-
 
 }
