@@ -286,19 +286,18 @@ public class HomeActivity extends Activity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if(!mAllScrollsDisabled) {
-                    Log.i("controls invisible", String.valueOf(mWidgetControlsInvisible));
                     if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() > 1) {
                         if (event.getAction() == MotionEvent.ACTION_DOWN) {
                             mStartScrollY = mWidgetScrollView.getScrollY();
                             startScrollX = (int) event.getX();
-                            Log.i("start scroll x: ", String.valueOf(startScrollX));
-                            Log.i("start scroll: ", String.valueOf(mStartScrollY));
                             return false;
                         } else if (event.getAction() == MotionEvent.ACTION_UP) {
                             int childCount = ((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount();
                             mSingleScrollHeight = mWidgetScrollView.getChildAt(0).getHeight() / childCount;
                             mEndScrollY = mWidgetScrollView.getScrollY();
                             endScrollX = (int) event.getX();
+                            Log.i("start scroll x: ", String.valueOf(startScrollX));
+                            Log.i("start scroll: ", String.valueOf(mStartScrollY));
                             Log.i("end scroll x: ", String.valueOf(endScrollX));
                             Log.i("end scroll: ", String.valueOf(mEndScrollY));
                             Log.i("y", String.valueOf(Math.abs(mStartScrollY - mEndScrollY)));
@@ -312,12 +311,14 @@ public class HomeActivity extends Activity {
                                 } else if (startScrollX - endScrollX > 400 || (mIsWidgetPinned && startScrollX - endScrollX > 100)){
                                     onSwipeLeft();
                                 } else {
-                                    mWidgetScrollView.postDelayed(new Runnable() {
-                                        public void run() {
-                                            mWidgetScrollView.smoothScrollTo(0, mCurrentWidgetPage * mSingleScrollHeight);
-                                            Log.i("current page 318", String.valueOf(mCurrentWidgetPage));
-                                        }
-                                    },10);
+                                    if(!(mStartScrollY == mEndScrollY)) {
+                                        mWidgetScrollView.postDelayed(new Runnable() {
+                                            public void run() {
+                                                mWidgetScrollView.smoothScrollTo(0, mCurrentWidgetPage * mSingleScrollHeight);
+                                                Log.i("current page 318", String.valueOf(mCurrentWidgetPage));
+                                            }
+                                        },10);
+                                    }
                                 }
                                 return true;
                             }
