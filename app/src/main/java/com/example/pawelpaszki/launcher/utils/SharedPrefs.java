@@ -279,4 +279,44 @@ public class SharedPrefs {
         String key = "controlsInVisible";
         return prefs.getBoolean(key, false);
     }
+
+    public static void setSafeModeOn(boolean isSafeModeOn, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "safeModeOn";
+        editor.putBoolean(key, isSafeModeOn);
+        editor.apply();
+    }
+
+    public static boolean getSafeModeOn(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "safeModeOn";
+        return prefs.getBoolean(key, false);
+    }
+
+    public static String getPassphrase(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString("passphrase", "");
+    }
+
+    public static void setPasshrase(Context context, String sortValue) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("passphrase", sortValue);
+        editor.apply();
+    }
+
+    public static void setHomeRecreateRequired(boolean homeRecreateRequired, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "homeRecreateRequired";
+        editor.putBoolean(key, homeRecreateRequired);
+        editor.apply();
+    }
+
+    public static boolean getHomeRecreateRequired(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "homeRecreateRequired";
+        return prefs.getBoolean(key, false);
+    }
 }

@@ -296,6 +296,31 @@
                 android:textColor="#303F9F"
                 android:text="@string/set_solid_color_wallpaper_desc"
                 android:onClick="setWallpaperColor"/>
+            <View style="@style/Divider"
+                android:id="@+id/div9"
+                android:layout_below="@+id/set_color_wallpaper_desc"/>
+            <TextView
+                android:id="@+id/enable_safe_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/div9"
+                android:padding="12dp"
+                android:textSize="16sp"
+                android:textColor="#1A237E"
+                android:text="@string/enable_safe_mode"/>
+            <TextView
+                android:id="@+id/enable_safe_mode_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/enable_safe_mode"
+                android:padding="12dp"
+                android:layout_marginTop="-22dp"
+                android:textSize="14sp"
+                android:textColor="#303F9F"
+                android:onClick="enableSafeMode"
+                android:text="@string/enable_safe_mode_desc"/>
 
         </RelativeLayout>
     </ScrollView>

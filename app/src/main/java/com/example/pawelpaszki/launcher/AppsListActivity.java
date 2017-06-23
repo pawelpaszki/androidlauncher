@@ -308,7 +308,14 @@ public class AppsListActivity extends Activity {
                 Log.i("icon side", String.valueOf(mIconSide));
             }
             if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(mPackageManager))) {
-                mApps.add(app);
+                if(ri.loadLabel(mPackageManager).toString().equalsIgnoreCase("Settings")) {
+                    if(!SharedPrefs.getSafeModeOn(this)) {
+                        mApps.add(app);
+                    }
+                } else {
+                    mApps.add(app);
+                }
+
                 mVisibleCount++;
                 Log.i("app starts", String.valueOf(ri.loadLabel(mPackageManager)) + " " + String.valueOf(ri.activityInfo.packageName) + " "+ SharedPrefs.getNumberOfActivityStarts(app.getmLabel().toString(), this));
             }

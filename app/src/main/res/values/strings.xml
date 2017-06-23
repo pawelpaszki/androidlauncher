@@ -43,6 +43,10 @@
     <string name="set_solid_color_wallpaper_desc">Pick a color to be used as your wallpaper</string>
     <string name="uninstall">Uninstall</string>
     <string name="cancel">Cancel</string>
+    <string name="enable_safe_mode">Enable Safe Mode</string>
+    <string name="enable_safe_mode_desc">Disable access to Settings, pull-down menu and (un)installing apps (Passphrase protected)</string>
+    <string name="disable_safe_mode">Disable Safe Mode</string>
+    <string name="disable_safe_mode_desc">Enable access to Settings, pull-down menu and (un)installing apps (Passphrase protected)</string>
     <string name="rgb_red">RED:</string>
     <string name="rgb_green">GREEN:</string>
     <string name="rgb_blue">BLUE:</string>

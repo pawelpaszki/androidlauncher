@@ -1,22 +1,30 @@
 package com.example.pawelpaszki.launcher;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -26,6 +34,8 @@ import android.widget.Toast;
 import com.example.pawelpaszki.launcher.utils.NetworkConnectivityChecker;
 import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 
+import static java.security.AccessController.getContext;
+
 /**
  * Created by PawelPaszki on 11/05/2017.
  * Settings view
@@ -34,12 +44,19 @@ import com.example.pawelpaszki.launcher.utils.SharedPrefs;
 public class SettingsActivity extends AppCompatActivity {
 
     private CheckBox mShowAppNamesCheckBox;
-    private GestureDetectorCompat mDetector;
+    private boolean mPinEntered;
+    private AlertDialog.Builder mBuilder;
+    private String mPassPhrase;
+    private AlertDialog mDialog;
+    private Context mContext;
+    private TextView mSafeMode;
+    private TextView mSafeModeDesc;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        mContext = this;
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(Color.TRANSPARENT);
@@ -123,14 +140,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
         mShowAppNamesCheckBox.setChecked(SharedPrefs.getShowAppNames(this));
-        RelativeLayout container = (RelativeLayout) findViewById(R.id.settings_container);
-        container.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mDetector.onTouchEvent(event);
-                return false;
-            }
-        });
         TextView sortDesc = (TextView) findViewById(R.id.sort_by_text_view_desc);
         TextView showLabelsDesc = (TextView) findViewById(R.id.show_app_names_desc);
         TextView noOfColsDesc = (TextView) findViewById(R.id.no_of_columns_desc);
@@ -148,13 +157,18 @@ public class SettingsActivity extends AppCompatActivity {
         params = (RelativeLayout.LayoutParams) noOfColsDesc.getLayoutParams();
         params.width = width;
         noOfColsDesc.setLayoutParams(params);
+
+        mSafeMode = (TextView) findViewById(R.id.enable_safe_mode);
+
+        mSafeModeDesc = (TextView) findViewById(R.id.enable_safe_mode_desc);
+
+        if(SharedPrefs.getSafeModeOn(mContext)) {
+            mSafeMode.setText(R.string.disable_safe_mode);
+            mSafeModeDesc.setText(R.string.disable_safe_mode_desc);
+        }
+
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        mDetector.onTouchEvent(event);
-        return super.onTouchEvent(event);
-    }
 
     public void set_icons(View view) {
         Intent i = new Intent(this, ChangeIconsActivity.class);
@@ -229,4 +243,80 @@ public class SettingsActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
     }
 
+    public void enableSafeMode(View view) {
+        mBuilder = new AlertDialog.Builder(this);
+        mBuilder.setTitle("Please type Passphrase");
+        mPinEntered = false;
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.pin_input, null, false);
+        final EditText pin_input = (EditText) viewInflated.findViewById(R.id.pin);
+        mBuilder.setView(viewInflated);
+
+        mBuilder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        mBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        mDialog = mBuilder.create();
+        mDialog.show();
+        mDialog.setCancelable(false);
+        mDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                if(!SharedPrefs.getSafeModeOn(mContext)) {
+                    if(!mPinEntered) {
+                        mDialog.setTitle("Please confirm Passphrase");
+                        mPassPhrase = pin_input.getText().toString();
+                        pin_input.setText("");
+                        mPinEntered = true;
+                    } else {
+                        if(pin_input.getText().toString().equals(mPassPhrase)) {
+                            SharedPrefs.setSafeModeOn(true, mContext);
+                            mSafeMode.setText(R.string.disable_safe_mode);
+                            mSafeModeDesc.setText(R.string.disable_safe_mode_desc);
+                            SharedPrefs.setPasshrase(mContext, pin_input.getText().toString());
+                            mDialog.dismiss();
+                            Toast.makeText(mContext,"Safe mode has been enabled" ,
+                                    Toast.LENGTH_LONG).show();
+                            onBackPressed();
+                        } else {
+                            pin_input.setText("");
+                            mDialog.setTitle("Please try again");
+                        }
+                    }
+                    Log.i("text", pin_input.getText().toString());
+                } else {
+                    if(pin_input.getText().toString().equals(SharedPrefs.getPassphrase(mContext))) {
+                        mSafeMode.setText(R.string.enable_safe_mode);
+                        mSafeModeDesc.setText(R.string.enable_safe_mode_desc);
+                        SharedPrefs.setSafeModeOn(false, mContext);
+                        Toast.makeText(mContext,"Safe mode has been disabled" ,
+                                Toast.LENGTH_LONG).show();
+                        SharedPrefs.setHomeRecreateRequired(true,mContext);
+                        SharedPrefs.setPasshrase(mContext,"");
+                        mDialog.dismiss();
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                onBackPressed();
+                            }
+                        }, 500);
+
+                    } else {
+                        pin_input.setText("");
+                        mDialog.setTitle("Please try again");
+                    }
+                }
+            }
+        });
+    }
 }

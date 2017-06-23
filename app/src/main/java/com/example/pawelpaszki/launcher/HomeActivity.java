@@ -8,6 +8,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -16,6 +17,7 @@ import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,9 +25,11 @@ import android.provider.CallLog;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,6 +40,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -45,6 +50,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.pawelpaszki.launcher.layouts.CustomViewGroup;
 import com.example.pawelpaszki.launcher.layouts.WidgetFrame;
 import com.example.pawelpaszki.launcher.layouts.WidgetInfo;
 import com.example.pawelpaszki.launcher.utils.AppsSorter;
@@ -161,6 +167,10 @@ public class HomeActivity extends Activity {
     private FloatingActionButton mGoToSettings;
     private FloatingActionButton mHideControls;
     private ArrayList<FloatingActionButton> mControls = new ArrayList<>();
+    private AlertDialog.Builder mBuilder;
+    private AlertDialog mDialog;
+    private CustomViewGroup mView;
+    private WindowManager mManager;
 
     @Override
     protected void onStart() {
@@ -246,6 +256,27 @@ public class HomeActivity extends Activity {
             });
 
         }
+        if(SharedPrefs.getSafeModeOn(mContext)) {
+            mManager = ((WindowManager) getApplicationContext()
+                    .getSystemService(Context.WINDOW_SERVICE));
+
+            WindowManager.LayoutParams localLayoutParams = new WindowManager.LayoutParams();
+            localLayoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
+            localLayoutParams.gravity = Gravity.TOP;
+            localLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+
+            localLayoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+            localLayoutParams.height = (int) (50 * getResources()
+                    .getDisplayMetrics().scaledDensity);
+            localLayoutParams.format = PixelFormat.TRANSPARENT;
+
+            mView = new CustomViewGroup(this);
+            mView.setId(999999);
+
+            mManager.addView(mView, localLayoutParams);
+        }
         super.onStart();
     }
 
@@ -254,11 +285,7 @@ public class HomeActivity extends Activity {
         super.onCreate(savedInstanceState);
         Log.i("oncreate", "home activity created");
         setContentView(R.layout.activity_home);
-        mAppWidgetManager = AppWidgetManager.getInstance(this);
-        Window window = getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(Color.TRANSPARENT);
-        window.setNavigationBarColor(Color.TRANSPARENT);
+
         boolean firstLaunch = SharedPrefs.getIsFirstLaunch(this);
         if(firstLaunch) {
             WallpaperManager myWallpaperManager
@@ -271,6 +298,12 @@ public class HomeActivity extends Activity {
             SharedPrefs.setIsFirstLaunch(false,this);
         }
         mContext = this;
+
+        mAppWidgetManager = AppWidgetManager.getInstance(this);
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setNavigationBarColor(Color.TRANSPARENT);
 
         mIsWidgetPinned = SharedPrefs.getWidgetPinned(mContext);
 
@@ -323,7 +356,7 @@ public class HomeActivity extends Activity {
                                 return true;
                             }
                             ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().stopListening();
-                            if(mStartScrollY < mEndScrollY) {
+                            if(mStartScrollY + 5 < mEndScrollY) {
                                 if(mStartScrollY < mSingleScrollHeight) {
 
                                     mStartScrollY = 1;
@@ -375,8 +408,11 @@ public class HomeActivity extends Activity {
         mGoToSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(mContext, SettingsActivity.class);
-                startActivity(i);
+                if(SharedPrefs.getSafeModeOn(mContext)) {
+                    showDialog();
+                } else {
+                    goToSettings();
+                }
             }
         });
 
@@ -433,7 +469,6 @@ public class HomeActivity extends Activity {
                     widgetIds.remove(viewToRemoveIndex);
 
                     if(mWidgetContainer.getChildCount() == 0) {
-                        mRemovePage.setEnabled(false);
                         SharedPrefs.clearWidgetsIds(mContext);
                     } else {
                         final int scrollTo = viewToRemoveIndex;
@@ -460,12 +495,9 @@ public class HomeActivity extends Activity {
                         SharedPrefs.setCurrentWidgetPage(mContext,mCurrentWidgetPage);
                         SharedPrefs.saveWidgetsIds(mContext,widgetIds);
                     }
-                    if (mWidgetContainer.getChildCount() == 1) {
-                        mPinPage.setEnabled(false);
-                    }
-                    if(mWidgetContainer.getChildCount() == 9) {
-                        mAddPage.setEnabled(true);
-                    }
+                } else {
+                    Toast.makeText(HomeActivity.this,"Nothing to remove" ,
+                            Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -477,19 +509,10 @@ public class HomeActivity extends Activity {
                 mIsWidgetPinned = !mIsWidgetPinned;
                 SharedPrefs.setWidgetPinned(mIsWidgetPinned, mContext);
                 if(mIsWidgetPinned) {
-                    mWidgetScrollView.setVerticalScrollBarEnabled(false);
-                    mAddPage.setEnabled(false);
-                    mRemovePage.setEnabled(false);
                     mPinPage.setImageDrawable(ContextCompat.getDrawable(getmContext(), R.drawable.unlock));
                 } else {
                     mWidgetScrollView.setVerticalScrollBarEnabled(true);
-                    if( mWidgetContainer.getChildCount() < 10) {
-                        mAddPage.setEnabled(true);
-                    }
-                    if(mWidgetContainer.getChildCount() > 0) {
-                        mRemovePage.setEnabled(true);
-                        mPinPage.setImageDrawable(ContextCompat.getDrawable(getmContext(), R.drawable.lock));
-                    }
+                    mPinPage.setImageDrawable(ContextCompat.getDrawable(getmContext(), R.drawable.lock));
                 }
             }
         });
@@ -527,14 +550,55 @@ public class HomeActivity extends Activity {
         if(mWidgetContainer.getChildCount() != widgetDetails.size()) {
             loadSavedWidgets(widgetDetails);
         }
-        if(mWidgetContainer.getChildCount() == 0) {
-            mRemovePage.setEnabled(false);
-        }
         mWidgetControlsInvisible = SharedPrefs.getControlsVisible(mContext);
         if(mWidgetControlsInvisible) {
             showWidgetControlButtonsOnSwipeRight(true);
         }
 
+    }
+
+    private void goToSettings() {
+        Intent i = new Intent(mContext, SettingsActivity.class);
+        startActivity(i);
+    }
+
+    private void showDialog() {
+        mBuilder = new AlertDialog.Builder(this);
+        mBuilder.setTitle("Please type Passphrase");
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.pin_input, null, false);
+        final EditText pin_input = (EditText) viewInflated.findViewById(R.id.pin);
+        mBuilder.setView(viewInflated);
+
+        mBuilder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        mBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        mDialog = mBuilder.create();
+        mDialog.show();
+        mDialog.setCancelable(false);
+        mDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                    if(pin_input.getText().toString().equals(SharedPrefs.getPassphrase(mContext))) {
+                        goToSettings();
+                        mDialog.dismiss();
+                    } else {
+                        pin_input.setText("");
+                        mDialog.setTitle("Please try again");
+                    }
+                }
+
+        });
     }
 
     private void onClickSelectWidget() {
@@ -693,15 +757,6 @@ public class HomeActivity extends Activity {
                 addWidget.setVisibility(View.GONE);
                 mResizeDown.setVisibility(View.GONE);
                 mResizeRight.setVisibility(View.GONE);
-                if(mWidgetContainer.getChildCount() < 10) {
-                    mAddPage.setEnabled(true);
-                } else {
-                    mAddPage.setEnabled(false);
-                }
-                mRemovePage.setEnabled(true);
-                if (mWidgetContainer.getChildCount() > 1) {
-                    mPinPage.setEnabled(true);
-                }
                 SharedPrefs.setWidgetHeight(mContext, mCurrentWidgetHeight, appWidgetId);
                 SharedPrefs.setWidgetWidth(mContext, mCurrentWidgetWidth, appWidgetId);
                 mAllScrollsDisabled = false;
@@ -814,7 +869,13 @@ public class HomeActivity extends Activity {
             app.setmIcon(ri.activityInfo.loadIcon(mPackageManager));
             app.setmNumberOfStarts(SharedPrefs.getNumberOfActivityStarts(app.getmLabel().toString(), this));
             if(SharedPrefs.getAppVisible(this, (String) ri.loadLabel(mPackageManager))) {
-                dockerApps.add(app);
+                if(ri.loadLabel(mPackageManager).toString().equalsIgnoreCase("Settings")) {
+                    if(!SharedPrefs.getSafeModeOn(this)) {
+                        dockerApps.add(app);
+                    }
+                } else {
+                    dockerApps.add(app);
+                }
                 //Log.i("no of runs", "label: " + app.getmLabel() + ": " + " package name: " + String.valueOf(ri.activityInfo.packageName) + String.valueOf(app.getmNumberOfStarts()));
             }
             numberOfApps++;
@@ -993,22 +1054,6 @@ public class HomeActivity extends Activity {
                 fadeIn.setDuration(i);
                 mControls.get(j).setAnimation(fadeIn);
             }
-
-            if(mWidgetContainer.getChildCount() > 0 &&  !mIsWidgetPinned) {
-                mRemovePage.setEnabled(true);
-            } else {
-                mRemovePage.setEnabled(false);
-            }
-            if(mWidgetContainer.getChildCount() > 1) {
-                mPinPage.setEnabled(true);
-            } else {
-                mPinPage.setEnabled(false);
-            }
-            if(mWidgetContainer.getChildCount() < 10 && !mIsWidgetPinned) {
-                mAddPage.setEnabled(true);
-            } else {
-                mAddPage.setEnabled(false);
-            }
         }
     }
 
@@ -1042,15 +1087,23 @@ public class HomeActivity extends Activity {
             SharedPrefs.setHomeReloadRequired(false, this);
             SharedPrefs.setVisibleCount(mDockLayout.getChildCount(), this);
             Handler handler = new Handler();
-            handler.postDelayed(new Runnable()
-            {
+            handler.postDelayed(new Runnable() {
                 @Override
-                public void run()
-                {
+                public void run() {
                     mDockLayout.removeAllViews();
                     loadCarousel();
                 }
             }, 1);
+        }
+        if (SharedPrefs.getHomeRecreateRequired(mContext)){
+            SharedPrefs.setHomeRecreateRequired(false, mContext);
+            mManager.removeView(mView);
+//            try {
+//
+//            } catch (Exception ignored) {
+//
+//            }
+
         }
         super.onResume();
     }
