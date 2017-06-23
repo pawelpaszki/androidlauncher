@@ -266,17 +266,17 @@ public class SharedPrefs {
         return prefs.getInt(key, 600);
     }
 
-    public static void setControlsVisible(boolean controlsVisible, Context context) {
+    public static void setControlsInVisible(boolean controlsInVisible, Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
-        String key = "controlsVisible";
-        editor.putBoolean(key, controlsVisible);
+        String key = "controlsInVisible";
+        editor.putBoolean(key, controlsInVisible);
         editor.apply();
     }
 
     public static boolean getControlsVisible(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String key = "controlsVisible";
+        String key = "controlsInVisible";
         return prefs.getBoolean(key, false);
     }
 }

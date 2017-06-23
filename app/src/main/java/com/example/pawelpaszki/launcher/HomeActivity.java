@@ -85,7 +85,7 @@ public class HomeActivity extends Activity {
     private int mStartScrollY;
     private int mEndScrollY;
     private int mCurrentWidgetPage;
-    private boolean mWidgetControlsInvisible = true;
+    private boolean mWidgetControlsInvisible;
     private boolean mAllScrollsDisabled = false;
 
     ///////////
@@ -307,10 +307,17 @@ public class HomeActivity extends Activity {
                                 if(endScrollX - startScrollX > 100) {
                                     if(mWidgetControlsInvisible) {
                                         mWidgetControlsInvisible = false;
-                                        showWidgetControlButtonsOnSwipeRight();
+                                        showWidgetControlButtonsOnSwipeRight(false);
                                     }
                                 } else if (startScrollX - endScrollX > 400 || (mIsWidgetPinned && startScrollX - endScrollX > 100)){
                                     onSwipeLeft();
+                                } else {
+                                    mWidgetScrollView.postDelayed(new Runnable() {
+                                        public void run() {
+                                            mWidgetScrollView.smoothScrollTo(0, mCurrentWidgetPage * mSingleScrollHeight);
+                                            Log.i("current page 318", String.valueOf(mCurrentWidgetPage));
+                                        }
+                                    },10);
                                 }
                                 return true;
                             }
@@ -363,14 +370,12 @@ public class HomeActivity extends Activity {
 
         mWidgetContainer = (LinearLayout) findViewById (R.id.widget_container);
 
-        ///// add saved widgets later //////////
         mGoToSettings = (FloatingActionButton) findViewById(R.id.go_to_settings);
         mGoToSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(mContext, SettingsActivity.class);
                 startActivity(i);
-                //overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
             }
         });
 
@@ -380,7 +385,7 @@ public class HomeActivity extends Activity {
             @Override
             public void onClick(View v) {
                 mWidgetControlsInvisible = true;
-                showWidgetControlButtonsOnSwipeRight();
+                showWidgetControlButtonsOnSwipeRight(false);
             }
         });
 
@@ -389,14 +394,6 @@ public class HomeActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if(mWidgetContainer.getChildCount() <= 10) {
-//            int height = appWidgetInfo.minHeight;
-//            int width = appWidgetInfo.minWidth;
-//            final float scale = mContext.getResources().getDisplayMetrics().density;
-//            int dpHeight = (int) (height * scale + 0.5f);
-//            int dpWidth = (int) (width * scale + 0.5f);
-//            Log.i("height", height + ":" + dpHeight);
-//            Log.i("width", width + ":" + dpWidth);
-//            launcherInfo.hostView.setLayoutParams(new FrameLayout.LayoutParams(dpWidth,dpHeight));
                     Log.i("addPage dimensions", mAddPage.getHeight() + ":" + mAddPage.getWidth());
                     Log.i("container width", String.valueOf(mWidgetContainer.getWidth()));
                     LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -435,7 +432,7 @@ public class HomeActivity extends Activity {
                     widgetIds.remove(viewToRemoveIndex);
 
                     if(mWidgetContainer.getChildCount() == 0) {
-                        mRemovePage.setVisibility(View.GONE);
+                        mRemovePage.setEnabled(false);
                         SharedPrefs.clearWidgetsIds(mContext);
                     } else {
                         final int scrollTo = viewToRemoveIndex;
@@ -530,8 +527,13 @@ public class HomeActivity extends Activity {
             loadSavedWidgets(widgetDetails);
         }
         if(mWidgetContainer.getChildCount() == 0) {
-            mRemovePage.setVisibility(View.GONE);
+            mRemovePage.setEnabled(false);
         }
+        mWidgetControlsInvisible = SharedPrefs.getControlsVisible(mContext);
+        if(mWidgetControlsInvisible) {
+            showWidgetControlButtonsOnSwipeRight(true);
+        }
+
     }
 
     private void onClickSelectWidget() {
@@ -659,6 +661,8 @@ public class HomeActivity extends Activity {
         mAddPage.setVisibility(View.GONE);
         mRemovePage.setVisibility(View.GONE);
         mPinPage.setVisibility(View.GONE);
+        mHideControls.setVisibility(View.GONE);
+        mGoToSettings.setVisibility(View.GONE);
         mAllScrollsDisabled = true;
         final FloatingActionButton addWidget = (FloatingActionButton) findViewById(R.id.complete_add_widget);
         if(mWidgetContainer.getChildCount() > 0) {
@@ -700,6 +704,7 @@ public class HomeActivity extends Activity {
                 SharedPrefs.setWidgetHeight(mContext, mCurrentWidgetHeight, appWidgetId);
                 SharedPrefs.setWidgetWidth(mContext, mCurrentWidgetWidth, appWidgetId);
                 mAllScrollsDisabled = false;
+                showWidgetControlButtonsOnSwipeRight(false);
             }
         });
     }
@@ -939,7 +944,7 @@ public class HomeActivity extends Activity {
                                 Log.i("swipe: ", "right");
                                 if(mWidgetControlsInvisible) {
                                     mWidgetControlsInvisible = false;
-                                    showWidgetControlButtonsOnSwipeRight();
+                                    showWidgetControlButtonsOnSwipeRight(false);
                                 }
                             } else {
                                 onSwipeLeft();
@@ -953,24 +958,31 @@ public class HomeActivity extends Activity {
         }
     }
 
-    private void showWidgetControlButtonsOnSwipeRight() {
-        if(mWidgetControlsInvisible) {
-            for(int i = 100, j = 4; i < 600; i = i + 100, j--) {
-                final int jj = j;
-                mControls.get(j).setVisibility(View.VISIBLE);
-                final Animation fadeIn = new AlphaAnimation(1,0);
-                fadeIn.setStartOffset(i);
-                fadeIn.setDuration(i);
-                mControls.get(j).setAnimation(fadeIn);
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable(){
-                    @Override
-                    public void run()
-                    {
-                        mControls.get(jj).setVisibility(View.GONE);
-                    }
-                }, i * 2);
+    private void showWidgetControlButtonsOnSwipeRight(boolean firstLoad) {
 
+        SharedPrefs.setControlsInVisible(mWidgetControlsInvisible, mContext);
+        if(mWidgetControlsInvisible) {
+            if(firstLoad) {
+                for(int i = 0; i < mControls.size(); i++) {
+                    mControls.get(i).setVisibility(View.GONE);
+                }
+            } else {
+                for(int i = 100, j = 4; i < 600; i = i + 100, j--) {
+                    final int jj = j;
+                    mControls.get(j).setVisibility(View.VISIBLE);
+                    final Animation fadeIn = new AlphaAnimation(1,0);
+                    fadeIn.setStartOffset(i);
+                    fadeIn.setDuration(i);
+                    mControls.get(j).setAnimation(fadeIn);
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable(){
+                        @Override
+                        public void run()
+                        {
+                            mControls.get(jj).setVisibility(View.GONE);
+                        }
+                    }, i * 2);
+                }
             }
         } else {
             for(int i = 100, j = 0; i < 600; i = i + 100, j++) {
