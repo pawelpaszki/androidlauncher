@@ -23,50 +23,79 @@
         </ScrollView>
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/remove_page_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/add_page_button"
-            android:clickable="true"
-            android:src="@drawable/remove"
-            android:tint="@color/semiTransparent"
-            app:backgroundTint="@color/semiTransparent"
-            app:elevation="0dp"
-            app:fabSize="normal"
-            android:visibility="gone"
-            app:rippleColor="@color/semiTransparent" />
-
-        <android.support.design.widget.FloatingActionButton
             android:id="@+id/add_page_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
             android:clickable="true"
             android:src="@drawable/add"
             android:tint="@color/semiTransparent"
-            app:backgroundTint="@color/semiTransparent"
+            app:backgroundTint="#5C6BC0"
             app:elevation="0dp"
             app:fabSize="normal"
-            android:visibility="gone"
+            app:rippleColor="@color/semiTransparent" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/remove_page_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/add_page_button"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:clickable="true"
+            android:src="@android:drawable/ic_delete"
+            android:tint="@color/semiTransparent"
+            app:backgroundTint="#5C6BC0"
+            app:elevation="0dp"
+            app:fabSize="normal"
             app:rippleColor="@color/semiTransparent" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/pin_page"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/remove_page_button"
             android:clickable="true"
             android:src="@drawable/lock"
             android:tint="@color/semiTransparent"
-            android:visibility="gone"
-            app:backgroundTint="@color/colorTransparent"
+            app:backgroundTint="#5C6BC0"
             app:elevation="0dp"
             app:fabSize="normal"
             app:rippleColor="@color/semiTransparent" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/go_to_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/pin_page"
+            android:clickable="true"
+            android:src="@drawable/settings"
+            android:tint="@color/semiTransparent"
+            app:backgroundTint="#5C6BC0"
+            app:elevation="0dp"
+            app:fabSize="normal"
+            app:rippleColor="@color/semiTransparent" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/hide_controls"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/go_to_settings"
+            android:clickable="true"
+            android:src="@drawable/hide_controls"
+            android:tint="@color/semiTransparent"
+            app:backgroundTint="#5C6BC0"
+            app:elevation="0dp"
+            app:fabSize="normal"
+            app:rippleColor="@color/semiTransparent" />
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/complete_add_widget"
             android:src="@drawable/add"

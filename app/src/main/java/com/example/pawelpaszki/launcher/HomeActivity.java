@@ -1,5 +1,6 @@
 package com.example.pawelpaszki.launcher;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.appwidget.AppWidgetHost;
@@ -31,6 +32,9 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
@@ -154,7 +158,9 @@ public class HomeActivity extends Activity {
     private WidgetInfo launcherInfo;
     private int mCurrentWidgetWidth;
     private int mCurrentWidgetHeight;
-
+    private FloatingActionButton mGoToSettings;
+    private FloatingActionButton mHideControls;
+    private ArrayList<FloatingActionButton> mControls = new ArrayList<>();
 
     @Override
     protected void onStart() {
@@ -280,6 +286,7 @@ public class HomeActivity extends Activity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if(!mAllScrollsDisabled) {
+                    Log.i("controls invisible", String.valueOf(mWidgetControlsInvisible));
                     if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() > 1) {
                         if (event.getAction() == MotionEvent.ACTION_DOWN) {
                             mStartScrollY = mWidgetScrollView.getScrollY();
@@ -297,8 +304,11 @@ public class HomeActivity extends Activity {
                             Log.i("y", String.valueOf(Math.abs(mStartScrollY - mEndScrollY)));
                             Log.i("x", String.valueOf(endScrollX - startScrollX));
                             if(Math.abs(mStartScrollY - mEndScrollY) < 50) {
-                                if(endScrollX - startScrollX > 200) {
-                                    showWidgetControlButtonsOnSwipeRight();
+                                if(endScrollX - startScrollX > 100) {
+                                    if(mWidgetControlsInvisible) {
+                                        mWidgetControlsInvisible = false;
+                                        showWidgetControlButtonsOnSwipeRight();
+                                    }
                                 } else if (startScrollX - endScrollX > 400 || (mIsWidgetPinned && startScrollX - endScrollX > 100)){
                                     onSwipeLeft();
                                 }
@@ -354,6 +364,23 @@ public class HomeActivity extends Activity {
         mWidgetContainer = (LinearLayout) findViewById (R.id.widget_container);
 
         ///// add saved widgets later //////////
+        mGoToSettings = (FloatingActionButton) findViewById(R.id.go_to_settings);
+        mGoToSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        mHideControls = (FloatingActionButton) findViewById(R.id.hide_controls);
+
+        mHideControls.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mWidgetControlsInvisible = true;
+                showWidgetControlButtonsOnSwipeRight();
+            }
+        });
 
         mAddPage = (FloatingActionButton) findViewById(R.id.add_page_button);
         mAddPage.setOnClickListener(new View.OnClickListener() {
@@ -401,6 +428,7 @@ public class HomeActivity extends Activity {
                     }
                     ((WidgetFrame) mWidgetContainer.getChildAt(viewToRemoveIndex)).getAppWidgetHost().stopListening();
                     ((WidgetFrame) mWidgetContainer.getChildAt(viewToRemoveIndex)).getAppWidgetHost().deleteAppWidgetId(widgetIds.get(viewToRemoveIndex));
+                    Log.i("removed index 404", String.valueOf(viewToRemoveIndex));
                     mWidgetContainer.removeViewAt(viewToRemoveIndex);
                     widgetIds.remove(viewToRemoveIndex);
 
@@ -414,7 +442,7 @@ public class HomeActivity extends Activity {
                             mWidgetScrollView.postDelayed(new Runnable() {
                                 public void run() {
                                     mWidgetScrollView.smoothScrollTo(0, (scrollTo-1) * mSingleScrollHeight);
-                                    Log.i("current page 415", String.valueOf(scrollTo-1));
+                                    Log.i("current page 419", String.valueOf(scrollTo-1));
                                 }
                             },10);
                             ((WidgetFrame) mWidgetContainer.getChildAt(scrollTo-1)).getAppWidgetHost().startListening();
@@ -424,7 +452,7 @@ public class HomeActivity extends Activity {
                             mWidgetScrollView.postDelayed(new Runnable() {
                                 public void run() {
                                     mWidgetScrollView.smoothScrollTo(0, scrollTo * mSingleScrollHeight);
-                                    Log.i("current page 426", String.valueOf(scrollTo));
+                                    Log.i("current page 428", String.valueOf(scrollTo));
                                 }
                             },10);
                             ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
@@ -433,10 +461,10 @@ public class HomeActivity extends Activity {
                         SharedPrefs.saveWidgetsIds(mContext,widgetIds);
                     }
                     if (mWidgetContainer.getChildCount() == 1) {
-                        mPinPage.setVisibility(View.GONE);
+                        mPinPage.setEnabled(false);
                     }
                     if(mWidgetContainer.getChildCount() == 9) {
-                        mAddPage.setVisibility(View.VISIBLE);
+                        mAddPage.setEnabled(true);
                     }
                 }
             }
@@ -450,23 +478,26 @@ public class HomeActivity extends Activity {
                 SharedPrefs.setWidgetPinned(mIsWidgetPinned, mContext);
                 if(mIsWidgetPinned) {
                     mWidgetScrollView.setVerticalScrollBarEnabled(false);
-                    mAddPage.setVisibility(View.GONE);
-                    mRemovePage.setVisibility(View.GONE);
+                    mAddPage.setEnabled(false);
+                    mRemovePage.setEnabled(false);
                     mPinPage.setImageDrawable(ContextCompat.getDrawable(getmContext(), R.drawable.unlock));
-                    mPinPage.setVisibility(View.GONE);
                 } else {
                     mWidgetScrollView.setVerticalScrollBarEnabled(true);
                     if( mWidgetContainer.getChildCount() < 10) {
-                        mAddPage.setVisibility(View.VISIBLE);
+                        mAddPage.setEnabled(true);
                     }
                     if(mWidgetContainer.getChildCount() > 0) {
-                        mRemovePage.setVisibility(View.VISIBLE);
+                        mRemovePage.setEnabled(true);
                         mPinPage.setImageDrawable(ContextCompat.getDrawable(getmContext(), R.drawable.lock));
-                        mPinPage.setVisibility(View.VISIBLE);
                     }
                 }
             }
         });
+        mControls.add(mAddPage);
+        mControls.add(mRemovePage);
+        mControls.add(mPinPage);
+        mControls.add(mGoToSettings);
+        mControls.add(mHideControls);
 
         mGestureDetector = new GestureDetectorCompat(this, new MyGestureListener());
         RelativeLayout home = (RelativeLayout) findViewById(R.id.home_container);
@@ -656,11 +687,13 @@ public class HomeActivity extends Activity {
                 mResizeDown.setVisibility(View.GONE);
                 mResizeRight.setVisibility(View.GONE);
                 if(mWidgetContainer.getChildCount() < 10) {
-                    mAddPage.setVisibility(View.VISIBLE);
+                    mAddPage.setEnabled(true);
+                } else {
+                    mAddPage.setEnabled(false);
                 }
-                mRemovePage.setVisibility(View.VISIBLE);
+                mRemovePage.setEnabled(true);
                 if (mWidgetContainer.getChildCount() > 1) {
-                    mPinPage.setVisibility(View.VISIBLE);
+                    mPinPage.setEnabled(true);
                 }
                 SharedPrefs.setWidgetHeight(mContext, mCurrentWidgetHeight, appWidgetId);
                 SharedPrefs.setWidgetWidth(mContext, mCurrentWidgetWidth, appWidgetId);
@@ -901,7 +934,11 @@ public class HomeActivity extends Activity {
                     if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                         if(!mAllScrollsDisabled) {
                             if (diffX > 0) {
-                                showWidgetControlButtonsOnSwipeRight();
+                                Log.i("swipe: ", "right");
+                                if(mWidgetControlsInvisible) {
+                                    mWidgetControlsInvisible = false;
+                                    showWidgetControlButtonsOnSwipeRight();
+                                }
                             } else {
                                 onSwipeLeft();
                             }
@@ -916,22 +953,119 @@ public class HomeActivity extends Activity {
 
     private void showWidgetControlButtonsOnSwipeRight() {
         if(mWidgetControlsInvisible) {
-            Log.i("mWidgetContainer", String.valueOf(mWidgetContainer.getChildCount()));
-            if(mWidgetContainer.getChildCount() > 0 &&  !mIsWidgetPinned) {
-                mRemovePage.setVisibility(View.VISIBLE);
-            }
-            if(mWidgetContainer.getChildCount() > 1) {
-                mPinPage.setVisibility(View.VISIBLE);
-            }
-            if(mWidgetContainer.getChildCount() < 10 && !mIsWidgetPinned) {
-                mAddPage.setVisibility(View.VISIBLE);
+            for(int i = 100, j = 4; i < 600; i = i + 100, j--) {
+                final int jj = j;
+                mControls.get(j).setVisibility(View.VISIBLE);
+                final Animation fadeIn = new AlphaAnimation(1,0);
+                fadeIn.setStartOffset(i);
+                fadeIn.setDuration(i);
+                mControls.get(j).setAnimation(fadeIn);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable(){
+                    @Override
+                    public void run()
+                    {
+                        mControls.get(jj).setVisibility(View.GONE);
+                    }
+                }, i * 2);
+
             }
         } else {
-            mPinPage.setVisibility(View.GONE);
-            mAddPage.setVisibility(View.GONE);
-            mRemovePage.setVisibility(View.GONE);
+            for(int i = 100, j = 0; i < 600; i = i + 100, j++) {
+                mControls.get(j).setVisibility(View.VISIBLE);
+                final Animation fadeIn = new AlphaAnimation(0,1);
+                fadeIn.setStartOffset(i);
+                fadeIn.setDuration(i);
+                mControls.get(j).setAnimation(fadeIn);
+            }
+
+//            Handler handler = new Handler();
+//            handler.postDelayed(new Runnable(){
+//                @Override
+//                public void run()
+//                {
+//                    mAddPage.setVisibility(View.VISIBLE);
+//                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mAddPage.getLayoutParams());
+//                    params.leftMargin = -200;
+//                    mAddPage.setLayoutParams(params);
+//                    ObjectAnimator animation = ObjectAnimator.ofFloat(mAddPage, "translationX", 250f);
+//                    animation.setDuration(200);
+//                    animation.start();
+//                }
+//            }, 100);
+//            handler = new Handler();
+//            handler.postDelayed(new Runnable(){
+//                @Override
+//                public void run()
+//                {
+//                    mRemovePage.setVisibility(View.VISIBLE);
+//                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mRemovePage.getLayoutParams());
+//                    params.leftMargin = -200;
+//                    mRemovePage.setLayoutParams(params);
+//                    ObjectAnimator animation = ObjectAnimator.ofFloat(mRemovePage, "translationX", 250f);
+//                    animation.setDuration(200);
+//                    animation.start();
+//                }
+//            }, 200);
+//            handler = new Handler();
+//            handler.postDelayed(new Runnable(){
+//                @Override
+//                public void run()
+//                {
+//                    mPinPage.setVisibility(View.VISIBLE);
+//                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mPinPage.getLayoutParams());
+//                    params.leftMargin = -200;
+//                    mPinPage.setLayoutParams(params);
+//                    ObjectAnimator animation = ObjectAnimator.ofFloat(mPinPage, "translationX", 250f);
+//                    animation.setDuration(200);
+//                    animation.start();
+//                }
+//            }, 300);
+//            handler = new Handler();
+//            handler.postDelayed(new Runnable(){
+//                @Override
+//                public void run()
+//                {
+//                    mGoToSettings.setVisibility(View.VISIBLE);
+//                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mGoToSettings.getLayoutParams());
+//                    params.leftMargin = -200;
+//                    mGoToSettings.setLayoutParams(params);
+//                    ObjectAnimator animation = ObjectAnimator.ofFloat(mGoToSettings, "translationX", 250f);
+//                    animation.setDuration(200);
+//                    animation.start();
+//                }
+//            }, 400);
+//            handler = new Handler();
+//            handler.postDelayed(new Runnable(){
+//                @Override
+//                public void run()
+//                {
+//                    mHideControls.setVisibility(View.VISIBLE);
+//                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mHideControls.getLayoutParams());
+//                    params.leftMargin = -200;
+//                    mHideControls.setLayoutParams(params);
+//                    ObjectAnimator animation = ObjectAnimator.ofFloat(mHideControls, "translationX", 250f);
+//                    animation.setDuration(200);
+//                    animation.start();
+//                }
+//            }, 500);
+
+            if(mWidgetContainer.getChildCount() > 0 &&  !mIsWidgetPinned) {
+                mRemovePage.setEnabled(true);
+            } else {
+                mRemovePage.setEnabled(false);
+            }
+            if(mWidgetContainer.getChildCount() > 1) {
+                mPinPage.setEnabled(true);
+            } else {
+                mPinPage.setEnabled(false);
+            }
+            if(mWidgetContainer.getChildCount() < 10 && !mIsWidgetPinned) {
+                mAddPage.setEnabled(true);
+            } else {
+                mAddPage.setEnabled(false);
+            }
         }
-        mWidgetControlsInvisible = !mWidgetControlsInvisible;
     }
 
     private void onSwipeLeft() {

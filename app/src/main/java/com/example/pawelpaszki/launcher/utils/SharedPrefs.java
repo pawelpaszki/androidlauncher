@@ -265,4 +265,18 @@ public class SharedPrefs {
         String key = "widgetwidth" + widgetId;
         return prefs.getInt(key, 600);
     }
+
+    public static void setControlsVisible(boolean controlsVisible, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "controlsVisible";
+        editor.putBoolean(key, controlsVisible);
+        editor.apply();
+    }
+
+    public static boolean getControlsVisible(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "controlsVisible";
+        return prefs.getBoolean(key, false);
+    }
 }
