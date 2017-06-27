@@ -328,6 +328,9 @@ public class HomeActivity extends Activity {
             public boolean onTouch(View v, MotionEvent event) {
                 if(!mAllScrollsDisabled) {
                     if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() > 1) {
+                        if(event.getAction() == MotionEvent.ACTION_MOVE) {
+
+                        }
                         if (event.getAction() == MotionEvent.ACTION_DOWN) {
                             mStartScrollY = mWidgetScrollView.getScrollY();
                             startScrollX = (int) event.getX();
@@ -1135,7 +1138,7 @@ public class HomeActivity extends Activity {
 
     @Override
     protected void onPause() {
-        super.onPause();
+
         if(mSmsReceiver != null) {
             unregisterReceiver(mSmsReceiver);
             mSmsReceiver = null;
@@ -1153,6 +1156,7 @@ public class HomeActivity extends Activity {
             }
         }
         Log.i("on pause scroll y", String.valueOf(mWidgetScrollView.getScrollY()));
+        super.onPause();
 
     }
 
