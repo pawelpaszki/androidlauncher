@@ -143,8 +143,6 @@
                 android:id="@+id/no_of_apps_per_row"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/div4"
-                android:layout_alignParentEnd="true"
                 android:layout_gravity="end"
                 android:background="#ffffff"
                 android:drawSelectorOnTop="true"
@@ -154,7 +152,9 @@
                 android:popupBackground="#ffffff"
                 android:textAlignment="textEnd"
                 android:textColor="#1A237E"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:layout_below="@+id/div3"
+                android:layout_alignParentEnd="true" />
             <TextView
                 android:id="@+id/no_of_columns_desc"
                 android:layout_width="wrap_content"
@@ -171,7 +171,7 @@
                 android:layout_below="@+id/no_of_columns_desc"/>
             <TextView
                 android:id="@+id/set_wallpaper"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/div4"
@@ -182,7 +182,7 @@
                 android:onClick="changeWallpaper"/>
             <TextView
                 android:id="@+id/set_wallpaper_desc"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/set_wallpaper"
@@ -196,7 +196,7 @@
                 android:layout_below="@+id/set_wallpaper_desc"/>
             <TextView
                 android:id="@+id/set_icons"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/div5"
@@ -207,7 +207,7 @@
                 android:onClick="set_icons"/>
             <TextView
                 android:id="@+id/set_icons_desc"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/set_icons"
@@ -222,7 +222,7 @@
                 android:layout_below="@+id/set_icons_desc"/>
             <TextView
                 android:id="@+id/set_icon_web"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/div6"
@@ -233,7 +233,7 @@
                 android:onClick="set_icons_web"/>
             <TextView
                 android:id="@+id/set_icons_desc_web"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/set_icon_web"
@@ -248,7 +248,7 @@
                 android:layout_below="@+id/set_icons_desc_web"/>
             <TextView
                 android:id="@+id/reset_icon"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/div7"
@@ -256,11 +256,11 @@
                 android:textSize="16sp"
                 android:textColor="#1A237E"
                 android:text="@string/reset_icon"
-                android:onClick="set_icons"/>
+                android:onClick="reset_icons"/>
             <TextView
                 android:id="@+id/reset_icon_desc"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/reset_icon"
                 android:padding="12dp"
@@ -275,7 +275,7 @@
                 android:layout_below="@+id/reset_icon_desc"/>
             <TextView
                 android:id="@+id/set_color_wallpaper_wallpaper"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/div8"
@@ -286,7 +286,7 @@
                 android:onClick="setWallpaperColor"/>
             <TextView
                 android:id="@+id/set_color_wallpaper_desc"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/set_color_wallpaper_wallpaper"
@@ -296,31 +296,31 @@
                 android:textColor="#303F9F"
                 android:text="@string/set_solid_color_wallpaper_desc"
                 android:onClick="setWallpaperColor"/>
-            <View style="@style/Divider"
-                android:id="@+id/div9"
-                android:layout_below="@+id/set_color_wallpaper_desc"/>
-            <TextView
-                android:id="@+id/enable_safe_mode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/div9"
-                android:padding="12dp"
-                android:textSize="16sp"
-                android:textColor="#1A237E"
-                android:text="@string/enable_safe_mode"/>
-            <TextView
-                android:id="@+id/enable_safe_mode_desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/enable_safe_mode"
-                android:padding="12dp"
-                android:layout_marginTop="-22dp"
-                android:textSize="14sp"
-                android:textColor="#303F9F"
-                android:onClick="enableSafeMode"
-                android:text="@string/enable_safe_mode_desc"/>
+            <!--<View style="@style/Divider"-->
+                <!--android:id="@+id/div9"-->
+                <!--android:layout_below="@+id/set_color_wallpaper_desc"/>-->
+            <!--<TextView-->
+                <!--android:id="@+id/enable_safe_mode"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentStart="true"-->
+                <!--android:layout_below="@+id/div9"-->
+                <!--android:padding="12dp"-->
+                <!--android:textSize="16sp"-->
+                <!--android:textColor="#1A237E"-->
+                <!--android:text="@string/enable_safe_mode"/>-->
+            <!--<TextView-->
+                <!--android:id="@+id/enable_safe_mode_desc"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentStart="true"-->
+                <!--android:layout_below="@+id/enable_safe_mode"-->
+                <!--android:padding="12dp"-->
+                <!--android:layout_marginTop="-22dp"-->
+                <!--android:textSize="14sp"-->
+                <!--android:textColor="#303F9F"-->
+                <!--android:onClick="enableSafeMode"-->
+                <!--android:text="@string/enable_safe_mode_desc"/>-->
 
         </RelativeLayout>
     </ScrollView>

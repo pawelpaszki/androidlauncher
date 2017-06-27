@@ -37,6 +37,21 @@
             app:rippleColor="@color/semiTransparent" />
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/refresh_widget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:clickable="true"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/refresh"
+            android:tint="@color/semiTransparent"
+            app:backgroundTint="#5C6BC0"
+            app:elevation="0dp"
+            app:fabSize="normal"
+            app:rippleColor="@color/semiTransparent" />
+
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/remove_page_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

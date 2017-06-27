@@ -127,7 +127,7 @@ public class GridAdapter extends BaseAdapter{
             v.setTag("Phone");
             if(MissedCallsCountRetriever.getMissedCallsCount(mContext) > 0) {
                 messagesCount.setVisibility(View.VISIBLE);
-                messagesCount.setText(MissedCallsCountRetriever.getMissedCallsCount(mContext));
+                messagesCount.setText(String.valueOf(MissedCallsCountRetriever.getMissedCallsCount(mContext)));
             } else {
                 messagesCount.setVisibility(View.GONE);
             }

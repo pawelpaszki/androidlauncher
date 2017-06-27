@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 public class CustomViewGroup extends ViewGroup{
 
+    private boolean locked;
     public CustomViewGroup(Context context) {
         super(context);
     }
@@ -22,6 +23,14 @@ public class CustomViewGroup extends ViewGroup{
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         Log.v("customViewGroup", "**********Intercepted");
-        return true;
+        return locked;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 }

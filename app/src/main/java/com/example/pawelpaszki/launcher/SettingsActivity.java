@@ -145,7 +145,7 @@ public class SettingsActivity extends AppCompatActivity {
         TextView noOfColsDesc = (TextView) findViewById(R.id.no_of_columns_desc);
 
         sortDesc.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-        int width = sortDesc.getMeasuredWidth() * 8 / 10;
+        int width = sortDesc.getMeasuredWidth() * 3 / 4;
 
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) sortDesc.getLayoutParams();
         params.width = width;
@@ -158,14 +158,14 @@ public class SettingsActivity extends AppCompatActivity {
         params.width = width;
         noOfColsDesc.setLayoutParams(params);
 
-        mSafeMode = (TextView) findViewById(R.id.enable_safe_mode);
-
-        mSafeModeDesc = (TextView) findViewById(R.id.enable_safe_mode_desc);
-
-        if(SharedPrefs.getSafeModeOn(mContext)) {
-            mSafeMode.setText(R.string.disable_safe_mode);
-            mSafeModeDesc.setText(R.string.disable_safe_mode_desc);
-        }
+//        mSafeMode = (TextView) findViewById(R.id.enable_safe_mode);
+//
+//        mSafeModeDesc = (TextView) findViewById(R.id.enable_safe_mode_desc);
+//
+//        if(SharedPrefs.getSafeModeOn(mContext)) {
+//            mSafeMode.setText(R.string.disable_safe_mode);
+//            mSafeModeDesc.setText(R.string.disable_safe_mode_desc);
+//        }
 
     }
 

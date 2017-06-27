@@ -214,6 +214,7 @@ public class AppsListActivity extends Activity {
             intent.putExtra(Intent.EXTRA_RETURN_RESULT, true);
             startActivityForResult(intent, UNINSTALL_REQUEST_CODE);
         }
+        SharedPrefs.setHomeReloadRequired(true, this);
     }
 
         @Override
