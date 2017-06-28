@@ -95,10 +95,11 @@ public class ResetIconsActivity extends AppCompatActivity {
                 Bitmap icon = IconLoader.loadImageFromStorage(path, (String) mApps.get(position).getmLabel());
                 if(icon == null) {
                     icon  = ((BitmapDrawable) mApps.get(position).getmIcon()).getBitmap();
-                } else {
-                    // rounded ??
-                    //icon = RoundBitmapGenerator.getCircleBitmap(icon);
                 }
+//                else {
+//                    // rounded ??
+//                    //icon = RoundBitmapGenerator.getCircleBitmap(icon);
+//                }
 
                 ImageView appIcon = (ImageView)convertView.findViewById(R.id.visible_app_icon);
                 if(icon.getWidth() != mIconSide || icon.getHeight() != mIconSide) {

@@ -99,28 +99,14 @@ public class HomeActivity extends Activity {
     private BroadcastReceiver mPackageUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mDockLayout.removeAllViews();
-                    loadCarousel();
-                }
-            }, 50);
+            reloadCarousel();
         }
     };
 
     private BroadcastReceiver mSmsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mDockLayout.removeAllViews();
-                    loadCarousel();
-                }
-            }, 500);
+            reloadCarousel();
         }
     };
 
@@ -128,14 +114,7 @@ public class HomeActivity extends Activity {
     private ContentObserver missedCallObserver = new ContentObserver(null) {
         @Override
         public void onChange(boolean selfChange) {
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mDockLayout.removeAllViews();
-                    loadCarousel();
-                }
-            }, 500);
+            reloadCarousel();
         }
     };
     private WidgetFrame newWidgetPage;
@@ -167,20 +146,23 @@ public class HomeActivity extends Activity {
     private WindowManager mManager;
     private FloatingActionButton mRefreshWidget;
 
+    private void reloadCarousel() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mDockLayout.removeAllViews();
+                loadCarousel();
+            }
+        }, 200);
+    }
+
     @Override
     protected void onStart() {
         mSmsReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mDockLayout.removeAllViews();
-                        loadCarousel();
-                    }
-                }, 500);
-
+                reloadCarousel();
             }
         };
         registerReceiver(mSmsReceiver, new IntentFilter(
@@ -190,14 +172,7 @@ public class HomeActivity extends Activity {
         mPackageUpdateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mDockLayout.removeAllViews();
-                        loadCarousel();
-                    }
-                }, 50);
+                reloadCarousel();
             }
         };
         IntentFilter intentFilter = new IntentFilter();
@@ -312,9 +287,6 @@ public class HomeActivity extends Activity {
             public boolean onTouch(View v, MotionEvent event) {
                 if(!mAllScrollsDisabled) {
                     if(((LinearLayout) mWidgetScrollView.getChildAt(0)).getChildCount() > 1) {
-                        if(event.getAction() == MotionEvent.ACTION_MOVE) {
-
-                        }
                         if (event.getAction() == MotionEvent.ACTION_DOWN) {
                             mStartScrollY = mWidgetScrollView.getScrollY();
                             startScrollX = (int) event.getX();

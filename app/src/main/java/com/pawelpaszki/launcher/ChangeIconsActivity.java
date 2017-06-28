@@ -198,19 +198,17 @@ public class ChangeIconsActivity extends AppCompatActivity {
             } catch (IOException ignored) {
 
             }
+            Matrix matrix = new Matrix();
             switch(orientation) {
                 case 3:
-                    Matrix matrix = new Matrix();
                     matrix.postRotate(180);
                     bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                     break;
                 case 6:
-                    matrix = new Matrix();
                     matrix.postRotate(90);
                     bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                     break;
                 case 8:
-                    matrix = new Matrix();
                     matrix.postRotate(270);
                     bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                     break;

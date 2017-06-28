@@ -17,8 +17,6 @@ import android.webkit.DownloadListener;
 import android.webkit.WebView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-
-import com.pawelpaszki.launcher.R;
 import com.pawelpaszki.launcher.utils.CustomWebView;
 import com.pawelpaszki.launcher.utils.ImageDownloader;
 
@@ -123,7 +121,7 @@ public class GetWebImageActivity extends AppCompatActivity {
         if (menuItem.getItemId() == android.R.id.home) {
             goBack();
         }
-        return true;//super.onOptionsItemSelected(menuItem);
+        return true;
     }
 
     private void goBack() {
