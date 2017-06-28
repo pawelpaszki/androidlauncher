@@ -7,7 +7,7 @@ android:layout_height="match_parent"
 android:background="#FFFFFFFF"
 android:theme="@style/Theme.AppCompat"
 android:id="@+id/set_icons_container"
-tools:context="com.example.pawelpaszki.launcher.ChangeIconsActivity"
+tools:context="com.pawelpaszki.launcher.ChangeIconsActivity"
 android:weightSum="1">
 
 <android.support.v7.widget.Toolbar

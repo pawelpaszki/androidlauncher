@@ -877,7 +877,7 @@ public class HomeActivity extends Activity {
                 } else {
                     homeNotifications.setVisibility(View.GONE);
                 }
-            } else if(dockerApps.get(j).getmLabel().toString().equalsIgnoreCase("Phone")) {
+            } else if(dockerApps.get(j).getmLabel().toString().equalsIgnoreCase("Phone") || dockerApps.get(j).getmLabel().toString().equalsIgnoreCase("Phone")) {
                 view.setTag("Phone");
                 if(MissedCallsCountRetriever.getMissedCallsCount(this) > 0) {
                     homeNotifications.setText(String.valueOf(MissedCallsCountRetriever.getMissedCallsCount(this)));

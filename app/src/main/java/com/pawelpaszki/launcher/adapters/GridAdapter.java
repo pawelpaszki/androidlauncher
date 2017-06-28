@@ -120,7 +120,7 @@ public class GridAdapter extends BaseAdapter{
             } else {
                 messagesCount.setVisibility(View.GONE);
             }
-        } else if (text.equalsIgnoreCase("Phone")) {
+        } else if (text.equalsIgnoreCase("Phone") || text.equalsIgnoreCase("Telephone")) {
             v.setTag("Phone");
             if(MissedCallsCountRetriever.getMissedCallsCount(mContext) > 0) {
                 messagesCount.setVisibility(View.VISIBLE);

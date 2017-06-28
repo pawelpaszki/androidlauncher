@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.pawelpaszki.launcher.layouts.WidgetFrame xmlns:android="http://schemas.android.com/apk/res/android"
+<com.pawelpaszki.launcher.layouts.WidgetFrame xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:id="@+id/widget_page"
@@ -7,4 +7,4 @@
 
     >
 
-</com.example.pawelpaszki.launcher.layouts.WidgetFrame>
+</com.pawelpaszki.launcher.layouts.WidgetFrame>
