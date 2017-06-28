@@ -7,8 +7,8 @@
     android:layout_height="match_parent"
     android:background="#00000000"
     android:id="@+id/first_launch_screen"
-    tools:context="com.example.pawelpaszki.launcher.FirstLaunchActivity">
-    <com.example.pawelpaszki.launcher.adapters.NoScrollViewPager
+    tools:context="com.pawelpaszki.launcher.FirstLaunchActivity">
+    <com.pawelpaszki.launcher.adapters.NoScrollViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

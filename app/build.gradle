@@ -2,9 +2,9 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
     defaultConfig {
-        applicationId "com.example.pawelpaszki.launcher"
+        applicationId "com.pawelpaszki.launcher"
         minSdkVersion 21
         targetSdkVersion 22
         versionCode 1
