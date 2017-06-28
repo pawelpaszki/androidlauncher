@@ -97,8 +97,15 @@ public class GridAdapter extends BaseAdapter{
         FrameLayout.LayoutParams margins = new FrameLayout.LayoutParams(imageView.getLayoutParams());
         margins.topMargin = 80 / noOfCols;
         margins.bottomMargin = 80 / noOfCols;
-        margins.leftMargin = noOfCols;
-        margins.rightMargin = noOfCols;
+        int screenWidth = SharedPrefs.getScreenWidth(mContext);
+        if(screenWidth > 1000) {
+            margins.leftMargin = noOfCols * 2;
+            margins.rightMargin = noOfCols * 2;
+        } else {
+            margins.leftMargin = noOfCols;
+            margins.rightMargin = noOfCols;
+        }
+
         String text = (String) mApps.get(position).getmLabel();
 //        if(noOfCols >= 5 || !SharedPrefs.getShowAppNames(mContext)) {
 //            textView.setVisibility(View.GONE);

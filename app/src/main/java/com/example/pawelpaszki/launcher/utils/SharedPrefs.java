@@ -319,4 +319,18 @@ public class SharedPrefs {
         String key = "homeRecreateRequired";
         return prefs.getBoolean(key, false);
     }
+
+    public static void saveScreenWidth(Context context, int width) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "screenwidth";
+        editor.putInt(key, width);
+        editor.apply();
+    }
+
+    public static int getScreenWidth(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String key = "screenwidth";
+        return prefs.getInt(key, 0);
+    }
 }

@@ -64,6 +64,7 @@ import java.util.List;
 import java.util.Random;
 
 import static com.example.pawelpaszki.launcher.utils.SharedPrefs.getCurrentWidgetPage;
+import static com.example.pawelpaszki.launcher.utils.SoftButtonsSizeRetriever.getSoftButtonsBarHeight;
 
 /**
  * Last Edited by PawelPaszki on 19/06/2017.
@@ -244,6 +245,9 @@ public class HomeActivity extends Activity {
                 @Override
                 public void onGlobalLayout() {
                     mSingleScrollHeight = mWidgetScrollView.getHeight();
+                    int screenWidth = mWidgetScrollView.getWidth();
+                    Log.i("width", String.valueOf(screenWidth));
+                    SharedPrefs.saveScreenWidth(mContext, screenWidth);
                     mWidgetScrollView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     Log.i("mSingleScrollHeight", String.valueOf(mSingleScrollHeight));
                     mWidgetScrollView.postDelayed(new Runnable() {
@@ -293,18 +297,14 @@ public class HomeActivity extends Activity {
         Log.i("oncreate", "home activity created");
         setContentView(R.layout.activity_home);
 
-        //TODO ????
-//        boolean firstLaunch = SharedPrefs.getIsFirstLaunch(this);
-//        if(firstLaunch) {
-//            WallpaperManager myWallpaperManager
-//                    = WallpaperManager.getInstance(getApplicationContext());
-//            try {
-//                myWallpaperManager.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background));
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            SharedPrefs.setIsFirstLaunch(false,this);
-//        }
+        boolean firstLaunch = SharedPrefs.getIsFirstLaunch(this);
+        // change back
+        if(!firstLaunch) {
+            SharedPrefs.setIsFirstLaunch(false,this);
+            Intent intent = new Intent(HomeActivity.this, FirstLaunchActivity.class);
+            startActivity(intent);
+        }
+
         mContext = this;
 
         mAppWidgetManager = AppWidgetManager.getInstance(this);
@@ -532,8 +532,12 @@ public class HomeActivity extends Activity {
         mRefreshWidget.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recreate();
-
+                if(mWidgetContainer.getChildCount() > 0) {
+                    recreate();
+                } else {
+                    Toast.makeText(HomeActivity.this,"No widget to refresh" ,
+                            Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -879,9 +883,9 @@ public class HomeActivity extends Activity {
         mTopContainer = (RelativeLayout) findViewById(R.id.top_container);
         final RelativeLayout.LayoutParams topContainerParams = new RelativeLayout.LayoutParams(mTopContainer.getLayoutParams());
         mTopContainerWidth = width;
-        mTopContainerHeight = height - width/5 - getSoftButtonsBarHeight() * 2;
+        mTopContainerHeight = height - width/5 - getSoftButtonsBarHeight(this) * 2;
         topContainerParams.height = mTopContainerHeight;
-        topContainerParams.topMargin = getSoftButtonsBarHeight();
+        topContainerParams.topMargin = getSoftButtonsBarHeight(this);
         mTopContainer.setLayoutParams(topContainerParams);
 
         List<ResolveInfo> availableActivities = mPackageManager.queryIntentActivities(i, 0);
@@ -989,17 +993,7 @@ public class HomeActivity extends Activity {
         }
     }
 
-    private int getSoftButtonsBarHeight() {
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int usableHeight = metrics.heightPixels;
-        getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-        int realHeight = metrics.heightPixels;
-        if (realHeight > usableHeight)
-            return realHeight - usableHeight;
-        else
-            return 0;
-    }
+
 
 
     @Override
