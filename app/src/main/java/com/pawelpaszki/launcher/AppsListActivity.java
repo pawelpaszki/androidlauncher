@@ -46,31 +46,14 @@ public class AppsListActivity extends Activity {
     private BroadcastReceiver mSmsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            for(int i = 0; i < mGridView.getChildCount(); i++) {
-                if(mGridView.getChildAt(i).getTag().equals("Messaging")) {
-                    mAppLabelTextView = (TextView) ((FrameLayout) ((LinearLayout) mGridView.getChildAt(i)).getChildAt(0)).getChildAt(1);
-                    final Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mAppLabelTextView.setText(String.valueOf(MissedCallsCountRetriever.getUnreadMessagesCount(AppsListActivity.this)));
-                        }
-                    }, 500);
-                }
-            }
+            onSmsReceive();
         }
     };
 
     private BroadcastReceiver mPackageUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    recreate();
-                }
-            }, 50);
+            reload();
         }
     };
     private boolean mUninstalled;
@@ -80,18 +63,7 @@ public class AppsListActivity extends Activity {
         mSmsReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                for(int i = 0; i < mGridView.getChildCount(); i++) {
-                    if(mGridView.getChildAt(i).getTag().equals("Messaging")) {
-                        mAppLabelTextView = (TextView) ((FrameLayout) ((LinearLayout) mGridView.getChildAt(i)).getChildAt(0)).getChildAt(1);
-                        final Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                mAppLabelTextView.setText(String.valueOf(MissedCallsCountRetriever.getUnreadMessagesCount(AppsListActivity.this)));
-                            }
-                        }, 500);
-                    }
-                }
+                onSmsReceive();
             }
         };
         registerReceiver(mSmsReceiver, new IntentFilter(
@@ -100,13 +72,7 @@ public class AppsListActivity extends Activity {
         mPackageUpdateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        recreate();
-                    }
-                }, 50);
+                reload();
             }
         };
         IntentFilter intentFilter = new IntentFilter();
@@ -127,6 +93,31 @@ public class AppsListActivity extends Activity {
             }
         }
         super.onStart();
+    }
+
+    private void onSmsReceive() {
+        for(int i = 0; i < mGridView.getChildCount(); i++) {
+            if(mGridView.getChildAt(i).getTag().equals("Messaging")) {
+                mAppLabelTextView = (TextView) ((FrameLayout) ((LinearLayout) mGridView.getChildAt(i)).getChildAt(0)).getChildAt(1);
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAppLabelTextView.setText(String.valueOf(MissedCallsCountRetriever.getUnreadMessagesCount(AppsListActivity.this)));
+                    }
+                }, 500);
+            }
+        }
+    }
+
+    private void reload() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                recreate();
+            }
+        }, 50);
     }
 
     @Override
@@ -317,37 +308,35 @@ public class AppsListActivity extends Activity {
             numberOfApps++;
         }
         SharedPrefs.setNumberOfApps(numberOfApps, this);
-        mApps = AppsSorter.sortApps(this, mApps, SharedPrefs.getSortingMethod(this), false);
+        mApps = AppsSorter.sortApps(mApps, SharedPrefs.getSortingMethod(this));
     }
 
     public void highlightView(String tag) {
         mHighlightedViewTag = tag;
-        for(int i = 0; i < mGridView.getChildCount(); i++) {
-            if (mGridView.getChildAt(i).getTag().equals(tag)) {
-                LinearLayout view = (LinearLayout) mGridView.getChildAt(i);
-                GradientDrawable border = new GradientDrawable();
-                border.setColor(0x00FFFFFF);
-                border.setStroke(3, 0xFFFF0000);
-                view.setBackground(border);
-                break;
-            }
-        }
+        setAroundAppIconBorder(0x00FFFFFF);
     }
 
     public void unHighlightView() {
-        for(int i = 0; i < mGridView.getChildCount(); i++) {
-            if (mGridView.getChildAt(i).getTag().equals(mHighlightedViewTag)) {
-                LinearLayout view = (LinearLayout) mGridView.getChildAt(i);
-                GradientDrawable border = new GradientDrawable();
-                border.setColor(0x00000000);
-                view.setBackground(border);
-                break;
-            }
-        }
+        setAroundAppIconBorder(0x00000000);
         mHighlightedViewTag = "";
         if(mUninstalled){
             mUninstalled = false;
             recreate();
+        }
+    }
+
+    private void setAroundAppIconBorder(int color) {
+        for(int i = 0; i < mGridView.getChildCount(); i++) {
+            if (mGridView.getChildAt(i).getTag().equals(mHighlightedViewTag)) {
+                LinearLayout view = (LinearLayout) mGridView.getChildAt(i);
+                GradientDrawable border = new GradientDrawable();
+                border.setColor(color);
+                if(color != 0x00000000) {
+                    border.setStroke(3, 0xFFFF0000);
+                }
+                view.setBackground(border);
+                break;
+            }
         }
     }
 

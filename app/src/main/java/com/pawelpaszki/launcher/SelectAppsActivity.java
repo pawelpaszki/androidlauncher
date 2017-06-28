@@ -53,7 +53,7 @@ public class SelectAppsActivity extends AppCompatActivity {
             }
             mApps.add(app);
         }
-        mApps = AppsSorter.sortApps(this,mApps, "most used", false);
+        mApps = AppsSorter.sortApps(mApps, "most used");
     }
 
     private void loadListView(){

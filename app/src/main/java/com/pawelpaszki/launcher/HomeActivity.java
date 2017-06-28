@@ -887,7 +887,7 @@ public class HomeActivity extends Activity {
             numberOfApps++;
         }
         SharedPrefs.setNumberOfApps(numberOfApps, mContext);
-        AppsSorter.sortApps(this, dockerApps, "most used", true);
+        AppsSorter.sortApps(dockerApps, "most used");
         int j;
         for(j = 0; j < dockerApps.size(); j++) {
             View view = LayoutInflater.from(this).inflate(R.layout.dock_item,null);

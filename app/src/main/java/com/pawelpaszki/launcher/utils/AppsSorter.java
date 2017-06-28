@@ -14,7 +14,7 @@ import java.util.List;
 
 public class AppsSorter {
 
-    public static List<AppDetail> sortApps(Context context, List<AppDetail> apps, String parameter, boolean isHomeActivity) {
+    public static List<AppDetail> sortApps(List<AppDetail> apps, String parameter) {
 
         if(parameter.equals("name")) {
             Collections.sort(apps, new Comparator<AppDetail>() {
