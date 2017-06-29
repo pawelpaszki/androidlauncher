@@ -3,7 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center_horizontal|center_vertical"
+    android:gravity="center_horizontal"
     android:id="@+id/apps_list">
     <FrameLayout
         android:layout_width="wrap_content"
@@ -15,7 +15,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
             android:scaleType="fitXY"
             android:adjustViewBounds="true"
             />
@@ -46,8 +45,7 @@
         android:shadowDx="1.5"
         android:shadowDy="1.3"
         android:shadowRadius="1.6"
-        android:layout_marginBottom="12dp"
-        android:maxLines="1"
+        android:maxLines="2"
         android:ellipsize="end"
         />
 

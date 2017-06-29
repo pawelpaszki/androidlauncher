@@ -3,6 +3,7 @@ package com.pawelpaszki.launcher.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -11,6 +12,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +50,6 @@ public class GridAdapter extends BaseAdapter{
     private LinearLayout mUninstallPackage;
     private static LayoutInflater sInflater =null;
     public GridAdapter(AppsListActivity appsListActivity, List<AppDetail> mApps, PackageManager mPackageManager, int mIconSide, LinearLayout mUninstallPackage) {
-        // TODO Auto-generated constructor stub
         this.mApps = mApps;
         mContext =appsListActivity;
         Bitmap icon = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.imageviewbg);
@@ -178,6 +179,13 @@ public class GridAdapter extends BaseAdapter{
         } else {
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,fontSize);
         }
+
+        float density = mContext.getResources().getDisplayMetrics().density;
+        int px = (int) ((int) fontSize * density);
+
+        float lineSpacing = textView.getPaint().getFontSpacing() * textView.getLineSpacingMultiplier() + textView.getLineSpacingExtra();
+
+        textView.setHeight((int) (px * 2 + lineSpacing / 2));
         messagesCount.setTextSize(TypedValue.COMPLEX_UNIT_SP,fontSize);
 
         RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(v.getResources(), mBgIcon);
@@ -217,6 +225,8 @@ public class GridAdapter extends BaseAdapter{
 
         return v;
     }
+
+
 
 }
 
