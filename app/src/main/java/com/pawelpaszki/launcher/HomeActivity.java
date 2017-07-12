@@ -219,6 +219,7 @@ public class HomeActivity extends Activity {
                         }
                     },10);
                     ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
+                    //mWidgetScrollView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
             });
 
@@ -486,6 +487,8 @@ public class HomeActivity extends Activity {
             public void onClick(View v) {
                 if(mWidgetContainer.getChildCount() > 0) {
                     mWidgetContainer.removeAllViews();
+                    Log.i("current widget page", String.valueOf(mCurrentWidgetPage));
+                    SharedPrefs.setCurrentWidgetPage(mContext, mCurrentWidgetPage);
                     loadSavedWidgets(widgetIds);
                 } else {
                     Toast.makeText(HomeActivity.this,"No widget to refresh" ,
@@ -628,16 +631,19 @@ public class HomeActivity extends Activity {
 
             mWidgetContainer.addView(newWidgetPage);
         }
-        mCurrentWidgetPage = getCurrentWidgetPage(mContext);
-        if(mCurrentWidgetPage != 0) {
-            mSingleScrollHeight = mWidgetScrollView.getChildAt(0).getHeight();
-            mWidgetScrollView.postDelayed(new Runnable() {
-                public void run() {
-                    mWidgetScrollView.smoothScrollTo(0, mCurrentWidgetPage * mSingleScrollHeight);
-                }
-            },10);
-        }
-        ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
+//
+//        if(mCurrentWidgetPage != 0) {
+//
+//            mWidgetScrollView.postDelayed(new Runnable() {
+//                public void run() {
+//                    mCurrentWidgetPage = getCurrentWidgetPage(mContext);
+//                    mSingleScrollHeight = mWidgetScrollView.getChildAt(0).getHeight();
+//                    mWidgetScrollView.smoothScrollTo(0, mCurrentWidgetPage * mSingleScrollHeight);
+//                    ((WidgetFrame) mWidgetContainer.getChildAt(mCurrentWidgetPage)).getAppWidgetHost().startListening();
+//                }
+//            },1);
+//        }
+
     }
 
     private void completeAddAppWidget(Intent data) {
