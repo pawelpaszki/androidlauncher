@@ -311,7 +311,9 @@ public class HomeActivity extends Activity {
                                         showWidgetControlButtonsOnSwipeRight(false);
                                     }
                                 } else if (startScrollX - endScrollX > 400 || (mIsWidgetPinned && startScrollX - endScrollX > 100)){
-                                    onSwipeLeft();
+                                    if(mWidgetControlsInvisible) {
+                                        onSwipeLeft();
+                                    }
                                 } else {
                                     if(!(mStartScrollY == mEndScrollY)) {
                                         mWidgetScrollView.postDelayed(new Runnable() {
@@ -982,7 +984,9 @@ public class HomeActivity extends Activity {
                                     showWidgetControlButtonsOnSwipeRight(false);
                                 }
                             } else {
-                                onSwipeLeft();
+                                if(mWidgetControlsInvisible) {
+                                    onSwipeLeft();
+                                }
                             }
                         }
                     }
