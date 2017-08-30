@@ -111,7 +111,7 @@ public class GetWebImageActivity extends AppCompatActivity {
         mWebView.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-                Log.i("about to download", url);
+//                Log.i("about to download", url);
             }
         });
     }

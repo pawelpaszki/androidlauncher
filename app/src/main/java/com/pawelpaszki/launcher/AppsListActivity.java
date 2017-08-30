@@ -214,7 +214,7 @@ public class AppsListActivity extends Activity {
                     } else if (resultCode == RESULT_CANCELED) {
                         hideUninstallView(null);
                     } else if (resultCode == RESULT_FIRST_USER) {
-                        Log.d("TAG", "onActivityResult: failed to (un)install");
+//                        Log.d("TAG", "onActivityResult: failed to (un)install");
                     }
                 } else {
                     unHighlightView();
@@ -303,7 +303,7 @@ public class AppsListActivity extends Activity {
                 }
 
                 mVisibleCount++;
-                Log.i("app starts", String.valueOf(ri.loadLabel(mPackageManager)) + " " + String.valueOf(ri.activityInfo.packageName) + " "+ SharedPrefs.getNumberOfActivityStarts(app.getmLabel().toString(), this));
+//                Log.i("app starts", String.valueOf(ri.loadLabel(mPackageManager)) + " " + String.valueOf(ri.activityInfo.packageName) + " "+ SharedPrefs.getNumberOfActivityStarts(app.getmLabel().toString(), this));
             }
             numberOfApps++;
         }

@@ -22,7 +22,7 @@ public class CustomViewGroup extends ViewGroup{
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        Log.v("customViewGroup", "**********Intercepted");
+//        Log.v("customViewGroup", "**********Intercepted");
         return mLocked;
     }
 

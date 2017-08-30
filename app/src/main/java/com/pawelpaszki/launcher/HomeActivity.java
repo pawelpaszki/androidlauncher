@@ -489,7 +489,7 @@ public class HomeActivity extends Activity {
             public void onClick(View v) {
                 if(mWidgetContainer.getChildCount() > 0) {
                     mWidgetContainer.removeAllViews();
-                    Log.i("current widget page", String.valueOf(mCurrentWidgetPage));
+//                    Log.i("current widget page", String.valueOf(mCurrentWidgetPage));
                     SharedPrefs.setCurrentWidgetPage(mContext, mCurrentWidgetPage);
                     loadSavedWidgets(widgetIds);
                 } else {
@@ -862,7 +862,7 @@ public class HomeActivity extends Activity {
                 } else {
                     dockerApps.add(app);
                 }
-                Log.i("no of runs", "label: " + app.getmLabel() + ": " + " package name: " + String.valueOf(ri.activityInfo.packageName) + String.valueOf(app.getmNumberOfStarts()));
+//                Log.i("no of runs", "label: " + app.getmLabel() + ": " + " package name: " + String.valueOf(ri.activityInfo.packageName) + String.valueOf(app.getmNumberOfStarts()));
             }
             numberOfApps++;
         }
